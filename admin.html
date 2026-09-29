@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annly Pedidos · Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+/* Mismo sistema visual del panel de Annly Agenda */
+:root{
+  --violet:#7C3AED; --pink:#EC4899; --grad:linear-gradient(135deg,#7C3AED,#EC4899);
+  --ink:#1A1625; --ink-soft:#6B6680; --line:#ECE6F5; --bg:#F7F5FB; --card:#fff;
+  --lilac:#F3EBFC; --ok:#159A61; --warn:#B7791F; --err:#C2695A;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
+button,input,select,textarea{font-family:inherit;}
+:focus-visible{outline:2px solid var(--violet);outline-offset:2px;}
+
+/* ---------- Acceso ---------- */
+.login{min-height:100vh;display:grid;place-items:center;padding:24px;font-family:'DM Sans',sans-serif;}
+.login-card{width:100%;max-width:400px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:34px 30px;}
+.login-logo{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;letter-spacing:-.03em;}
+.login-logo span{color:var(--pink);}
+.login-sub{font-size:14px;color:var(--ink-soft);margin:6px 0 26px;line-height:1.5;}
+.fg{margin-bottom:14px;}
+.flbl{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.fi{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;background:#fff;color:var(--ink);}
+.fi:focus{border-color:var(--violet);outline:none;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;padding:13px 18px;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-grad{background:var(--grad);color:#fff;width:100%;}
+.btn-grad:disabled{opacity:.6;cursor:default;}
+.btn-line{background:#fff;color:var(--ink);border:1.5px solid var(--line);width:100%;}
+.msg{font-size:12.5px;min-height:18px;margin:4px 0 10px;color:var(--err);}
+.divider{display:flex;align-items:center;gap:10px;color:var(--ink-soft);font-size:12px;margin:16px 0;}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line);}
+.login-foot{font-size:12.5px;color:var(--ink-soft);text-align:center;margin-top:18px;}
+.login-foot a{color:var(--violet);font-weight:600;}
+
+/* ---------- Panel ---------- */
+.app{display:none;min-height:100vh;grid-template-columns:240px 1fr;}
+.app.on{display:grid;}
+.side{background:#fff;border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:4px;}
+.side-logo{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;padding:0 10px 18px;}
+.side-logo span{color:var(--pink);}
+.side-logo small{display:block;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;color:var(--violet);margin-top:2px;}
+.tab{display:flex;align-items:center;gap:10px;border:none;background:none;padding:11px 12px;border-radius:12px;font-size:14px;font-weight:600;color:var(--ink-soft);cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;}
+.tab i{font-size:19px;}
+.tab.on{background:var(--lilac);color:var(--violet);}
+.tab-sep{flex:1;}
+.main{padding:26px 30px 60px;max-width:1080px;width:100%;}
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
+.hdr h1{font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.01em;}
+.hdr p{font-size:13px;color:var(--ink-soft);margin-top:3px;}
+.hdr-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.chip-btn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;text-decoration:none;}
+.sel-negocio{border:1.5px solid var(--line);border-radius:999px;padding:8px 12px;font-size:12.5px;font-weight:600;background:#fff;}
+
+/* Resumen del día */
+.hoy{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:22px;}
+.hoy-item{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;}
+.hoy-item b{display:block;font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;}
+.hoy-item span{font-size:12.5px;color:var(--ink-soft);}
+.hoy-item.alerta b{color:var(--warn);}
+
+/* Primeros pasos: una secuencia real, por eso va numerada */
+.guia{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 22px 8px;}
+.guia h2{font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800;}
+.guia > p{font-size:13px;color:var(--ink-soft);margin:4px 0 16px;}
+.barra{height:6px;background:var(--lilac);border-radius:999px;overflow:hidden;margin-bottom:10px;}
+.barra div{height:100%;background:var(--grad);border-radius:999px;transition:width .4s;}
+.paso{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line);}
+.paso-n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;flex-shrink:0;border:1.5px solid var(--line);color:var(--ink-soft);font-family:'DM Sans',sans-serif;}
+.paso.hecho .paso-n{background:var(--ok);border-color:var(--ok);color:#fff;}
+.paso-txt{flex:1;min-width:0;}
+.paso-txt strong{display:block;font-size:14px;}
+.paso-txt span{font-size:12.5px;color:var(--ink-soft);}
+.paso .chip-btn{flex-shrink:0;}
+.paso.hecho .paso-txt strong{color:var(--ink-soft);}
+
+.vacio{background:#fff;border:1.5px dashed #DCCFF1;border-radius:18px;padding:40px 24px;text-align:center;}
+.vacio i{font-size:30px;color:var(--violet);}
+.vacio h3{font-family:'DM Sans',sans-serif;font-size:16px;margin:10px 0 6px;}
+.vacio p{font-size:13px;color:var(--ink-soft);max-width:420px;margin:0 auto;line-height:1.55;}
+
+.aviso{display:none;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;max-width:460px;margin:12vh auto;text-align:center;}
+.aviso.on{display:block;}
+.aviso h2{font-family:'DM Sans',sans-serif;font-size:18px;margin-bottom:8px;}
+.aviso p{font-size:13.5px;color:var(--ink-soft);line-height:1.55;margin-bottom:16px;}
+
+@media(max-width:860px){
+  .app.on{grid-template-columns:1fr;}
+  .side{flex-direction:row;overflow-x:auto;padding:10px;border-right:none;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;}
+  .side-logo,.tab-sep{display:none;}
+  .tab{white-space:nowrap;padding:9px 12px;}
+  .main{padding:20px 16px 50px;}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<!-- Acceso -->
+<div class="login" id="login" style="display:none;">
+  <div class="login-card">
+    <div class="login-logo">Annly<span>.</span></div>
+    <p class="login-sub">Entra al panel de pedidos de tu negocio.</p>
+    <div class="fg"><label class="flbl" for="l-email">Correo</label><input class="fi" id="l-email" type="email" autocomplete="email"></div>
+    <div class="fg"><label class="flbl" for="l-pass">Contraseña</label><input class="fi" id="l-pass" type="password" autocomplete="current-password"></div>
+    <p class="msg" id="l-msg"></p>
+    <button class="btn btn-grad" id="l-btn" onclick="entrar()">Entrar</button>
+    <div class="divider">o</div>
+    <button class="btn btn-line" onclick="entrarGoogle()"><i class="ti ti-brand-google"></i> Continuar con Google</button>
+    <p class="login-foot">¿Aún no tienes cuenta? <a id="l-registro" href="#">Crea tu tienda</a></p>
+  </div>
+</div>
+
+<!-- Avisos de acceso -->
+<div class="aviso" id="aviso-citas">
+  <h2>Tu negocio usa Annly Agenda</h2>
+  <p>Esta cuenta es de un negocio de citas. Su panel está en Annly Agenda.</p>
+  <a class="btn btn-grad" id="btn-ir-agenda" href="#">Ir a mi panel de citas</a>
+</div>
+<div class="aviso" id="aviso-sin-negocio">
+  <h2>Aún no tienes una tienda</h2>
+  <p>Crea tu negocio en el registro de Annly y elige "Venta de productos por pedido".</p>
+  <a class="btn btn-grad" id="btn-ir-registro" href="#">Crear mi tienda</a>
+  <p style="margin-top:14px;"><a href="#" onclick="Pedidos.salir();return false;" style="color:var(--violet);font-size:12.5px;">Entrar con otra cuenta</a></p>
+</div>
+
+<!-- Panel -->
+<div class="app" id="app">
+  <nav class="side" aria-label="Secciones">
+    <div class="side-logo">Annly<span>.</span><small>Pedidos</small></div>
+    <button class="tab on" data-tab="inicio" onclick="irTab('inicio')"><i class="ti ti-home"></i>Inicio</button>
+    <button class="tab" data-tab="pedidos" onclick="irTab('pedidos')"><i class="ti ti-receipt"></i>Pedidos</button>
+    <button class="tab" data-tab="catalogo" onclick="irTab('catalogo')"><i class="ti ti-flower"></i>Catálogo</button>
+    <button class="tab" data-tab="inventario" onclick="irTab('inventario')"><i class="ti ti-packages"></i>Inventario</button>
+    <button class="tab" data-tab="entregas" onclick="irTab('entregas')"><i class="ti ti-truck-delivery"></i>Entregas y horarios</button>
+    <button class="tab" data-tab="config" onclick="irTab('config')"><i class="ti ti-settings"></i>Configuración</button>
+    <div class="tab-sep"></div>
+    <button class="tab" onclick="Pedidos.salir()"><i class="ti ti-logout"></i>Cerrar sesión</button>
+  </nav>
+
+  <main class="main">
+    <div class="hdr">
+      <div>
+        <h1 id="hdr-nombre">Tu tienda</h1>
+        <p id="hdr-sub"></p>
+      </div>
+      <div class="hdr-actions">
+        <select class="sel-negocio" id="sel-negocio" style="display:none;" onchange="cambiarNegocio(this.value)" aria-label="Negocio"></select>
+        <a class="chip-btn" id="btn-ver-tienda" href="#" target="_blank" rel="noopener"><i class="ti ti-external-link"></i> Ver mi tienda</a>
+        <button class="chip-btn" onclick="copiarLink(this)"><i class="ti ti-link"></i> <span>Copiar link</span></button>
+      </div>
+    </div>
+
+    <section id="tab-inicio">
+      <div class="hoy">
+        <div class="hoy-item"><b id="k-hoy">0</b><span>Pedidos para hoy</span></div>
+        <div class="hoy-item" id="k-pend-wrap"><b id="k-pend">0</b><span>Pagos por confirmar</span></div>
+      </div>
+      <div class="guia" id="guia">
+        <h2>Primeros pasos</h2>
+        <p id="guia-sub">Completa estos pasos y tu tienda queda lista para recibir pedidos.</p>
+        <div class="barra"><div id="guia-barra" style="width:0%"></div></div>
+        <div id="guia-pasos"></div>
+      </div>
+    </section>
+
+    <section id="tab-otro" style="display:none;">
+      <div class="vacio">
+        <i class="ti ti-tools"></i>
+        <h3 id="otro-titulo">Sección en construcción</h3>
+        <p id="otro-texto">Esta sección llega en las próximas entregas.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="pedidos.js?v=1"></script>
+<script>
+const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
+document.getElementById('l-registro').href = ANNLY + '/registro.html';
+document.getElementById('btn-ir-registro').href = ANNLY + '/registro.html';
+
+function mostrar(id){
+  ['login','app','aviso-citas','aviso-sin-negocio'].forEach(x => {
+    const el = document.getElementById(x);
+    if (x === 'login') el.style.display = x === id ? 'grid' : 'none';
+    else el.classList.toggle('on', x === id);
+  });
+}
+
+async function arrancar(){
+  await Pedidos.tomarSesionDelHash();
+  let estado;
+  try { estado = await Pedidos.cargarNegocioDelPanel(); }
+  catch(e){ console.error(e); estado = 'sin-sesion'; }
+  if (estado === 'sin-sesion'){ mostrar('login'); return; }
+  if (estado === 'es-citas'){ document.getElementById('btn-ir-agenda').href = Pedidos.urlPanelAgenda(); mostrar('aviso-citas'); return; }
+  if (estado === 'sin-negocio'){ mostrar('aviso-sin-negocio'); return; }
+  mostrar('app');
+  pintarEncabezado();
+  await Pedidos.liberarVencidos();
+  await cargarInicio();
+}
+
+function pintarEncabezado(){
+  const n = Pedidos.negocio;
+  document.getElementById('hdr-nombre').textContent = n.nombre;
+  document.getElementById('hdr-sub').textContent = 'annly.app/' + n.slug;
+  document.getElementById('btn-ver-tienda').href = '/' + encodeURIComponent(n.slug);
+  const sel = document.getElementById('sel-negocio');
+  if (Pedidos.esPlatformAdmin && Pedidos.negocios.length){
+    sel.style.display = '';
+    sel.innerHTML = Pedidos.negocios.map(x => `<option value="${x.id}"${x.id === n.id ? ' selected' : ''}>${Pedidos.esc(x.nombre)}</option>`).join('');
+  }
+}
+
+async function cambiarNegocio(id){
+  Pedidos.seleccionarNegocio(id);
+  pintarEncabezado();
+  irTab('inicio');
+  await cargarInicio();
+}
+
+function copiarLink(btn){
+  const url = ANNLY + '/' + Pedidos.negocio.slug;
+  navigator.clipboard.writeText(url).then(() => {
+    const t = btn.querySelector('span'); const antes = t.textContent;
+    t.textContent = '¡Copiado!'; setTimeout(() => { t.textContent = antes; }, 1600);
+  });
+}
+
+// ---------- Inicio: resumen del día y primeros pasos ----------
+async function cargarInicio(){
+  const e = await Pedidos.estadoConfiguracion();
+  document.getElementById('k-hoy').textContent = e.pedidosHoy;
+  document.getElementById('k-pend').textContent = e.pendientes;
+  document.getElementById('k-pend-wrap').classList.toggle('alerta', e.pendientes > 0);
+
+  const pasos = [
+    { ok: e.categorias > 0, t: 'Crea tus categorías', d: e.categorias ? e.categorias + ' creadas' : 'Por ejemplo: Ramos, Arreglos, Cajas.', tab: 'catalogo', b: 'Crear categorías' },
+    { ok: e.productos > 0, t: 'Agrega tus productos', d: e.productos ? e.productos + ' en tu catálogo' : 'Foto, precio y descripción de cada uno.', tab: 'catalogo', b: 'Agregar productos' },
+    { ok: e.articulos > 0, t: 'Define los extras', d: e.articulos ? e.articulos + ' artículos en inventario' : 'Chocolates, globos, peluches: lo que el cliente puede sumar.', tab: 'inventario', b: 'Agregar extras' },
+    { ok: e.zonas > 0, t: 'Configura tus zonas de entrega', d: e.zonas ? e.zonas + ' zonas con su precio' : 'Cada zona con su costo de envío. Si solo haces retiro, puedes saltarlo.', tab: 'entregas', b: 'Crear zonas' },
+    { ok: e.franjas > 0, t: 'Define tus franjas y cuántos pedidos atiendes', d: e.franjas ? e.franjas + ' franjas activas' : 'Por ejemplo: de 9:00 a 12:00, máximo 5 pedidos.', tab: 'entregas', b: 'Crear franjas' },
+    { ok: e.yappy, t: 'Agrega tu número de Yappy', d: e.yappy ? 'Listo para cobrar' : 'Tus clientes pagan por Yappy y tú confirmas el pago.', tab: 'config', b: 'Agregar Yappy' }
+  ];
+  const hechos = pasos.filter(p => p.ok).length;
+  document.getElementById('guia-barra').style.width = Math.round(hechos / pasos.length * 100) + '%';
+  document.getElementById('guia-sub').textContent = hechos === pasos.length
+    ? 'Tu tienda está lista. Comparte tu link para empezar a recibir pedidos.'
+    : `Llevas ${hechos} de ${pasos.length}. Completa los pasos y tu tienda queda lista para recibir pedidos.`;
+  document.getElementById('guia-pasos').innerHTML = pasos.map((p, i) => `
+    <div class="paso${p.ok ? ' hecho' : ''}">
+      <div class="paso-n">${p.ok ? '<i class="ti ti-check"></i>' : i + 1}</div>
+      <div class="paso-txt"><strong>${p.t}</strong><span>${Pedidos.esc(p.d)}</span></div>
+      ${p.ok ? '' : `<button class="chip-btn" onclick="irTab('${p.tab}')">${p.b}</button>`}
+    </div>`).join('');
+}
+
+// ---------- Pestañas ----------
+const TEXTO_TABS = {
+  pedidos: ['Pedidos', 'Aquí verás los pedidos por fecha y franja, con su estado, pago y bitácora.'],
+  catalogo: ['Catálogo', 'Aquí crearás categorías y productos con foto, precio y sus extras.'],
+  inventario: ['Inventario', 'Aquí registrarás tus artículos, entradas de mercancía y stock mínimo.'],
+  entregas: ['Entregas y horarios', 'Aquí definirás zonas con su precio, franjas con su capacidad y fechas sin pedidos.'],
+  config: ['Configuración', 'Aquí ajustarás el tiempo mínimo de preparación, el pago y los datos de tu tienda.']
+};
+function irTab(tab){
+  document.querySelectorAll('.tab[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  document.getElementById('tab-inicio').style.display = tab === 'inicio' ? '' : 'none';
+  document.getElementById('tab-otro').style.display = tab === 'inicio' ? 'none' : '';
+  if (tab !== 'inicio'){
+    document.getElementById('otro-titulo').textContent = TEXTO_TABS[tab][0];
+    document.getElementById('otro-texto').textContent = TEXTO_TABS[tab][1];
+  } else cargarInicio();
+}
+
+// ---------- Acceso ----------
+async function entrar(){
+  const msg = document.getElementById('l-msg'), btn = document.getElementById('l-btn');
+  const email = document.getElementById('l-email').value.trim(), pass = document.getElementById('l-pass').value;
+  msg.textContent = '';
+  if (!email || !pass){ msg.textContent = 'Escribe tu correo y tu contraseña.'; return; }
+  btn.disabled = true;
+  try { await Pedidos.entrar(email, pass); await arrancar(); }
+  catch(e){ msg.textContent = 'Correo o contraseña incorrectos.'; }
+  btn.disabled = false;
+}
+async function entrarGoogle(){
+  try { await Pedidos.entrarConGoogle(); }
+  catch(e){ document.getElementById('l-msg').textContent = 'No se pudo abrir Google. Intenta de nuevo.'; }
+}
+document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+
+arrancar();
+</script>
+</body>
+</html>

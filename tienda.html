@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos en línea</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+/* Los colores salen del negocio (color_primario / color_secundario), como en Annly Agenda */
+:root{ --p:#7C3AED; --s:#EC4899; --ink:#1F1B2B; --ink-soft:#6B6680; --line:#ECE8F2; --bg:#FAF8FC; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+:focus-visible{outline:2px solid var(--p);outline-offset:2px;}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px;}
+
+header{background:#fff;border-bottom:1px solid var(--line);}
+.hero{display:flex;align-items:center;gap:16px;padding:26px 0 22px;}
+.logo{width:68px;height:68px;border-radius:50%;object-fit:cover;background:var(--bg);border:1px solid var(--line);flex-shrink:0;}
+.hero h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;letter-spacing:-.01em;}
+.hero p{font-size:13.5px;color:var(--ink-soft);margin-top:4px;}
+
+.cats{display:flex;gap:8px;overflow-x:auto;padding:16px 0 4px;scrollbar-width:none;}
+.cat{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+.cat.on{background:var(--p);border-color:var(--p);color:#fff;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;padding:18px 0 60px;}
+.prod{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;text-align:left;padding:0;font:inherit;color:inherit;display:flex;flex-direction:column;}
+.prod-foto{aspect-ratio:4/5;width:100%;object-fit:cover;background:linear-gradient(160deg,color-mix(in srgb,var(--p) 14%,#fff),color-mix(in srgb,var(--s) 14%,#fff));display:grid;place-items:center;color:var(--p);font-size:34px;}
+.prod-info{padding:12px 14px 14px;}
+.prod-info strong{display:block;font-family:'DM Sans',sans-serif;font-size:15px;}
+.prod-info span{display:block;font-size:12.5px;color:var(--ink-soft);margin:3px 0 8px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.prod-info b{font-family:'DM Sans',sans-serif;font-size:16px;color:var(--p);}
+
+.estado{text-align:center;padding:70px 20px;color:var(--ink-soft);font-size:14px;line-height:1.6;}
+.estado h2{font-family:'DM Sans',sans-serif;color:var(--ink);font-size:18px;margin-bottom:6px;}
+
+/* Detalle del producto */
+.ov{position:fixed;inset:0;background:rgba(25,20,35,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;}
+.ov.on{display:flex;}
+.hoja{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;}
+@media(min-width:640px){.ov{align-items:center;}.hoja{border-radius:22px;}}
+.hoja-foto{width:100%;aspect-ratio:16/11;object-fit:cover;background:linear-gradient(160deg,color-mix(in srgb,var(--p) 14%,#fff),color-mix(in srgb,var(--s) 14%,#fff));display:grid;place-items:center;color:var(--p);font-size:40px;}
+.hoja-body{padding:18px 20px 22px;}
+.hoja-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
+.hoja h3{font-family:'DM Sans',sans-serif;font-size:20px;}
+.hoja-desc{font-size:13.5px;color:var(--ink-soft);line-height:1.55;margin:6px 0 14px;}
+.cerrar{border:none;background:var(--bg);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0;}
+.sub{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;margin:14px 0 8px;}
+.extra{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer;font-size:13.5px;}
+.extra input{accent-color:var(--p);width:17px;height:17px;}
+.extra span{flex:1;}
+.extra b{font-weight:600;color:var(--ink-soft);}
+.total{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:14px;padding-top:14px;font-family:'DM Sans',sans-serif;}
+.total b{font-size:20px;}
+.btn-pedir{width:100%;margin-top:14px;border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--p),var(--s));cursor:pointer;font-family:'DM Sans',sans-serif;}
+.btn-pedir:disabled{opacity:.55;cursor:default;}
+.nota{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:8px;}
+
+footer{background:#fff;border-top:1px solid var(--line);padding:26px 0;font-size:13px;color:var(--ink-soft);}
+footer .wrap{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between;}
+footer a{color:var(--p);font-weight:600;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hero">
+      <img class="logo" id="t-logo" alt="" hidden>
+      <div>
+        <h1 id="t-nombre">Cargando…</h1>
+        <p id="t-sub">Haz tu pedido en línea</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="cats" id="t-cats" role="tablist" aria-label="Categorías"></div>
+  <div class="grid" id="t-grid"></div>
+  <div class="estado" id="t-estado" hidden></div>
+</main>
+
+<footer id="t-footer" hidden>
+  <div class="wrap">
+    <div id="t-dir"></div>
+    <div id="t-contacto"></div>
+  </div>
+</footer>
+
+<!-- Detalle del producto -->
+<div class="ov" id="ov-prod" onclick="if(event.target===this)cerrarProducto()">
+  <div class="hoja" role="dialog" aria-modal="true" aria-labelledby="p-nombre">
+    <div id="p-foto"></div>
+    <div class="hoja-body">
+      <div class="hoja-top">
+        <h3 id="p-nombre"></h3>
+        <button class="cerrar" onclick="cerrarProducto()" aria-label="Cerrar">×</button>
+      </div>
+      <p class="hoja-desc" id="p-desc"></p>
+      <div id="p-extras"></div>
+      <div class="total"><span>Total</span><b id="p-total"></b></div>
+      <button class="btn-pedir" id="p-btn" disabled>Elegir fecha y entrega</button>
+      <p class="nota">La fecha, la entrega y el pago se habilitan en la próxima entrega.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/pedidos.js?v=1"></script>
+<script>
+let CAT = { categorias: [], productos: [], zonas: [] };
+let CAT_SEL = null;
+let PROD = null;
+const E = Pedidos.esc;
+
+function estado(titulo, texto){
+  document.getElementById('t-grid').innerHTML = '';
+  document.getElementById('t-cats').innerHTML = '';
+  const el = document.getElementById('t-estado');
+  el.hidden = false;
+  el.innerHTML = `<h2>${E(titulo)}</h2><p>${E(texto)}</p>`;
+}
+
+async function arrancar(){
+  const slug = Pedidos.slugDeLaUrl();
+  if (!slug){ estado('Tienda no encontrada', 'Revisa el link que te compartieron.'); document.getElementById('t-nombre').textContent = 'Annly Pedidos'; return; }
+  let n;
+  try { n = await Pedidos.cargarNegocioPorSlug(slug); } catch(e){ console.error(e); }
+  if (!n || n.activo === false){ document.getElementById('t-nombre').textContent = 'Tienda no encontrada'; estado('Tienda no encontrada', 'Revisa el link que te compartieron.'); return; }
+  if (n.tipo_negocio !== 'pedidos'){
+    // Un negocio de citas: su agenda está en Annly
+    window.location.replace(((window.PEDIDOS_CONFIG || {}).ANNLY_URL || 'https://annly.app') + '/' + encodeURIComponent(n.slug));
+    return;
+  }
+  pintarNegocio(n);
+  try { CAT = await Pedidos.catalogo(); }
+  catch(e){ console.error(e); estado('No pudimos cargar el catálogo', 'Recarga la página en un momento.'); return; }
+  if (!CAT.productos.length){ estado('Catálogo en preparación', 'Pronto podrás hacer tus pedidos aquí.'); return; }
+  pintarCategorias();
+  pintarProductos();
+}
+
+function pintarNegocio(n){
+  document.title = n.nombre + ' · Pedidos en línea';
+  const r = document.documentElement.style;
+  if (n.color_primario) r.setProperty('--p', n.color_primario);
+  if (n.color_secundario) r.setProperty('--s', n.color_secundario);
+  document.getElementById('t-nombre').textContent = n.nombre;
+  document.getElementById('t-sub').textContent = n.tagline || (n.categoria ? n.categoria + ' · pedidos en línea' : 'Haz tu pedido en línea');
+  if (n.logo_url){ const l = document.getElementById('t-logo'); l.src = n.logo_url; l.alt = n.nombre; l.hidden = false; }
+  const wa = String(n.whatsapp || '').replace(/\D/g, '');
+  document.getElementById('t-dir').innerHTML = n.direccion ? '<i class="ti ti-map-pin"></i> ' + E(n.direccion) : '';
+  document.getElementById('t-contacto').innerHTML = [
+    wa ? `<a href="https://wa.me/${wa}" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i> WhatsApp</a>` : '',
+    n.instagram ? `<a href="https://instagram.com/${E(String(n.instagram).replace(/^@/, ''))}" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i> Instagram</a>` : ''
+  ].filter(Boolean).join(' &nbsp; ');
+  document.getElementById('t-footer').hidden = !(n.direccion || wa || n.instagram);
+}
+
+function pintarCategorias(){
+  const usadas = CAT.categorias.filter(c => CAT.productos.some(p => p.categoriaId === c.id));
+  const cats = [{ id: null, nombre: 'Todo' }, ...usadas];
+  document.getElementById('t-cats').innerHTML = cats.length > 2 ? cats.map(c =>
+    `<button class="cat${c.id === CAT_SEL ? ' on' : ''}" role="tab" aria-selected="${c.id === CAT_SEL}" onclick="elegirCategoria(${c.id ? `'${c.id}'` : 'null'})">${E(c.nombre)}</button>`).join('') : '';
+}
+function elegirCategoria(id){ CAT_SEL = id; pintarCategorias(); pintarProductos(); }
+
+function fotoHtml(p, clase){
+  return p.foto ? `<img class="${clase}" src="${E(p.foto)}" alt="${E(p.nombre)}" loading="lazy">` : `<div class="${clase}"><i class="ti ti-flower"></i></div>`;
+}
+
+function pintarProductos(){
+  const lista = CAT.productos.filter(p => !CAT_SEL || p.categoriaId === CAT_SEL);
+  document.getElementById('t-estado').hidden = true;
+  document.getElementById('t-grid').innerHTML = lista.map(p => `
+    <button class="prod" onclick="abrirProducto('${p.id}')">
+      ${fotoHtml(p, 'prod-foto')}
+      <div class="prod-info"><strong>${E(p.nombre)}</strong>${p.descripcion ? `<span>${E(p.descripcion)}</span>` : ''}<b>${Pedidos.dinero(p.precio)}</b></div>
+    </button>`).join('');
+}
+
+function abrirProducto(id){
+  PROD = CAT.productos.find(p => p.id === id);
+  if (!PROD) return;
+  document.getElementById('p-foto').innerHTML = fotoHtml(PROD, 'hoja-foto');
+  document.getElementById('p-nombre').textContent = PROD.nombre;
+  document.getElementById('p-desc').textContent = PROD.descripcion || '';
+  document.getElementById('p-extras').innerHTML = PROD.extras.length ? '<div class="sub">Agrégale algo especial</div>' + PROD.extras.map(x => `
+    <label class="extra"><input type="checkbox" class="p-extra" value="${x.id}" onchange="recalcular()"><span>${E(x.nombre)}</span><b>+${Pedidos.dinero(x.precio)}</b></label>`).join('') : '';
+  recalcular();
+  document.getElementById('ov-prod').classList.add('on');
+}
+function cerrarProducto(){ document.getElementById('ov-prod').classList.remove('on'); }
+function recalcular(){
+  const extras = [...document.querySelectorAll('.p-extra:checked')].map(i => PROD.extras.find(x => x.id === i.value));
+  const total = Number(PROD.precio) + extras.reduce((s, x) => s + Number(x.precio), 0);
+  document.getElementById('p-total').textContent = Pedidos.dinero(total);
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarProducto(); });
+
+arrancar();
+</script>
+</body>
+</html>

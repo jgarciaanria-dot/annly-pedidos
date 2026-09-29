@@ -1,0 +1,9 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/:slug", "destination": "/tienda.html" }
+  ],
+  "headers": [
+    { "source": "/(.*).js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+  ]
+}
