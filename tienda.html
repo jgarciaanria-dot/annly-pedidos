@@ -299,6 +299,33 @@ footer{animation:aparecer .6s ease both;}
   *,*::before,*::after{animation:none!important;transition:none!important;}
   .prod{opacity:1;}
 }
+
+
+/* =========================================================
+   Confirmación de pedido — celebración sutil
+   ========================================================= */
+.celebracion{position:fixed;inset:0;z-index:120;pointer-events:none;display:none;overflow:hidden;}
+.celebracion.on{display:block;}
+.celebracion::before{content:"";position:absolute;left:50%;top:50%;width:230px;height:230px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--p) 12%,transparent),transparent 68%);animation:celebracionGlow 1.25s ease-out both;}
+.corazon-flotante{position:absolute;left:var(--x);bottom:var(--y);font-size:var(--size);color:var(--p);opacity:0;filter:drop-shadow(0 5px 9px color-mix(in srgb,var(--p) 22%,transparent));animation:corazonSube var(--dur) var(--delay) cubic-bezier(.18,.72,.2,1) both;}
+.corazon-flotante:nth-child(even){color:var(--s);}
+.destello{position:absolute;left:var(--x);top:var(--y);width:6px;height:6px;border-radius:50%;background:var(--p);opacity:0;animation:destello .75s var(--delay) ease-out both;}
+.destello:nth-child(even){background:var(--s);}
+@keyframes corazonSube{0%{opacity:0;transform:translate3d(0,20px,0) scale(.45) rotate(-10deg);}15%{opacity:.9;}70%{opacity:.7;}100%{opacity:0;transform:translate3d(var(--drift),-180px,0) scale(1) rotate(var(--rot));}}
+@keyframes destello{0%{opacity:0;transform:scale(.2);}25%{opacity:.9;transform:scale(1);}100%{opacity:0;transform:scale(0) translateY(-18px);}}
+@keyframes celebracionGlow{0%{opacity:0;transform:translate(-50%,-50%) scale(.55);}35%{opacity:1;}100%{opacity:0;transform:translate(-50%,-50%) scale(1.25);}}
+
+/* Éxito: más elegante, sin recargar */
+.listo{position:relative;padding:12px 4px 8px;}
+.listo .check-wrap{width:68px;height:68px;margin:0 auto 10px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,color-mix(in srgb,var(--p) 11%,#fff),color-mix(in srgb,var(--s) 12%,#fff));box-shadow:0 12px 28px -18px var(--p);animation:pop .65s cubic-bezier(.2,.8,.2,1) both;}
+.listo .check-wrap i{font-size:35px;color:var(--p);animation:none;}
+.listo h3{font-size:22px;margin:2px 0 2px;letter-spacing:-.02em;}
+.listo .num{display:inline-flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--p) 8%,#fff);border:1px solid color-mix(in srgb,var(--p) 15%,#fff);border-radius:999px;padding:6px 13px;font-size:20px;margin:7px 0 10px;}
+.listo .paso-sub{max-width:390px;margin:0 auto 4px;}
+.resumen{background:linear-gradient(180deg,#fff,color-mix(in srgb,var(--p) 2%,#fff));box-shadow:0 8px 24px -24px rgba(31,27,43,.55);}
+.btn-sec{transition:transform .15s,background .2s,border-color .2s;}
+.btn-sec:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--p) 22%,#fff);background:color-mix(in srgb,var(--p) 3%,#fff);}
+
 </style>
 </head>
 <body>
@@ -354,6 +381,23 @@ footer{animation:aparecer .6s ease both;}
   </div>
 </footer>
 <a class="wa-flot" id="t-wa-flot" href="#" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp" hidden><i class="ti ti-brand-whatsapp"></i></a>
+
+
+
+<!-- Celebración ligera al completar el pedido -->
+<div class="celebracion" id="celebracion" aria-hidden="true">
+  <span class="corazon-flotante" style="--x:42%;--y:24%;--size:19px;--dur:1.15s;--delay:.00s;--drift:-18px;--rot:-12deg;">♥</span>
+  <span class="corazon-flotante" style="--x:50%;--y:27%;--size:25px;--dur:1.35s;--delay:.08s;--drift:14px;--rot:10deg;">♥</span>
+  <span class="corazon-flotante" style="--x:57%;--y:25%;--size:15px;--dur:1.05s;--delay:.16s;--drift:24px;--rot:18deg;">♥</span>
+  <span class="corazon-flotante" style="--x:36%;--y:30%;--size:13px;--dur:1.25s;--delay:.12s;--drift:-28px;--rot:-18deg;">♥</span>
+  <span class="corazon-flotante" style="--x:63%;--y:31%;--size:18px;--dur:1.45s;--delay:.22s;--drift:30px;--rot:14deg;">♥</span>
+  <span class="corazon-flotante" style="--x:47%;--y:22%;--size:12px;--dur:1.1s;--delay:.28s;--drift:-35px;--rot:-8deg;">♥</span>
+  <span class="corazon-flotante" style="--x:54%;--y:23%;--size:14px;--dur:1.3s;--delay:.34s;--drift:38px;--rot:20deg;">♥</span>
+  <i class="destello" style="--x:40%;--y:39%;--delay:.05s;"></i>
+  <i class="destello" style="--x:60%;--y:37%;--delay:.18s;"></i>
+  <i class="destello" style="--x:52%;--y:31%;--delay:.30s;"></i>
+  <i class="destello" style="--x:45%;--y:34%;--delay:.42s;"></i>
+</div>
 
 <!-- Producto y pedido (pasos) -->
 <div class="ov" id="ov-prod" onclick="if(event.target===this)cerrarProducto()">
@@ -537,7 +581,7 @@ function abrirProducto(id){
   pintarPaso();
   document.getElementById('ov-prod').classList.add('on');
 }
-function cerrarProducto(){ document.getElementById('ov-prod').classList.remove('on'); }
+function cerrarProducto(){ document.getElementById('ov-prod').classList.remove('on'); document.getElementById('celebracion')?.classList.remove('on'); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarProducto(); });
 
 // ---- Montos (solo para mostrar; el total real lo calcula la base al crear el pedido) ----
@@ -554,7 +598,7 @@ function barraPasos(){
   return `<div class="pasos" aria-hidden="true">${Array.from({ length: PASOS }, (_, i) => `<span class="${i < PED.paso ? 'on' : ''}"></span>`).join('')}</div>`;
 }
 function botonVolver(){ return PED.paso > 1 ? `<button class="volver" onclick="irPaso(${PED.paso - 1})"><i class="ti ti-chevron-left"></i> Volver</button>` : ''; }
-function irPaso(n){ PED.paso = n; pintarPaso(); document.querySelector('.hoja').scrollTop = 0; }
+function irPaso(n){ PED.paso = n; pintarPaso(); document.querySelector('.hoja').scrollTop = 0; if(n === 6) setTimeout(lanzarCelebracion, 120); }
 
 function pintarPaso(){
   document.getElementById('p-foto').style.display = PED.paso === 1 ? '' : 'none';
@@ -780,12 +824,22 @@ async function enviarPedido(){
 }
 
 // ---- 6. Listo ----
+function lanzarCelebracion(){
+  const el = document.getElementById('celebracion');
+  if(!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  el.classList.remove('on');
+  void el.offsetWidth;
+  el.classList.add('on');
+  clearTimeout(window.__celebracionTimer);
+  window.__celebracionTimer = setTimeout(() => el.classList.remove('on'), 1700);
+}
+
 function paso6(){
   const r = PED.resultado, n = Pedidos.negocio || {};
   const numero = '#' + String(r.numero).padStart(6, '0');
   const wa = String(n.whatsapp || '').replace(/\D/g, '');
   const texto = encodeURIComponent(`Hola, acabo de hacer el pedido ${numero} (${PED.prod.nombre}) para el ${fechaLarga(PED.fecha)}. A nombre de ${PED.cliente.nombre}.`);
-  return `<div class="listo"><i class="ti ti-circle-check"></i>
+  return `<div class="listo"><div class="check-wrap"><i class="ti ti-check"></i></div>
     <h3>¡Pedido recibido!</h3>
     <div class="num">${numero}</div>
     <p class="paso-sub">${E(n.nombre || '')} revisará tu pago y te confirmará por WhatsApp.</p></div>
