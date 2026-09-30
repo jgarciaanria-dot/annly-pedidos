@@ -298,21 +298,69 @@ footer{animation:aparecer .6s ease both;}
   .pie-base{font-size:11px;gap:8px;}
   .wa-flot{width:48px;height:48px;font-size:25px;right:14px;bottom:14px;}
 }
-/* ---------- Pedido móvil: ver producto completo sin hacer scroll innecesario ---------- */
+/* ---------- Pedido móvil: imagen completa + ficha compacta ---------- */
 @media(max-width:560px){
-  .ov{align-items:flex-end;}
-  .hoja{max-height:86vh;border-radius:20px 20px 0 0;}
-  .hoja-foto{height:clamp(145px,19vh,175px);object-fit:cover;}
-  .hoja-body{padding:11px 14px 14px;}
-  .pasos{margin-bottom:10px;}
-  .hoja-top{gap:8px;}
-  .hoja h3{font-size:18px;}
-  .hoja-desc{font-size:12.5px;line-height:1.4;margin:4px 0 9px;}
+  .ov{
+    align-items:flex-end;
+    padding:0;
+  }
+
+  .hoja{
+    width:100%;
+    max-height:88vh;
+    border-radius:22px 22px 0 0;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+  }
+
+  /* La foto ya no se recorta: se muestra completa dentro de un marco limpio */
+  .hoja-foto{
+    height:clamp(185px,27vh,235px);
+    aspect-ratio:auto;
+    object-fit:contain;
+    object-position:center;
+    background:linear-gradient(
+      145deg,
+      color-mix(in srgb,var(--p) 7%,#fff),
+      color-mix(in srgb,var(--s) 7%,#fff)
+    );
+  }
+
+  .hoja-body{
+    padding:10px 14px 14px;
+  }
+
+  .pasos{margin-bottom:9px;}
+  .hoja-top{gap:8px;align-items:center;}
+  .hoja h3{font-size:18px;line-height:1.2;}
+  .cerrar{width:32px;height:32px;font-size:17px;}
+
+  .hoja-desc{
+    font-size:12.5px;
+    line-height:1.4;
+    margin:4px 0 8px;
+  }
+
   .sub{margin:8px 0 5px;font-size:12.5px;}
-  .extra{padding:8px 10px;margin-bottom:6px;border-radius:11px;}
-  .total{margin-top:9px;padding-top:9px;}
+
+  .extra{
+    padding:8px 10px;
+    margin-bottom:6px;
+    border-radius:11px;
+  }
+
+  .total{
+    margin-top:8px;
+    padding-top:9px;
+  }
+
   .total b{font-size:18px;}
-  .btn-pedir{margin-top:10px;padding:12px;font-size:13.5px;}
+
+  .btn-pedir{
+    margin-top:10px;
+    padding:12px;
+    font-size:13.5px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -351,6 +399,18 @@ footer{animation:aparecer .6s ease both;}
 .btn-sec:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--p) 22%,#fff);background:color-mix(in srgb,var(--p) 3%,#fff);}
 
 </style>
+
+<style>
+@media(max-width:560px){
+  #p-foto img.hoja-foto{
+    display:block;
+    width:100%;
+    max-width:100%;
+    object-fit:contain;
+  }
+}
+</style>
+
 </head>
 <body>
 
