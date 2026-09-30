@@ -277,6 +277,23 @@ const Pedidos = {
     Object.assign(this.negocio, data[0]);
   },
 
+  // Logo de la tienda (mismo espacio de fotos, carpeta del negocio)
+  async subirLogo(file) {
+    const blob = await this._reducirImagen(file, 600, 0.9);
+    const path = `${this.id}/logo-${Date.now()}.webp`;
+    const { error } = await sb.storage.from('productos').upload(path, blob, { contentType: 'image/webp', upsert: false });
+    if (error) throw new Error('No se pudo subir el logo: ' + this.mensajeError(error));
+    const url = sb.storage.from('productos').getPublicUrl(path).data.publicUrl;
+    const data = await this._q(sb.from('businesses').update({ logo_url: url }).eq('id', this.id).select('logo_url'));
+    if (!data || !data.length) throw new Error('No se pudo guardar el logo (sin permisos).');
+    this.negocio.logo_url = url;
+    return url;
+  },
+  async quitarLogo() {
+    await this._q(sb.from('businesses').update({ logo_url: null }).eq('id', this.id));
+    this.negocio.logo_url = null;
+  },
+
   async listarZonas() {
     return (await this._q(sb.from('order_zones').select('*').eq('business_id', this.id).order('position').order('name'))) || [];
   },
