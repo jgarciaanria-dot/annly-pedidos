@@ -401,8 +401,10 @@ button,input,select,textarea{font-family:inherit;}
 <div class="ov" id="ov-cancel"><div class="modal">
   <div class="modal-hdr"><h3>Cancelar pedido</h3><button class="modal-x" onclick="cerrar('ov-cancel')" aria-label="Cerrar">×</button></div>
   <div class="modal-body">
-    <div class="fg"><label class="flbl" for="can-motivo">Motivo</label><input class="fi" id="can-motivo" maxlength="160" placeholder="El cliente pidió cancelar"></div>
-    <div class="fg"><label class="flbl" for="can-reembolso">Reembolso ($)</label><input class="fi" id="can-reembolso" type="number" step="0.01" min="0"><p class="ayuda" id="can-ayuda"></p></div>
+    <div class="fg"><label class="flbl">Motivo</label>
+      <div class="filtros" id="can-motivos" style="margin-bottom:8px;"></div>
+      <input class="fi" id="can-motivo" maxlength="160" placeholder="Escribe el motivo"></div>
+    <div class="fg" id="can-reemb-wrap"><label class="flbl" for="can-reembolso">¿Devuelves dinero al cliente? ($)</label><input class="fi" id="can-reembolso" type="number" step="0.01" min="0" value="0"><p class="ayuda" id="can-ayuda"></p></div>
     <label class="check" id="can-stock-wrap"><input type="checkbox" id="can-stock"> Los extras regresan al inventario (no se usaron)</label>
     <p class="msg" id="can-msg"></p>
     <button class="btn btn-grad btn-save" id="can-btn" onclick="confirmarCancelacion()">Cancelar pedido</button>
@@ -797,20 +799,41 @@ async function verPedido(id){
     ${!['CANCELADO','ENTREGADO'].includes(p.estado) ? `<button class="btn-del" onclick="abrirCancelacion()">Cancelar pedido</button>` : ''}`;
 }
 
+// Motivos frecuentes: "No realizó el pago" nunca lleva reembolso
+const MOTIVOS_CANCEL = [
+  { t: 'No realizó el pago', sinReembolso: true },
+  { t: 'El cliente pidió cancelar' },
+  { t: 'No tenemos disponibilidad' },
+  { t: 'No se pudo entregar' }
+];
 function abrirCancelacion(){
   const p = PED_ACTUAL;
   const pagado = p.estado !== 'PENDIENTE';
   document.getElementById('can-motivo').value = '';
-  document.getElementById('can-reembolso').value = pagado ? Number(p.total).toFixed(2) : '0';
-  document.getElementById('can-ayuda').textContent = pagado ? `El pago está confirmado. Puedes devolver hasta ${$(p.total)}.` : 'El pago aún no está confirmado: normalmente no hay nada que devolver.';
+  // El reembolso arranca siempre en 0: solo se devuelve dinero si el negocio lo indica
+  document.getElementById('can-reembolso').value = '0';
+  document.getElementById('can-reembolso').disabled = false;
+  document.getElementById('can-reemb-wrap').style.display = pagado ? '' : 'none';
+  document.getElementById('can-ayuda').textContent = pagado ? `El pago de ${$(p.total)} está confirmado. Si le devuelves dinero, escribe cuánto (máximo ${$(p.total)}). Si no, déjalo en 0.` : '';
+  document.getElementById('can-motivos').innerHTML = MOTIVOS_CANCEL.map((m, i) => `<button type="button" class="fchip" data-i="${i}" onclick="elegirMotivo(${i})">${m.t}</button>`).join('');
   document.getElementById('can-stock').checked = true;
   document.getElementById('can-stock-wrap').style.display = pagado && (p.order_extras || []).length ? '' : 'none';
   msg('can-msg'); abrir('ov-cancel');
 }
+function elegirMotivo(i){
+  const m = MOTIVOS_CANCEL[i];
+  document.querySelectorAll('#can-motivos .fchip').forEach(b => b.classList.toggle('on', Number(b.dataset.i) === i));
+  document.getElementById('can-motivo').value = m.t;
+  const r = document.getElementById('can-reembolso');
+  if (m.sinReembolso){ r.value = '0'; r.disabled = true; } else r.disabled = false;
+}
 async function confirmarCancelacion(){
   const p = PED_ACTUAL, btn = document.getElementById('can-btn');
   const motivo = document.getElementById('can-motivo').value.trim();
-  if (!motivo){ msg('can-msg', 'Escribe el motivo de la cancelación.'); return; }
+  if (!motivo){ msg('can-msg', 'Elige o escribe el motivo de la cancelación.'); return; }
+  const reemb = Number(document.getElementById('can-reembolso').value || 0);
+  if (reemb < 0 || reemb > Number(p.total)){ msg('can-msg', `El reembolso debe estar entre $0 y ${$(p.total)}.`); return; }
+  if (reemb > 0 && !confirm(`¿Confirmas que le devolverás ${$(reemb)} al cliente? Se le avisará por correo.`)) return;
   btn.disabled = true;
   try {
     await Pedidos.cancelarPedido(p.id, motivo, document.getElementById('can-reembolso').value, document.getElementById('can-stock').checked);
