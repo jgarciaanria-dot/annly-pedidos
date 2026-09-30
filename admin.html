@@ -90,6 +90,62 @@ button,input,select,textarea{font-family:inherit;}
 .aviso h2{font-family:'DM Sans',sans-serif;font-size:18px;margin-bottom:8px;}
 .aviso p{font-size:13.5px;color:var(--ink-soft);line-height:1.55;margin-bottom:16px;}
 
+/* Secciones del panel */
+.sec{background:#fff;border:1px solid var(--line);border-radius:18px;margin-bottom:16px;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.sec-hdr h2{font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;}
+.sec-hdr p{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+.sec-body{padding:6px 18px 14px;}
+.btn-add{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #DCCFF1;background:#fff;color:var(--violet);border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;}
+.fila{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);}
+.fila:first-child{border-top:none;}
+.fila-info{flex:1;min-width:0;}
+.fila-info strong{display:block;font-size:14px;}
+.fila-info span{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+.fila-acc{display:flex;gap:6px;flex-shrink:0;}
+.ico{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--line);background:#fff;cursor:pointer;display:grid;place-items:center;color:var(--ink-soft);font-size:16px;}
+.ico.del{color:var(--err);}
+.miniatura{width:52px;height:52px;border-radius:12px;object-fit:cover;background:var(--lilac);display:grid;place-items:center;color:var(--violet);flex-shrink:0;font-size:22px;}
+.chip{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;margin-left:6px;vertical-align:1px;}
+.chip.gris{background:var(--bg);color:var(--ink-soft);border:1px solid var(--line);}
+.chip.warn{background:#FFF4E0;color:var(--warn);}
+.chip.ok{background:#E9F6EF;color:var(--ok);}
+.grupo{font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:800;color:var(--violet);padding:14px 0 2px;}
+.vacio-mini{font-size:13px;color:var(--ink-soft);padding:16px 0;text-align:center;line-height:1.55;}
+.dias{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;}
+.dia{border:1px solid var(--line);border-radius:14px;padding:10px;min-height:120px;background:var(--bg);}
+.dia h4{font-family:'DM Sans',sans-serif;font-size:12.5px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.dia h4 button{border:none;background:none;color:var(--violet);cursor:pointer;font-size:16px;}
+.franja{background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 8px;font-size:11.5px;margin-bottom:6px;cursor:pointer;}
+.franja b{display:block;font-size:12px;}
+.franja.off{opacity:.5;}
+@media(max-width:980px){.dias{grid-template-columns:repeat(2,minmax(0,1fr));}}
+
+/* Modales */
+.ov{position:fixed;inset:0;background:rgba(26,22,37,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+.ov.on{display:flex;}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1;}
+.modal-hdr h3{font-family:'DM Sans',sans-serif;font-size:17px;}
+.modal-x{border:none;background:var(--bg);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;}
+.modal-body{padding:16px 20px 20px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;margin:4px 0 12px;}
+.check input{accent-color:var(--violet);width:16px;height:16px;}
+.ayuda{font-size:11.5px;color:var(--ink-soft);margin-top:5px;line-height:1.5;}
+.foto-box{display:flex;align-items:center;gap:12px;}
+.foto-box img,.foto-box .foto-vacia{width:84px;height:84px;border-radius:14px;object-fit:cover;background:var(--lilac);display:grid;place-items:center;color:var(--violet);font-size:26px;flex-shrink:0;}
+.extra-opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;font-size:13px;}
+.extra-opt span{flex:1;}
+.extra-opt input[type=number]{width:86px;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12.5px;}
+.mov{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:6px 0;border-top:1px solid var(--line);}
+.mov b.pos{color:var(--ok);} .mov b.neg{color:var(--err);}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.seg button{flex:1;border:none;background:#fff;padding:10px;font-size:13px;font-weight:700;color:var(--ink-soft);cursor:pointer;}
+.seg button.on{background:var(--lilac);color:var(--violet);}
+.btn-save{width:100%;margin-top:8px;}
+.btn-del{background:none;border:none;color:var(--err);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:12px;width:100%;}
+
 @media(max-width:860px){
   .app.on{grid-template-columns:1fr;}
   .side{flex-direction:row;overflow-x:auto;padding:10px;border-right:none;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;}
@@ -170,19 +226,231 @@ button,input,select,textarea{font-family:inherit;}
       </div>
     </section>
 
-    <section id="tab-otro" style="display:none;">
+    <!-- Catálogo -->
+    <section id="tab-catalogo" class="tabsec" hidden>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Categorías</h2><p>Agrupan tus productos en la tienda.</p></div>
+          <button class="btn-add" onclick="abrirCategoria()"><i class="ti ti-plus"></i> Nueva categoría</button></div>
+        <div class="sec-body" id="lista-categorias"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Productos</h2><p>Lo que tus clientes pueden pedir, con sus extras.</p></div>
+          <button class="btn-add" onclick="abrirProducto()"><i class="ti ti-plus"></i> Nuevo producto</button></div>
+        <div class="sec-body" id="lista-productos"></div>
+      </div>
+    </section>
+
+    <!-- Inventario -->
+    <section id="tab-inventario" class="tabsec" hidden>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Artículos y extras</h2><p>Lo que el cliente puede sumar a su pedido. El stock se mueve con entradas, salidas y ventas.</p></div>
+          <button class="btn-add" onclick="abrirArticulo()"><i class="ti ti-plus"></i> Nuevo artículo</button></div>
+        <div class="sec-body" id="lista-articulos"></div>
+      </div>
+    </section>
+
+    <!-- Entregas y horarios -->
+    <section id="tab-entregas" class="tabsec" hidden>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Formas de entrega</h2><p>Lo que ofreces a tus clientes al hacer un pedido.</p></div></div>
+        <div class="sec-body">
+          <label class="check"><input type="checkbox" id="e-retiro" onchange="guardarFormasEntrega()"> Retiro en tienda</label>
+          <label class="check"><input type="checkbox" id="e-domicilio" onchange="guardarFormasEntrega()"> Entrega a domicilio</label>
+        </div>
+      </div>
+      <div class="sec" id="sec-zonas">
+        <div class="sec-hdr"><div><h2>Zonas de entrega</h2><p>Cada zona con su costo de envío. Si el cliente está fuera de tus zonas, el envío queda por confirmar.</p></div>
+          <button class="btn-add" onclick="abrirZona()"><i class="ti ti-plus"></i> Nueva zona</button></div>
+        <div class="sec-body" id="lista-zonas"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Franjas de entrega</h2><p>Horarios en que entregas o se retira, y cuántos pedidos atiendes en cada uno.</p></div></div>
+        <div class="sec-body"><div class="dias" id="lista-franjas"></div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Fechas sin pedidos</h2><p>Feriados o días que no trabajas.</p></div>
+          <button class="btn-add" onclick="abrirFecha()"><i class="ti ti-plus"></i> Bloquear fecha</button></div>
+        <div class="sec-body" id="lista-fechas"></div>
+      </div>
+    </section>
+
+    <!-- Configuración -->
+    <section id="tab-config" class="tabsec" hidden>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Tiempos de pedido</h2><p>Controlan qué franjas puede elegir el cliente.</p></div></div>
+        <div class="sec-body" style="padding-top:14px;">
+          <div class="frow">
+            <div class="fg"><label class="flbl" for="c-min">Tiempo mínimo de preparación (horas)</label><input class="fi" id="c-min" type="number" min="0" max="168"><p class="ayuda">Una franja que empiece antes de este tiempo no se puede elegir.</p></div>
+            <div class="fg"><label class="flbl" for="c-warn">Aviso de poca anticipación (horas)</label><input class="fi" id="c-warn" type="number" min="0" max="168"><p class="ayuda">Por debajo de este tiempo el pedido se acepta con un aviso.</p></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl" for="c-exp">Horas para confirmar el pago</label><input class="fi" id="c-exp" type="number" min="1" max="168"><p class="ayuda">Si no confirmas el pago en este tiempo, el pedido se cancela y su cupo y extras se liberan.</p></div>
+            <div class="fg"><label class="flbl" for="c-max">Días hacia adelante</label><input class="fi" id="c-max" type="number" min="1" max="365"><p class="ayuda">Hasta cuántos días en el futuro se puede pedir.</p></div>
+          </div>
+          <p class="msg" id="c-msg"></p>
+          <button class="btn btn-grad" style="width:auto;" onclick="guardarTiempos()"><i class="ti ti-check"></i> Guardar tiempos</button>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Pago y contacto</h2><p>Lo que ve el cliente en tu tienda y al pagar.</p></div></div>
+        <div class="sec-body" style="padding-top:14px;">
+          <div class="frow">
+            <div class="fg"><label class="flbl" for="d-yappy">Número de Yappy</label><input class="fi" id="d-yappy" inputmode="numeric" placeholder="6000-1111"></div>
+            <div class="fg"><label class="flbl" for="d-wa">WhatsApp</label><input class="fi" id="d-wa" inputmode="numeric" placeholder="50760001111"></div>
+          </div>
+          <div class="fg"><label class="flbl" for="d-dir">Dirección de la tienda (para retiro)</label><input class="fi" id="d-dir"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl" for="d-ig">Instagram</label><input class="fi" id="d-ig" placeholder="tutienda"></div>
+            <div class="fg"><label class="flbl" for="d-tag">Frase de la tienda</label><input class="fi" id="d-tag" maxlength="80" placeholder="Flores frescas para cada ocasión"></div>
+          </div>
+          <p class="msg" id="d-msg"></p>
+          <button class="btn btn-grad" style="width:auto;" onclick="guardarDatos()"><i class="ti ti-check"></i> Guardar datos</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pedidos (llega en los días 8–9) -->
+    <section id="tab-pedidos" class="tabsec" hidden>
       <div class="vacio">
-        <i class="ti ti-tools"></i>
-        <h3 id="otro-titulo">Sección en construcción</h3>
-        <p id="otro-texto">Esta sección llega en las próximas entregas.</p>
+        <i class="ti ti-receipt"></i>
+        <h3>Pedidos</h3>
+        <p>Aquí verás tus pedidos por fecha y franja, con su estado, pago y bitácora. Llega en la próxima entrega.</p>
       </div>
     </section>
   </main>
 </div>
 
+
+<!-- Modal categoría -->
+<div class="ov" id="ov-cat"><div class="modal">
+  <div class="modal-hdr"><h3 id="cat-titulo">Nueva categoría</h3><button class="modal-x" onclick="cerrar('ov-cat')" aria-label="Cerrar">×</button></div>
+  <div class="modal-body">
+    <div class="fg"><label class="flbl" for="cat-nombre">Nombre</label><input class="fi" id="cat-nombre" maxlength="40" placeholder="Ramos"></div>
+    <label class="check"><input type="checkbox" id="cat-activa" checked> Visible en la tienda</label>
+    <p class="msg" id="cat-msg"></p>
+    <button class="btn btn-grad btn-save" onclick="guardarCategoria()">Guardar categoría</button>
+    <button class="btn-del" id="cat-borrar" onclick="borrarCategoria()">Borrar categoría</button>
+  </div>
+</div></div>
+
+<!-- Modal producto -->
+<div class="ov" id="ov-prod"><div class="modal">
+  <div class="modal-hdr"><h3 id="prod-titulo">Nuevo producto</h3><button class="modal-x" onclick="cerrar('ov-prod')" aria-label="Cerrar">×</button></div>
+  <div class="modal-body">
+    <div class="fg"><label class="flbl">Foto</label>
+      <div class="foto-box"><div id="prod-foto-prev"></div>
+        <div><label class="btn-add" style="cursor:pointer;"><i class="ti ti-camera"></i> <span id="prod-foto-txt">Subir foto</span><input type="file" id="prod-foto" accept="image/*" hidden onchange="subirFotoProducto(this)"></label>
+        <p class="ayuda">JPG, PNG o WebP. Se optimiza sola al subirla.</p></div></div>
+    </div>
+    <div class="fg"><label class="flbl" for="prod-nombre">Nombre</label><input class="fi" id="prod-nombre" maxlength="80" placeholder="Ramo de 24 rosas"></div>
+    <div class="fg"><label class="flbl" for="prod-cat">Categoría</label><select class="fi" id="prod-cat"></select></div>
+    <div class="fg"><label class="flbl" for="prod-desc">Descripción</label><textarea class="fi" id="prod-desc" rows="3" maxlength="400" placeholder="24 rosas rojas con follaje y papel coreano."></textarea></div>
+    <div class="frow">
+      <div class="fg"><label class="flbl" for="prod-precio">Precio ($)</label><input class="fi" id="prod-precio" type="number" step="0.01" min="0" oninput="margenProducto()"></div>
+      <div class="fg"><label class="flbl" for="prod-costo">Costo estimado ($)</label><input class="fi" id="prod-costo" type="number" step="0.01" min="0" oninput="margenProducto()"></div>
+    </div>
+    <p class="ayuda" id="prod-margen" style="margin:-6px 0 12px;"></p>
+    <div class="fg"><label class="flbl">Extras que se pueden agregar</label><div id="prod-extras"></div>
+      <p class="ayuda">Deja el precio vacío para usar el del artículo, o escribe uno solo para este producto.</p></div>
+    <label class="check"><input type="checkbox" id="prod-activo" checked> Visible en la tienda</label>
+    <p class="msg" id="prod-msg"></p>
+    <button class="btn btn-grad btn-save" id="prod-btn" onclick="guardarProducto()">Guardar producto</button>
+    <button class="btn-del" id="prod-borrar" onclick="borrarProducto()">Borrar producto</button>
+  </div>
+</div></div>
+
+<!-- Modal artículo -->
+<div class="ov" id="ov-art"><div class="modal">
+  <div class="modal-hdr"><h3 id="art-titulo">Nuevo artículo</h3><button class="modal-x" onclick="cerrar('ov-art')" aria-label="Cerrar">×</button></div>
+  <div class="modal-body">
+    <div class="fg"><label class="flbl" for="art-nombre">Nombre</label><input class="fi" id="art-nombre" maxlength="60" placeholder="Caja de chocolates"></div>
+    <div class="fg"><label class="flbl" for="art-desc">Descripción (opcional)</label><input class="fi" id="art-desc" maxlength="160"></div>
+    <div class="frow">
+      <div class="fg"><label class="flbl" for="art-precio">Precio como extra ($)</label><input class="fi" id="art-precio" type="number" step="0.01" min="0"></div>
+      <div class="fg"><label class="flbl" for="art-costo">Costo unitario ($)</label><input class="fi" id="art-costo" type="number" step="0.01" min="0"></div>
+    </div>
+    <label class="check"><input type="checkbox" id="art-track" checked onchange="document.getElementById('art-stock-wrap').style.display=this.checked?'':'none'"> Controlar stock de este artículo</label>
+    <div id="art-stock-wrap" class="frow">
+      <div class="fg"><label class="flbl" for="art-min">Stock mínimo</label><input class="fi" id="art-min" type="number" step="1" min="0"><p class="ayuda">Al llegar a este número verás el aviso de stock bajo.</p></div>
+      <div class="fg" id="art-inicial-wrap"><label class="flbl" for="art-inicial">Stock inicial</label><input class="fi" id="art-inicial" type="number" step="1" min="0"><p class="ayuda">Queda registrado como entrada.</p></div>
+    </div>
+    <label class="check"><input type="checkbox" id="art-activo" checked> Disponible como extra</label>
+    <p class="msg" id="art-msg"></p>
+    <button class="btn btn-grad btn-save" onclick="guardarArticulo()">Guardar artículo</button>
+  </div>
+</div></div>
+
+<!-- Modal movimiento de inventario -->
+<div class="ov" id="ov-mov"><div class="modal">
+  <div class="modal-hdr"><h3 id="mov-titulo">Movimiento</h3><button class="modal-x" onclick="cerrar('ov-mov')" aria-label="Cerrar">×</button></div>
+  <div class="modal-body">
+    <p class="ayuda" id="mov-stock" style="font-size:13px;margin:0 0 12px;"></p>
+    <div class="seg" role="tablist">
+      <button id="mov-t-entrada" class="on" onclick="tipoMov('entrada')">Entrada</button>
+      <button id="mov-t-salida" onclick="tipoMov('salida')">Salida</button>
+      <button id="mov-t-ajuste" onclick="tipoMov('ajuste')">Ajuste</button>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flbl" for="mov-qty" id="mov-qty-lbl">Cantidad que entra</label><input class="fi" id="mov-qty" type="number" step="1"></div>
+      <div class="fg" id="mov-costo-wrap"><label class="flbl" for="mov-costo">Costo unitario ($)</label><input class="fi" id="mov-costo" type="number" step="0.01" min="0"></div>
+    </div>
+    <p class="ayuda" id="mov-ayuda" style="margin:-6px 0 10px;">Mercancía que llegó.</p>
+    <div class="fg"><label class="flbl" for="mov-nota">Nota</label><input class="fi" id="mov-nota" maxlength="120" placeholder="Compra al proveedor"></div>
+    <p class="msg" id="mov-msg"></p>
+    <button class="btn btn-grad btn-save" onclick="guardarMovimiento()">Registrar movimiento</button>
+    <div style="margin-top:18px;"><div class="flbl">Últimos movimientos</div><div id="mov-historial"></div></div>
+  </div>
+</div></div>
+
+<!-- Modal zona -->
+<div class="ov" id="ov-zona"><div class="modal">
+  <div class="modal-hdr"><h3 id="zona-titulo">Nueva zona</h3><button class="modal-x" onclick="cerrar('ov-zona')" aria-label="Cerrar">×</button></div>
+  <div class="modal-body">
+    <div class="frow">
+      <div class="fg"><label class="flbl" for="zona-nombre">Nombre</label><input class="fi" id="zona-nombre" maxlength="60" placeholder="San Francisco"></div>
+      <div class="fg"><label class="flbl" for="zona-precio">Costo de envío ($)</label><input class="fi" id="zona-precio" type="number" step="0.01" min="0"></div>
+    </div>
+    <label class="check"><input type="checkbox" id="zona-activa" checked> Disponible</label>
+    <p class="msg" id="zona-msg"></p>
+    <button class="btn btn-grad btn-save" onclick="guardarZona()">Guardar zona</button>
+    <button class="btn-del" id="zona-borrar" onclick="borrarZona()">Borrar zona</button>
+  </div>
+</div></div>
+
+<!-- Modal franja -->
+<div class="ov" id="ov-franja"><div class="modal">
+  <div class="modal-hdr"><h3 id="franja-titulo">Nueva franja</h3><button class="modal-x" onclick="cerrar('ov-franja')" aria-label="Cerrar">×</button></div>
+  <div class="modal-body">
+    <div class="fg"><label class="flbl" for="franja-dia">Día</label><select class="fi" id="franja-dia"></select></div>
+    <div class="frow">
+      <div class="fg"><label class="flbl" for="franja-ini">Desde</label><input class="fi" id="franja-ini" type="time"></div>
+      <div class="fg"><label class="flbl" for="franja-fin">Hasta</label><input class="fi" id="franja-fin" type="time"></div>
+    </div>
+    <div class="fg"><label class="flbl" for="franja-cap">Pedidos que puedes atender en esta franja</label><input class="fi" id="franja-cap" type="number" min="1" step="1"></div>
+    <label class="check"><input type="checkbox" id="franja-activa" checked> Activa</label>
+    <label class="check" id="franja-copiar-wrap"><input type="checkbox" id="franja-copiar"> Crear también de lunes a sábado</label>
+    <p class="msg" id="franja-msg"></p>
+    <button class="btn btn-grad btn-save" onclick="guardarFranja()">Guardar franja</button>
+    <button class="btn-del" id="franja-borrar" onclick="borrarFranja()">Borrar franja</button>
+  </div>
+</div></div>
+
+<!-- Modal fecha bloqueada -->
+<div class="ov" id="ov-fecha"><div class="modal">
+  <div class="modal-hdr"><h3>Bloquear fecha</h3><button class="modal-x" onclick="cerrar('ov-fecha')" aria-label="Cerrar">×</button></div>
+  <div class="modal-body">
+    <div class="frow">
+      <div class="fg"><label class="flbl" for="fecha-dia">Fecha</label><input class="fi" id="fecha-dia" type="date"></div>
+      <div class="fg"><label class="flbl" for="fecha-motivo">Motivo (opcional)</label><input class="fi" id="fecha-motivo" maxlength="60" placeholder="Feriado"></div>
+    </div>
+    <p class="msg" id="fecha-msg"></p>
+    <button class="btn btn-grad btn-save" onclick="guardarFecha()">Bloquear fecha</button>
+  </div>
+</div></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=1"></script>
+<script src="pedidos.js?v=2"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
 document.getElementById('l-registro').href = ANNLY + '/registro.html';
@@ -266,21 +534,323 @@ async function cargarInicio(){
 }
 
 // ---------- Pestañas ----------
-const TEXTO_TABS = {
-  pedidos: ['Pedidos', 'Aquí verás los pedidos por fecha y franja, con su estado, pago y bitácora.'],
-  catalogo: ['Catálogo', 'Aquí crearás categorías y productos con foto, precio y sus extras.'],
-  inventario: ['Inventario', 'Aquí registrarás tus artículos, entradas de mercancía y stock mínimo.'],
-  entregas: ['Entregas y horarios', 'Aquí definirás zonas con su precio, franjas con su capacidad y fechas sin pedidos.'],
-  config: ['Configuración', 'Aquí ajustarás el tiempo mínimo de preparación, el pago y los datos de tu tienda.']
-};
+const CARGA_TAB = { catalogo: cargarCatalogo, inventario: cargarInventario, entregas: cargarEntregas, config: cargarConfig };
 function irTab(tab){
   document.querySelectorAll('.tab[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   document.getElementById('tab-inicio').style.display = tab === 'inicio' ? '' : 'none';
-  document.getElementById('tab-otro').style.display = tab === 'inicio' ? 'none' : '';
-  if (tab !== 'inicio'){
-    document.getElementById('otro-titulo').textContent = TEXTO_TABS[tab][0];
-    document.getElementById('otro-texto').textContent = TEXTO_TABS[tab][1];
-  } else cargarInicio();
+  document.querySelectorAll('.tabsec').forEach(x => { x.hidden = x.id !== 'tab-' + tab; });
+  if (tab === 'inicio') cargarInicio();
+  else if (CARGA_TAB[tab]) CARGA_TAB[tab]();
+}
+function abrir(id){ document.getElementById(id).classList.add('on'); }
+function cerrar(id){ document.getElementById(id).classList.remove('on'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.ov.on').forEach(o => o.classList.remove('on')); });
+function msg(id, t){ document.getElementById(id).textContent = t || ''; }
+const E = s => Pedidos.esc(s);
+const $ = s => Pedidos.dinero(s);
+
+// ---------- Catálogo ----------
+let CATS = [], PRODS = [], ARTS = [];
+let editCat = null, editProd = null, fotoProd = null;
+
+async function cargarCatalogo(){
+  try { [CATS, PRODS, ARTS] = await Promise.all([Pedidos.listarCategorias(), Pedidos.listarProductos(), Pedidos.listarArticulos()]); }
+  catch(e){ document.getElementById('lista-productos').innerHTML = `<p class="vacio-mini">${E(e.message)}</p>`; return; }
+  document.getElementById('lista-categorias').innerHTML = CATS.length ? CATS.map(c => {
+    const n = PRODS.filter(p => p.category_id === c.id).length;
+    return `<div class="fila"><div class="fila-info"><strong>${E(c.name)}${c.active ? '' : '<span class="chip gris">Oculta</span>'}</strong><span>${n} producto${n === 1 ? '' : 's'}</span></div>
+      <div class="fila-acc"><button class="ico" onclick="abrirCategoria('${c.id}')" aria-label="Editar"><i class="ti ti-edit"></i></button></div></div>`;
+  }).join('') : '<p class="vacio-mini">Crea tu primera categoría, por ejemplo "Ramos".</p>';
+
+  const grupos = [...CATS.map(c => ({ nombre: c.name, items: PRODS.filter(p => p.category_id === c.id) })),
+                  { nombre: 'Sin categoría', items: PRODS.filter(p => !p.category_id || !CATS.some(c => c.id === p.category_id)) }]
+                 .filter(g => g.items.length);
+  document.getElementById('lista-productos').innerHTML = PRODS.length ? grupos.map(g => `<div class="grupo">${E(g.nombre)}</div>` + g.items.map(p => {
+    const nx = (p.product_extras || []).length;
+    return `<div class="fila">${p.photo_url ? `<img class="miniatura" src="${E(p.photo_url)}" alt="">` : '<div class="miniatura"><i class="ti ti-flower"></i></div>'}
+      <div class="fila-info"><strong>${E(p.name)}${p.active ? '' : '<span class="chip gris">Oculto</span>'}</strong>
+      <span>${$(p.price)} · costo ${$(p.estimated_cost)} · ${nx} extra${nx === 1 ? '' : 's'}</span></div>
+      <div class="fila-acc"><button class="ico" onclick="abrirProducto('${p.id}')" aria-label="Editar"><i class="ti ti-edit"></i></button></div></div>`;
+  }).join('')).join('') : '<p class="vacio-mini">Agrega tu primer producto con su foto, precio y extras.</p>';
+}
+
+function abrirCategoria(id){
+  editCat = id ? CATS.find(c => c.id === id) : null;
+  document.getElementById('cat-titulo').textContent = editCat ? 'Editar categoría' : 'Nueva categoría';
+  document.getElementById('cat-nombre').value = editCat ? editCat.name : '';
+  document.getElementById('cat-activa').checked = editCat ? editCat.active : true;
+  document.getElementById('cat-borrar').style.display = editCat ? '' : 'none';
+  msg('cat-msg'); abrir('ov-cat');
+}
+async function guardarCategoria(){
+  try {
+    await Pedidos.guardarCategoria({ id: editCat && editCat.id, name: document.getElementById('cat-nombre').value,
+      active: document.getElementById('cat-activa').checked, position: editCat ? editCat.position : CATS.length });
+    cerrar('ov-cat'); cargarCatalogo();
+  } catch(e){ msg('cat-msg', e.message); }
+}
+async function borrarCategoria(){
+  const n = PRODS.filter(p => p.category_id === editCat.id).length;
+  if (!confirm(n ? `Los ${n} productos de esta categoría quedarán "Sin categoría". ¿Borrarla?` : '¿Borrar esta categoría?')) return;
+  try { await Pedidos.borrarCategoria(editCat.id); cerrar('ov-cat'); cargarCatalogo(); } catch(e){ msg('cat-msg', e.message); }
+}
+
+async function abrirProducto(id){
+  if (!ARTS.length && !CATS.length) await cargarCatalogo();
+  editProd = id ? PRODS.find(p => p.id === id) : null;
+  fotoProd = editProd ? editProd.photo_url : null;
+  document.getElementById('prod-titulo').textContent = editProd ? 'Editar producto' : 'Nuevo producto';
+  document.getElementById('prod-nombre').value = editProd ? editProd.name : '';
+  document.getElementById('prod-desc').value = editProd ? (editProd.description || '') : '';
+  document.getElementById('prod-precio').value = editProd ? editProd.price : '';
+  document.getElementById('prod-costo').value = editProd ? editProd.estimated_cost : '';
+  document.getElementById('prod-activo').checked = editProd ? editProd.active : true;
+  document.getElementById('prod-cat').innerHTML = '<option value="">Sin categoría</option>' +
+    CATS.map(c => `<option value="${c.id}"${editProd && editProd.category_id === c.id ? ' selected' : ''}>${E(c.name)}</option>`).join('');
+  const sel = editProd ? (editProd.product_extras || []) : [];
+  const disponibles = ARTS.filter(a => a.active || sel.some(x => x.item_id === a.id));
+  document.getElementById('prod-extras').innerHTML = disponibles.length ? disponibles.map(a => {
+    const x = sel.find(y => y.item_id === a.id);
+    return `<label class="extra-opt"><input type="checkbox" class="px-chk" value="${a.id}"${x ? ' checked' : ''}>
+      <span>${E(a.name)} <small style="color:var(--ink-soft);">(${$(a.sale_price)})</small></span>
+      <input type="number" class="px-precio" data-id="${a.id}" step="0.01" min="0" placeholder="${Number(a.sale_price).toFixed(2)}" value="${x && x.price != null ? x.price : ''}" aria-label="Precio de ${E(a.name)} en este producto"></label>`;
+  }).join('') : '<p class="ayuda">Aún no tienes artículos. Créalos en Inventario y luego márcalos aquí.</p>';
+  document.getElementById('prod-borrar').style.display = editProd ? '' : 'none';
+  pintarFotoProducto(); margenProducto(); msg('prod-msg'); abrir('ov-prod');
+}
+function pintarFotoProducto(){
+  document.getElementById('prod-foto-prev').innerHTML = fotoProd ? `<img src="${E(fotoProd)}" alt="">` : '<div class="foto-vacia"><i class="ti ti-photo"></i></div>';
+  document.getElementById('prod-foto-txt').textContent = fotoProd ? 'Cambiar foto' : 'Subir foto';
+}
+async function subirFotoProducto(input){
+  const f = input.files && input.files[0]; input.value = '';
+  if (!f) return;
+  const btn = document.getElementById('prod-btn');
+  btn.disabled = true; msg('prod-msg', 'Subiendo foto…');
+  try { fotoProd = await Pedidos.subirFoto(f); pintarFotoProducto(); msg('prod-msg'); }
+  catch(e){ msg('prod-msg', e.message); }
+  btn.disabled = false;
+}
+function margenProducto(){
+  const p = parseFloat(document.getElementById('prod-precio').value) || 0;
+  const c = parseFloat(document.getElementById('prod-costo').value) || 0;
+  document.getElementById('prod-margen').textContent = p > 0 ? `Margen: ${$(p - c)} (${Math.round((p - c) / p * 100)}%)` : '';
+}
+async function guardarProducto(){
+  const extras = [...document.querySelectorAll('.px-chk:checked')].map(c => ({
+    item_id: c.value, price: document.querySelector(`.px-precio[data-id="${c.value}"]`).value
+  }));
+  const precio = document.getElementById('prod-precio').value;
+  if (precio === '') { msg('prod-msg', 'Escribe el precio del producto.'); return; }
+  const btn = document.getElementById('prod-btn'); btn.disabled = true;
+  try {
+    await Pedidos.guardarProducto({ id: editProd && editProd.id, name: document.getElementById('prod-nombre').value,
+      category_id: document.getElementById('prod-cat').value, description: document.getElementById('prod-desc').value,
+      photo_url: fotoProd, price: precio, estimated_cost: document.getElementById('prod-costo').value,
+      active: document.getElementById('prod-activo').checked, position: editProd ? editProd.position : PRODS.length, extras });
+    cerrar('ov-prod'); cargarCatalogo();
+  } catch(e){ msg('prod-msg', e.message); }
+  btn.disabled = false;
+}
+async function borrarProducto(){
+  if (!confirm('¿Borrar este producto? Los pedidos que ya lo tienen conservan su nombre y precio.')) return;
+  try { await Pedidos.borrarProducto(editProd.id); cerrar('ov-prod'); cargarCatalogo(); } catch(e){ msg('prod-msg', e.message); }
+}
+
+// ---------- Inventario ----------
+let editArt = null, movArt = null, MOV_TIPO = 'entrada';
+async function cargarInventario(){
+  try { ARTS = await Pedidos.listarArticulos(); }
+  catch(e){ document.getElementById('lista-articulos').innerHTML = `<p class="vacio-mini">${E(e.message)}</p>`; return; }
+  document.getElementById('lista-articulos').innerHTML = ARTS.length ? ARTS.map(a => `
+    <div class="fila"><div class="fila-info"><strong>${E(a.name)}${a.active ? '' : '<span class="chip gris">Inactivo</span>'}${a.track_stock && a.stock_bajo ? '<span class="chip warn">Stock bajo</span>' : ''}</strong>
+      <span>${a.track_stock ? `Stock: <b>${Number(a.stock)}</b> · mínimo ${Number(a.stock_min)}` : 'Sin control de stock'} · extra ${$(a.sale_price)} · costo ${$(a.unit_cost)}</span></div>
+      <div class="fila-acc">${a.track_stock ? `<button class="ico" onclick="abrirMovimiento('${a.id}')" aria-label="Movimiento de stock" title="Entrada, salida o ajuste"><i class="ti ti-arrows-exchange"></i></button>` : ''}
+      <button class="ico" onclick="abrirArticulo('${a.id}')" aria-label="Editar"><i class="ti ti-edit"></i></button></div></div>`).join('')
+    : '<p class="vacio-mini">Agrega los artículos que el cliente puede sumar: chocolates, globos, peluches…</p>';
+}
+function abrirArticulo(id){
+  editArt = id ? ARTS.find(a => a.id === id) : null;
+  document.getElementById('art-titulo').textContent = editArt ? 'Editar artículo' : 'Nuevo artículo';
+  document.getElementById('art-nombre').value = editArt ? editArt.name : '';
+  document.getElementById('art-desc').value = editArt ? (editArt.description || '') : '';
+  document.getElementById('art-precio').value = editArt ? editArt.sale_price : '';
+  document.getElementById('art-costo').value = editArt ? editArt.unit_cost : '';
+  document.getElementById('art-min').value = editArt ? editArt.stock_min : '';
+  document.getElementById('art-inicial').value = '';
+  document.getElementById('art-inicial-wrap').style.display = editArt ? 'none' : '';
+  const track = editArt ? editArt.track_stock : true;
+  document.getElementById('art-track').checked = track;
+  document.getElementById('art-stock-wrap').style.display = track ? '' : 'none';
+  document.getElementById('art-activo').checked = editArt ? editArt.active : true;
+  msg('art-msg'); abrir('ov-art');
+}
+async function guardarArticulo(){
+  try {
+    await Pedidos.guardarArticulo({ id: editArt && editArt.id, name: document.getElementById('art-nombre').value,
+      description: document.getElementById('art-desc').value, sale_price: document.getElementById('art-precio').value,
+      unit_cost: document.getElementById('art-costo').value, stock_min: document.getElementById('art-min').value,
+      track_stock: document.getElementById('art-track').checked, active: document.getElementById('art-activo').checked,
+      stock_inicial: document.getElementById('art-inicial').value });
+    cerrar('ov-art'); cargarInventario();
+  } catch(e){ msg('art-msg', e.message); }
+}
+async function abrirMovimiento(id){
+  movArt = ARTS.find(a => a.id === id);
+  document.getElementById('mov-titulo').textContent = movArt.name;
+  document.getElementById('mov-stock').innerHTML = `Stock actual: <b>${Number(movArt.stock)}</b>`;
+  document.getElementById('mov-qty').value = ''; document.getElementById('mov-costo').value = movArt.unit_cost;
+  document.getElementById('mov-nota').value = '';
+  tipoMov('entrada'); msg('mov-msg'); abrir('ov-mov');
+  document.getElementById('mov-historial').innerHTML = '<p class="ayuda">Cargando…</p>';
+  const NOMBRE = { entrada:'Entrada', salida:'Salida', ajuste:'Ajuste', reserva:'Reservado en pedido', venta:'Vendido', liberacion:'Liberado', devolucion:'Devuelto' };
+  try {
+    const movs = await Pedidos.movimientos(id);
+    document.getElementById('mov-historial').innerHTML = movs.length ? movs.map(m => `
+      <div class="mov"><span>${new Date(m.created_at).toLocaleDateString('es-PA', { day:'numeric', month:'short' })} · ${NOMBRE[m.tipo] || m.tipo}${m.nota ? ' · ' + E(m.nota) : ''}</span>
+      <b class="${m.qty > 0 ? 'pos' : 'neg'}">${m.qty > 0 ? '+' : ''}${Number(m.qty)}</b></div>`).join('') : '<p class="ayuda">Sin movimientos.</p>';
+  } catch(e){ document.getElementById('mov-historial').innerHTML = `<p class="ayuda">${E(e.message)}</p>`; }
+}
+function tipoMov(t){
+  MOV_TIPO = t;
+  ['entrada','salida','ajuste'].forEach(x => document.getElementById('mov-t-' + x).classList.toggle('on', x === t));
+  document.getElementById('mov-qty-lbl').textContent = { entrada:'Cantidad que entra', salida:'Cantidad que sale', ajuste:'Diferencia (+ o −)' }[t];
+  document.getElementById('mov-ayuda').textContent = { entrada:'Mercancía que llegó. Si cambias el costo, se actualiza el costo del artículo.', salida:'Uso interno, merma o producto dañado.', ajuste:'Corrige el stock tras un conteo físico: escribe cuánto sobra (+) o falta (−).' }[t];
+  document.getElementById('mov-costo-wrap').style.display = t === 'entrada' ? '' : 'none';
+}
+async function guardarMovimiento(){
+  const q = parseFloat(document.getElementById('mov-qty').value);
+  if (!q){ msg('mov-msg', 'Indica la cantidad.'); return; }
+  try {
+    await Pedidos.moverInventario(movArt.id, MOV_TIPO, q, MOV_TIPO === 'entrada' ? document.getElementById('mov-costo').value : null, document.getElementById('mov-nota').value);
+    cerrar('ov-mov'); cargarInventario();
+  } catch(e){ msg('mov-msg', e.message); }
+}
+
+// ---------- Entregas y horarios ----------
+const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const ORDEN_DIAS = [1,2,3,4,5,6,0];
+let CFG = null, ZONAS = [], FRANJAS = [], FECHAS = [], editZona = null, editFranja = null;
+async function cargarEntregas(){
+  try { [CFG, ZONAS, FRANJAS, FECHAS] = await Promise.all([Pedidos.configuracion(), Pedidos.listarZonas(), Pedidos.listarFranjas(), Pedidos.listarFechasBloqueadas()]); }
+  catch(e){ document.getElementById('lista-zonas').innerHTML = `<p class="vacio-mini">${E(e.message)}</p>`; return; }
+  document.getElementById('e-retiro').checked = CFG.acepta_retiro;
+  document.getElementById('e-domicilio').checked = CFG.acepta_domicilio;
+  document.getElementById('sec-zonas').style.display = CFG.acepta_domicilio ? '' : 'none';
+  document.getElementById('lista-zonas').innerHTML = ZONAS.length ? ZONAS.map(z => `
+    <div class="fila"><div class="fila-info"><strong>${E(z.name)}${z.active ? '' : '<span class="chip gris">Inactiva</span>'}</strong><span>Envío ${$(z.price)}</span></div>
+    <div class="fila-acc"><button class="ico" onclick="abrirZona('${z.id}')" aria-label="Editar"><i class="ti ti-edit"></i></button></div></div>`).join('')
+    : '<p class="vacio-mini">Crea las zonas a las que entregas, cada una con su costo.</p>';
+  const hh = t => String(t).slice(0,5);
+  document.getElementById('lista-franjas').innerHTML = ORDEN_DIAS.map(d => `
+    <div class="dia"><h4>${DIAS[d].slice(0,3)}<button onclick="abrirFranja(null, ${d})" aria-label="Agregar franja el ${DIAS[d]}"><i class="ti ti-plus"></i></button></h4>
+      ${FRANJAS.filter(f => f.weekday === d).map(f => `<div class="franja${f.active ? '' : ' off'}" onclick="abrirFranja('${f.id}')"><b>${hh(f.start_time)}–${hh(f.end_time)}</b>${f.capacity} pedido${f.capacity === 1 ? '' : 's'}${f.active ? '' : ' · inactiva'}</div>`).join('') || '<p class="ayuda">Sin franjas</p>'}
+    </div>`).join('');
+  document.getElementById('lista-fechas').innerHTML = FECHAS.length ? FECHAS.map(f => `
+    <div class="fila"><div class="fila-info"><strong>${new Date(f.fecha + 'T12:00:00').toLocaleDateString('es-PA', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</strong><span>${E(f.motivo || 'Sin pedidos')}</span></div>
+    <div class="fila-acc"><button class="ico del" onclick="desbloquearFecha('${f.id}')" aria-label="Quitar"><i class="ti ti-trash"></i></button></div></div>`).join('')
+    : '<p class="vacio-mini">No tienes fechas bloqueadas.</p>';
+}
+async function guardarFormasEntrega(){
+  const r = document.getElementById('e-retiro').checked, d = document.getElementById('e-domicilio').checked;
+  if (!r && !d){ alert('Debes ofrecer al menos una forma de entrega.'); document.getElementById('e-retiro').checked = true; return; }
+  try { await Pedidos.guardarConfiguracion({ ...CFG, acepta_retiro: r, acepta_domicilio: d }); cargarEntregas(); }
+  catch(e){ alert(e.message); }
+}
+function abrirZona(id){
+  editZona = id ? ZONAS.find(z => z.id === id) : null;
+  document.getElementById('zona-titulo').textContent = editZona ? 'Editar zona' : 'Nueva zona';
+  document.getElementById('zona-nombre').value = editZona ? editZona.name : '';
+  document.getElementById('zona-precio').value = editZona ? editZona.price : '';
+  document.getElementById('zona-activa').checked = editZona ? editZona.active : true;
+  document.getElementById('zona-borrar').style.display = editZona ? '' : 'none';
+  msg('zona-msg'); abrir('ov-zona');
+}
+async function guardarZona(){
+  try { await Pedidos.guardarZona({ id: editZona && editZona.id, name: document.getElementById('zona-nombre').value,
+    price: document.getElementById('zona-precio').value, active: document.getElementById('zona-activa').checked }); cerrar('ov-zona'); cargarEntregas(); }
+  catch(e){ msg('zona-msg', e.message); }
+}
+async function borrarZona(){
+  if (!confirm('¿Borrar esta zona? Los pedidos que ya la usaron conservan su nombre y costo.')) return;
+  try { await Pedidos.borrarZona(editZona.id); cerrar('ov-zona'); cargarEntregas(); } catch(e){ msg('zona-msg', e.message); }
+}
+function abrirFranja(id, dia){
+  editFranja = id ? FRANJAS.find(f => f.id === id) : null;
+  document.getElementById('franja-titulo').textContent = editFranja ? 'Editar franja' : 'Nueva franja';
+  document.getElementById('franja-dia').innerHTML = ORDEN_DIAS.map(d => `<option value="${d}">${DIAS[d]}</option>`).join('');
+  document.getElementById('franja-dia').value = editFranja ? editFranja.weekday : dia;
+  document.getElementById('franja-ini').value = editFranja ? String(editFranja.start_time).slice(0,5) : '09:00';
+  document.getElementById('franja-fin').value = editFranja ? String(editFranja.end_time).slice(0,5) : '12:00';
+  document.getElementById('franja-cap').value = editFranja ? editFranja.capacity : 5;
+  document.getElementById('franja-activa').checked = editFranja ? editFranja.active : true;
+  document.getElementById('franja-copiar').checked = false;
+  document.getElementById('franja-copiar-wrap').style.display = editFranja ? 'none' : '';
+  document.getElementById('franja-borrar').style.display = editFranja ? '' : 'none';
+  msg('franja-msg'); abrir('ov-franja');
+}
+async function guardarFranja(){
+  const base = { start_time: document.getElementById('franja-ini').value, end_time: document.getElementById('franja-fin').value,
+    capacity: document.getElementById('franja-cap').value, active: document.getElementById('franja-activa').checked };
+  try {
+    if (editFranja) await Pedidos.guardarFranja({ ...base, id: editFranja.id, weekday: document.getElementById('franja-dia').value });
+    else {
+      const dias = document.getElementById('franja-copiar').checked ? [1,2,3,4,5,6] : [Number(document.getElementById('franja-dia').value)];
+      for (const d of dias) await Pedidos.guardarFranja({ ...base, weekday: d });
+    }
+    cerrar('ov-franja'); cargarEntregas();
+  } catch(e){ msg('franja-msg', e.message); }
+}
+async function borrarFranja(){
+  if (!confirm('¿Borrar esta franja?')) return;
+  try {
+    const r = await Pedidos.borrarFranja(editFranja.id);
+    if (r === 'desactivada') alert('Esta franja ya tiene pedidos, así que se desactivó en lugar de borrarse.');
+    cerrar('ov-franja'); cargarEntregas();
+  } catch(e){ msg('franja-msg', e.message); }
+}
+function abrirFecha(){
+  document.getElementById('fecha-dia').value = ''; document.getElementById('fecha-dia').min = Pedidos.hoyISO();
+  document.getElementById('fecha-motivo').value = ''; msg('fecha-msg'); abrir('ov-fecha');
+}
+async function guardarFecha(){
+  try { await Pedidos.bloquearFecha(document.getElementById('fecha-dia').value, document.getElementById('fecha-motivo').value); cerrar('ov-fecha'); cargarEntregas(); }
+  catch(e){ msg('fecha-msg', e.message); }
+}
+async function desbloquearFecha(id){
+  if (!confirm('¿Volver a recibir pedidos esa fecha?')) return;
+  try { await Pedidos.desbloquearFecha(id); cargarEntregas(); } catch(e){ alert(e.message); }
+}
+
+// ---------- Configuración ----------
+async function cargarConfig(){
+  try { CFG = await Pedidos.configuracion(); } catch(e){ msg('c-msg', e.message); return; }
+  document.getElementById('c-min').value = CFG.min_prep_hours;
+  document.getElementById('c-warn').value = CFG.warn_hours;
+  document.getElementById('c-exp').value = CFG.pending_expiry_hours;
+  document.getElementById('c-max').value = CFG.max_days_ahead;
+  const n = Pedidos.negocio;
+  document.getElementById('d-yappy').value = n.yappy_numero || '';
+  document.getElementById('d-wa').value = n.whatsapp || '';
+  document.getElementById('d-dir').value = n.direccion || '';
+  document.getElementById('d-ig').value = n.instagram || '';
+  document.getElementById('d-tag').value = n.tagline || '';
+  msg('c-msg'); msg('d-msg');
+}
+async function guardarTiempos(){
+  const v = id => parseInt(document.getElementById(id).value, 10);
+  const c = { min_prep_hours: v('c-min'), warn_hours: v('c-warn'), pending_expiry_hours: v('c-exp'), max_days_ahead: v('c-max') };
+  if (Object.values(c).some(x => isNaN(x) || x < 0)){ msg('c-msg', 'Revisa los valores: deben ser números mayores o iguales a 0.'); return; }
+  if (c.pending_expiry_hours < 1 || c.max_days_ahead < 1){ msg('c-msg', 'Las horas para confirmar el pago y los días hacia adelante deben ser al menos 1.'); return; }
+  try { await Pedidos.guardarConfiguracion({ ...CFG, ...c }); CFG = { ...CFG, ...c }; msg('c-msg', ''); alert('Tiempos guardados.'); }
+  catch(e){ msg('c-msg', e.message); }
+}
+async function guardarDatos(){
+  try {
+    await Pedidos.guardarDatosNegocio({ yappy_numero: document.getElementById('d-yappy').value, whatsapp: document.getElementById('d-wa').value,
+      direccion: document.getElementById('d-dir').value, instagram: document.getElementById('d-ig').value, tagline: document.getElementById('d-tag').value });
+    msg('d-msg', ''); alert('Datos guardados.');
+  } catch(e){ msg('d-msg', e.message); }
 }
 
 // ---------- Acceso ----------
