@@ -108,27 +108,47 @@ header{background:#fff;border-bottom:1px solid var(--line);}
 .btn-sec{width:100%;margin-top:10px;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;}
 
 /* ---------- Pie de página ---------- */
-footer{background:color-mix(in srgb,var(--p) 7%,#fff);border-top:1px solid color-mix(in srgb,var(--p) 18%,#fff);padding:34px 0 18px;font-size:13px;color:var(--ink-soft);}
-.pie{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:26px;}
-.pie-marca{display:flex;gap:12px;align-items:flex-start;}
-.pie-marca img{width:52px;height:52px;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--line);flex-shrink:0;}
-.pie-marca strong{display:block;font-family:'Playfair Display',serif;font-size:19px;color:var(--ink);line-height:1.2;}
-.pie-marca p{margin-top:4px;line-height:1.5;}
-.pie h4{font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--p);margin-bottom:10px;}
-.pie-dato{display:flex;gap:8px;align-items:flex-start;line-height:1.5;margin-bottom:8px;color:var(--ink);}
-.pie-dato i{color:var(--p);font-size:16px;margin-top:1px;}
-.pie-dato a{color:var(--p);font-weight:600;text-decoration:none;font-size:12.5px;}
-.redes{display:flex;flex-wrap:wrap;gap:8px;}
-.red{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;background:#fff;border:1.5px solid color-mix(in srgb,var(--p) 25%,#fff);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;transition:transform .2s,box-shadow .2s,border-color .2s;}
-.red i{font-size:17px;color:var(--p);}
-.red:hover{transform:translateY(-2px);border-color:var(--p);box-shadow:0 8px 18px -12px var(--p);}
-.pie-base{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid color-mix(in srgb,var(--p) 14%,#fff);margin-top:26px;padding-top:14px;font-size:12px;}
-.pie-base a{color:var(--ink-soft);text-decoration:none;font-weight:600;}
-.pie-base a b{background:linear-gradient(135deg,#7C3AED,#EC4899);-webkit-background-clip:text;background-clip:text;color:transparent;}
-@media(max-width:720px){.pie{grid-template-columns:1fr;gap:22px;}.pie-base{justify-content:center;text-align:center;}}
+footer{position:relative;overflow:hidden;background:linear-gradient(180deg,color-mix(in srgb,var(--p) 5%,#fff),color-mix(in srgb,var(--p) 11%,#fff));border-top:1px solid color-mix(in srgb,var(--p) 14%,#fff);padding:30px 0 20px;font-size:13.5px;color:var(--ink);}
+/* Formas suaves de fondo (decorativas) */
+footer::before,footer::after{content:"";position:absolute;border-radius:50%;filter:blur(40px);opacity:.55;pointer-events:none;}
+footer::before{width:260px;height:260px;left:-90px;bottom:-120px;background:color-mix(in srgb,var(--s) 30%,#fff);}
+footer::after{width:220px;height:220px;right:-70px;top:-90px;background:color-mix(in srgb,var(--p) 22%,#fff);}
+footer .wrap{position:relative;z-index:1;max-width:680px;}
+.pie-card{display:grid;grid-template-columns:1fr 1px 1fr;gap:18px;align-items:start;background:rgba(255,255,255,.55);border:1px solid color-mix(in srgb,var(--p) 14%,#fff);border-radius:20px;padding:18px;backdrop-filter:blur(4px);}
+.pie-sep{background:color-mix(in srgb,var(--p) 18%,#fff);height:100%;min-height:70px;}
+.pie-col{display:flex;gap:12px;align-items:flex-start;min-width:0;}
+.pie-ico{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:color-mix(in srgb,var(--p) 12%,#fff);color:var(--p);font-size:21px;}
+.pie h4{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--p);margin:2px 0 6px;}
+.pie-col p{line-height:1.45;word-break:break-word;}
+.pie-col a{display:inline-block;margin-top:6px;color:var(--p);font-weight:700;text-decoration:none;font-size:13px;}
+.pie-titulo{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--p);margin:22px 0 10px 4px;}
+.redes{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.red{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:16px;color:#fff;font-weight:700;font-size:14px;text-decoration:none;min-width:0;box-shadow:0 12px 22px -16px rgba(0,0,0,.55);transition:transform .2s,box-shadow .2s;}
+.red span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.red i{font-size:22px;flex-shrink:0;}
+.red .ti-arrow-right{font-size:17px;opacity:.9;transition:transform .2s;}
+.red:hover{transform:translateY(-2px);box-shadow:0 16px 26px -16px rgba(0,0,0,.6);}
+.red:hover .ti-arrow-right{transform:translateX(3px);}
+.red.wa{background:linear-gradient(135deg,#1EBE5B,#25D366);}
+.red.ig{background:linear-gradient(135deg,#F58529 0%,#DD2A7B 55%,#8134AF 100%);}
+.pie-corazon{display:flex;align-items:center;gap:12px;margin:24px 0 12px;color:var(--p);}
+.pie-corazon::before,.pie-corazon::after{content:"";flex:1;height:1px;background:color-mix(in srgb,var(--p) 30%,#fff);}
+.pie-corazon i{font-size:18px;}
+.pie-base{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);}
+.pie-base .barra{width:1px;height:14px;background:color-mix(in srgb,var(--p) 30%,#fff);}
+.pie-base a{color:var(--ink-soft);text-decoration:none;}
+.pie-base a b{color:var(--p);}
+@media(max-width:520px){
+  .pie-card{padding:14px;gap:12px;}
+  .pie-ico{width:38px;height:38px;font-size:18px;}
+  .pie-col{gap:9px;}
+  .red{padding:12px 13px;font-size:13px;gap:8px;}
+}
+@media(max-width:360px){.redes{grid-template-columns:1fr;}}
 
 /* WhatsApp flotante */
-.wa-flot{position:fixed;right:18px;bottom:18px;width:54px;height:54px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;font-size:28px;text-decoration:none;box-shadow:0 12px 26px -10px rgba(37,211,102,.8);z-index:40;animation:flotar 3.2s ease-in-out infinite;}
+.wa-flot.oculto{opacity:0;transform:scale(.6);pointer-events:none;}
+.wa-flot{transition:opacity .25s,transform .25s;position:fixed;right:18px;bottom:18px;width:54px;height:54px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;font-size:28px;text-decoration:none;box-shadow:0 12px 26px -10px rgba(37,211,102,.8);z-index:40;animation:flotar 3.2s ease-in-out infinite;}
 .wa-flot:hover{transform:scale(1.07);}
 @keyframes flotar{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
 
@@ -186,14 +206,13 @@ footer{animation:aparecer .6s ease both;}
 </main>
 
 <footer id="t-footer" hidden>
-  <div class="wrap">
-    <div class="pie">
-      <div class="pie-marca" id="t-pie-marca"></div>
-      <div id="t-pie-visita"></div>
-      <div id="t-pie-contacto"></div>
-    </div>
+  <div class="wrap pie">
+    <div class="pie-card" id="t-pie-card"></div>
+    <div id="t-pie-redes"></div>
+    <div class="pie-corazon" aria-hidden="true"><i class="ti ti-heart"></i></div>
     <div class="pie-base">
       <span id="t-pie-copy"></span>
+      <span class="barra" aria-hidden="true"></span>
       <a href="https://annly.app" target="_blank" rel="noopener">Tienda creada con <b>Annly</b></a>
     </div>
   </div>
@@ -255,24 +274,29 @@ function pintarNegocio(n){
   if (n.logo_url){ const l = document.getElementById('t-logo'); l.src = n.logo_url; l.alt = n.nombre; l.hidden = false; }
   const wa = String(n.whatsapp || '').replace(/\D/g, '');
   const ig = String(n.instagram || '').replace(/^@+/, '');
-  // Marca: logo, nombre y frase
-  document.getElementById('t-pie-marca').innerHTML =
-    (n.logo_url ? `<img src="${E(n.logo_url)}" alt="">` : '') +
-    `<div><strong>${E(n.nombre)}</strong>${n.tagline || n.categoria ? `<p>${E(n.tagline || n.categoria)}</p>` : ''}</div>`;
-  // Visítanos: dirección con enlace al mapa y formas de entrega
+  // El pie no repite el encabezado: solo dónde estamos, qué ofrecemos y cómo escribirnos
   const mapa = n.direccion ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(n.direccion + ', Panamá') : '';
-  document.getElementById('t-pie-visita').innerHTML = `<h4>Visítanos</h4>` +
-    (n.direccion ? `<div class="pie-dato"><i class="ti ti-map-pin"></i><div>${E(n.direccion)}<br><a href="${mapa}" target="_blank" rel="noopener">Ver en el mapa →</a></div></div>` : '') +
-    `<div class="pie-dato" id="t-pie-entregas"><i class="ti ti-truck-delivery"></i><div>Pedidos en línea</div></div>`;
-  // Contacto: WhatsApp e Instagram
-  document.getElementById('t-pie-contacto').innerHTML = (wa || ig) ? `<h4>Escríbenos</h4><div class="redes">` +
-    (wa ? `<a class="red" href="https://wa.me/${wa}" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i> WhatsApp</a>` : '') +
-    (ig ? `<a class="red" href="https://instagram.com/${E(ig)}" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i> @${E(ig)}</a>` : '') +
+  document.getElementById('t-pie-card').innerHTML =
+    (n.direccion ? `<div class="pie-col"><div class="pie-ico"><i class="ti ti-map-pin"></i></div>
+      <div><h4>Visítanos</h4><p>${E(n.direccion)}</p><a href="${mapa}" target="_blank" rel="noopener">Ver en el mapa →</a></div></div>
+      <div class="pie-sep" aria-hidden="true"></div>` : '') +
+    `<div class="pie-col"><div class="pie-ico"><i class="ti ti-truck-delivery"></i></div>
+      <div><h4>Nuestros servicios</h4><p id="t-pie-entregas">Pedidos en línea</p></div></div>`;
+  if (!n.direccion) document.getElementById('t-pie-card').style.gridTemplateColumns = '1fr';
+  document.getElementById('t-pie-redes').innerHTML = (wa || ig) ? `<div class="pie-titulo">Escríbenos</div><div class="redes">` +
+    (wa ? `<a class="red wa" href="https://wa.me/${wa}" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i><span>WhatsApp</span><i class="ti ti-arrow-right"></i></a>` : '') +
+    (ig ? `<a class="red ig" href="https://instagram.com/${E(ig)}" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i><span>@${E(ig)}</span><i class="ti ti-arrow-right"></i></a>` : '') +
     `</div>` : '';
+  if (!(wa && ig)) { const r = document.querySelector('.redes'); if (r) r.style.gridTemplateColumns = '1fr'; }
   document.getElementById('t-pie-copy').textContent = '© ' + new Date().getFullYear() + ' ' + n.nombre;
   const flot = document.getElementById('t-wa-flot');
   if (wa){ flot.href = 'https://wa.me/' + wa; flot.hidden = false; }
   document.getElementById('t-footer').hidden = false;
+  // Con el pie a la vista, el botón flotante se esconde para no taparlo
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(ents => ents.forEach(en => flot.classList.toggle('oculto', en.isIntersecting)), { threshold: 0.05 })
+      .observe(document.getElementById('t-footer'));
+  }
 }
 
 // Formas de entrega en el pie (cuando ya se cargó el catálogo)
@@ -281,7 +305,7 @@ function pintarEntregasPie(){
   if (!el) return;
   const c = { retiro: true, domicilio: true, ...((CAT && CAT.config) || {}) };
   const txt = c.retiro && c.domicilio ? 'Retiro en tienda y entrega a domicilio' : (c.domicilio ? 'Entrega a domicilio' : 'Retiro en tienda');
-  el.querySelector('div').textContent = txt;
+  el.innerHTML = c.retiro && c.domicilio ? 'Retiro en tienda<br>y entrega a domicilio' : E(txt);
 }
 
 
