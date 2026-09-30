@@ -107,9 +107,62 @@ header{background:#fff;border-bottom:1px solid var(--line);}
 .listo .num{font-family:'DM Sans',sans-serif;font-size:26px;font-weight:800;color:var(--p);margin:6px 0 10px;}
 .btn-sec{width:100%;margin-top:10px;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;}
 
-footer{background:#fff;border-top:1px solid var(--line);padding:26px 0;font-size:13px;color:var(--ink-soft);}
-footer .wrap{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between;}
-footer a{color:var(--p);font-weight:600;text-decoration:none;}
+/* ---------- Pie de página ---------- */
+footer{background:color-mix(in srgb,var(--p) 7%,#fff);border-top:1px solid color-mix(in srgb,var(--p) 18%,#fff);padding:34px 0 18px;font-size:13px;color:var(--ink-soft);}
+.pie{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:26px;}
+.pie-marca{display:flex;gap:12px;align-items:flex-start;}
+.pie-marca img{width:52px;height:52px;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--line);flex-shrink:0;}
+.pie-marca strong{display:block;font-family:'Playfair Display',serif;font-size:19px;color:var(--ink);line-height:1.2;}
+.pie-marca p{margin-top:4px;line-height:1.5;}
+.pie h4{font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--p);margin-bottom:10px;}
+.pie-dato{display:flex;gap:8px;align-items:flex-start;line-height:1.5;margin-bottom:8px;color:var(--ink);}
+.pie-dato i{color:var(--p);font-size:16px;margin-top:1px;}
+.pie-dato a{color:var(--p);font-weight:600;text-decoration:none;font-size:12.5px;}
+.redes{display:flex;flex-wrap:wrap;gap:8px;}
+.red{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;background:#fff;border:1.5px solid color-mix(in srgb,var(--p) 25%,#fff);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;transition:transform .2s,box-shadow .2s,border-color .2s;}
+.red i{font-size:17px;color:var(--p);}
+.red:hover{transform:translateY(-2px);border-color:var(--p);box-shadow:0 8px 18px -12px var(--p);}
+.pie-base{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid color-mix(in srgb,var(--p) 14%,#fff);margin-top:26px;padding-top:14px;font-size:12px;}
+.pie-base a{color:var(--ink-soft);text-decoration:none;font-weight:600;}
+.pie-base a b{background:linear-gradient(135deg,#7C3AED,#EC4899);-webkit-background-clip:text;background-clip:text;color:transparent;}
+@media(max-width:720px){.pie{grid-template-columns:1fr;gap:22px;}.pie-base{justify-content:center;text-align:center;}}
+
+/* WhatsApp flotante */
+.wa-flot{position:fixed;right:18px;bottom:18px;width:54px;height:54px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;font-size:28px;text-decoration:none;box-shadow:0 12px 26px -10px rgba(37,211,102,.8);z-index:40;animation:flotar 3.2s ease-in-out infinite;}
+.wa-flot:hover{transform:scale(1.07);}
+@keyframes flotar{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+
+/* ---------- Animaciones ---------- */
+@keyframes subir{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+@keyframes aparecer{from{opacity:0;}to{opacity:1;}}
+@keyframes hojaSube{from{transform:translateY(40px);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes pasoEntra{from{opacity:0;transform:translateX(16px);}to{opacity:1;transform:none;}}
+@keyframes pop{0%{transform:scale(.4);opacity:0;}70%{transform:scale(1.12);opacity:1;}100%{transform:scale(1);}}
+.hero{animation:subir .6s ease both;}
+.cats{animation:subir .5s .1s ease both;}
+.cats .cat{transition:background .2s,color .2s,border-color .2s,transform .15s;}
+.cats .cat:active{transform:scale(.95);}
+.prod{opacity:0;animation:subir .55s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .25s ease,box-shadow .25s ease;}
+.prod:hover{transform:translateY(-4px);box-shadow:0 18px 34px -22px rgba(31,27,43,.45);}
+.prod .prod-foto{transition:transform .5s ease;}
+.prod:hover .prod-foto{transform:scale(1.04);}
+.prod{overflow:hidden;}
+.ov.on{animation:aparecer .25s ease;}
+.ov.on .hoja{animation:hojaSube .35s cubic-bezier(.2,.8,.2,1);}
+#p-body > *:not(.pasos){animation:pasoEntra .3s ease both;}
+.pasos span{transition:background .35s ease;}
+.dia,.fr,.opc,.extra{transition:border-color .2s,background .2s,transform .15s;}
+.dia:active,.fr:active,.opc:active,.extra:active{transform:scale(.97);}
+.btn-pedir{transition:transform .15s,opacity .2s,box-shadow .2s;}
+.btn-pedir:not(:disabled):hover{box-shadow:0 12px 24px -14px var(--p);}
+.btn-pedir:not(:disabled):active{transform:scale(.98);}
+.listo i{display:inline-block;animation:pop .6s cubic-bezier(.2,.8,.2,1) both;}
+.listo .num{animation:subir .5s .2s ease both;}
+footer{animation:aparecer .6s ease both;}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;}
+  .prod{opacity:1;}
+}
 </style>
 </head>
 <body>
@@ -134,10 +187,18 @@ footer a{color:var(--p);font-weight:600;text-decoration:none;}
 
 <footer id="t-footer" hidden>
   <div class="wrap">
-    <div id="t-dir"></div>
-    <div id="t-contacto"></div>
+    <div class="pie">
+      <div class="pie-marca" id="t-pie-marca"></div>
+      <div id="t-pie-visita"></div>
+      <div id="t-pie-contacto"></div>
+    </div>
+    <div class="pie-base">
+      <span id="t-pie-copy"></span>
+      <a href="https://annly.app" target="_blank" rel="noopener">Tienda creada con <b>Annly</b></a>
+    </div>
   </div>
 </footer>
+<a class="wa-flot" id="t-wa-flot" href="#" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp" hidden><i class="ti ti-brand-whatsapp"></i></a>
 
 <!-- Producto y pedido (pasos) -->
 <div class="ov" id="ov-prod" onclick="if(event.target===this)cerrarProducto()">
@@ -179,6 +240,7 @@ async function arrancar(){
   try { CAT = await Pedidos.catalogo(); }
   catch(e){ console.error(e); estado('No pudimos cargar el catálogo', 'Recarga la página en un momento.'); return; }
   if (!CAT.productos.length){ estado('Catálogo en preparación', 'Pronto podrás hacer tus pedidos aquí.'); return; }
+  pintarEntregasPie();
   pintarCategorias();
   pintarProductos();
 }
@@ -192,13 +254,36 @@ function pintarNegocio(n){
   document.getElementById('t-sub').textContent = n.tagline || (n.categoria ? n.categoria + ' · pedidos en línea' : 'Haz tu pedido en línea');
   if (n.logo_url){ const l = document.getElementById('t-logo'); l.src = n.logo_url; l.alt = n.nombre; l.hidden = false; }
   const wa = String(n.whatsapp || '').replace(/\D/g, '');
-  document.getElementById('t-dir').innerHTML = n.direccion ? '<i class="ti ti-map-pin"></i> ' + E(n.direccion) : '';
-  document.getElementById('t-contacto').innerHTML = [
-    wa ? `<a href="https://wa.me/${wa}" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i> WhatsApp</a>` : '',
-    n.instagram ? `<a href="https://instagram.com/${E(String(n.instagram).replace(/^@/, ''))}" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i> Instagram</a>` : ''
-  ].filter(Boolean).join(' &nbsp; ');
-  document.getElementById('t-footer').hidden = !(n.direccion || wa || n.instagram);
+  const ig = String(n.instagram || '').replace(/^@+/, '');
+  // Marca: logo, nombre y frase
+  document.getElementById('t-pie-marca').innerHTML =
+    (n.logo_url ? `<img src="${E(n.logo_url)}" alt="">` : '') +
+    `<div><strong>${E(n.nombre)}</strong>${n.tagline || n.categoria ? `<p>${E(n.tagline || n.categoria)}</p>` : ''}</div>`;
+  // Visítanos: dirección con enlace al mapa y formas de entrega
+  const mapa = n.direccion ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(n.direccion + ', Panamá') : '';
+  document.getElementById('t-pie-visita').innerHTML = `<h4>Visítanos</h4>` +
+    (n.direccion ? `<div class="pie-dato"><i class="ti ti-map-pin"></i><div>${E(n.direccion)}<br><a href="${mapa}" target="_blank" rel="noopener">Ver en el mapa →</a></div></div>` : '') +
+    `<div class="pie-dato" id="t-pie-entregas"><i class="ti ti-truck-delivery"></i><div>Pedidos en línea</div></div>`;
+  // Contacto: WhatsApp e Instagram
+  document.getElementById('t-pie-contacto').innerHTML = (wa || ig) ? `<h4>Escríbenos</h4><div class="redes">` +
+    (wa ? `<a class="red" href="https://wa.me/${wa}" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i> WhatsApp</a>` : '') +
+    (ig ? `<a class="red" href="https://instagram.com/${E(ig)}" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i> @${E(ig)}</a>` : '') +
+    `</div>` : '';
+  document.getElementById('t-pie-copy').textContent = '© ' + new Date().getFullYear() + ' ' + n.nombre;
+  const flot = document.getElementById('t-wa-flot');
+  if (wa){ flot.href = 'https://wa.me/' + wa; flot.hidden = false; }
+  document.getElementById('t-footer').hidden = false;
 }
+
+// Formas de entrega en el pie (cuando ya se cargó el catálogo)
+function pintarEntregasPie(){
+  const el = document.getElementById('t-pie-entregas');
+  if (!el) return;
+  const c = { retiro: true, domicilio: true, ...((CAT && CAT.config) || {}) };
+  const txt = c.retiro && c.domicilio ? 'Retiro en tienda y entrega a domicilio' : (c.domicilio ? 'Entrega a domicilio' : 'Retiro en tienda');
+  el.querySelector('div').textContent = txt;
+}
+
 
 function pintarCategorias(){
   const usadas = CAT.categorias.filter(c => CAT.productos.some(p => p.categoriaId === c.id));
@@ -215,8 +300,8 @@ function fotoHtml(p, clase){
 function pintarProductos(){
   const lista = CAT.productos.filter(p => !CAT_SEL || p.categoriaId === CAT_SEL);
   document.getElementById('t-estado').hidden = true;
-  document.getElementById('t-grid').innerHTML = lista.map(p => `
-    <button class="prod" onclick="abrirProducto('${p.id}')">
+  document.getElementById('t-grid').innerHTML = lista.map((p, i) => `
+    <button class="prod" style="animation-delay:${Math.min(i, 11) * 60}ms" onclick="abrirProducto('${p.id}')">
       ${fotoHtml(p, 'prod-foto')}
       <div class="prod-info"><strong>${E(p.nombre)}</strong>${p.descripcion ? `<span>${E(p.descripcion)}</span>` : ''}<b>${Pedidos.dinero(p.precio)}</b></div>
     </button>`).join('');
