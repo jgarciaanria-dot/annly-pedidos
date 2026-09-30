@@ -360,6 +360,8 @@ button,input,select,textarea{font-family:inherit;}
             <div class="fg"><label class="flbl" for="d-wa">WhatsApp</label><input class="fi" id="d-wa" inputmode="numeric" placeholder="50760001111"></div>
           </div>
           <div class="fg"><label class="flbl" for="d-dir">Dirección de la tienda (para retiro)</label><input class="fi" id="d-dir"></div>
+          <div class="fg"><label class="flbl" for="d-avisos">Correo para avisos de pedidos</label><input class="fi" id="d-avisos" type="email" maxlength="120" placeholder="pedidos@tunegocio.com">
+            <p class="ayuda" id="d-avisos-ayuda">Aquí llegan los avisos de pedidos nuevos. Si lo dejas vacío, llegan a tu correo de acceso.</p></div>
           <div class="frow">
             <div class="fg"><label class="flbl" for="d-ig">Instagram</label><input class="fi" id="d-ig" placeholder="tutienda"></div>
             <div class="fg"><label class="flbl" for="d-tag">Frase de la tienda</label><input class="fi" id="d-tag" maxlength="80" placeholder="Flores frescas para cada ocasión"></div>
@@ -1135,6 +1137,7 @@ async function cargarConfig(){
   document.getElementById('d-dir').value = n.direccion || '';
   document.getElementById('d-ig').value = n.instagram || '';
   document.getElementById('d-tag').value = n.tagline || '';
+  document.getElementById('d-avisos').value = CFG.correo_avisos || '';
   msg('c-msg'); msg('d-msg');
 }
 async function guardarTiempos(){
@@ -1146,7 +1149,11 @@ async function guardarTiempos(){
   catch(e){ msg('c-msg', e.message); }
 }
 async function guardarDatos(){
+  const avisos = document.getElementById('d-avisos').value.trim();
+  if (avisos && !/^\S+@\S+\.\S+$/.test(avisos)){ msg('d-msg', 'Revisa el correo para avisos.'); return; }
   try {
+    await Pedidos.guardarConfiguracion({ ...CFG, correo_avisos: avisos || null });
+    CFG = { ...CFG, correo_avisos: avisos || null };
     await Pedidos.guardarDatosNegocio({ yappy_numero: document.getElementById('d-yappy').value, whatsapp: document.getElementById('d-wa').value,
       direccion: document.getElementById('d-dir').value, instagram: document.getElementById('d-ig').value, tagline: document.getElementById('d-tag').value });
     msg('d-msg', ''); alert('Datos guardados.');
