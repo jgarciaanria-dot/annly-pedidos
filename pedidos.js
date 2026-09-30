@@ -121,7 +121,7 @@ const Pedidos = {
     const n = this.negocio || {};
     return {
       categorias, productos, articulos, zonas, franjas, pedidosHoy, pendientes,
-      yappy: !!(n.yappy_numero || n.tiene_yappy_comercial)
+      yappy: !!(n.yappy_numero || n.tiene_yappy_comercial || (n.banco_nombre && n.banco_numero_cuenta))
     };
   },
 
@@ -270,7 +270,12 @@ const Pedidos = {
       whatsapp: (d.whatsapp || '').replace(/\D/g, '') || null,
       direccion: (d.direccion || '').trim() || null,
       instagram: (d.instagram || '').trim().replace(/^@+/, '') || null,
-      tagline: (d.tagline || '').trim() || null
+      tagline: (d.tagline || '').trim() || null,
+      // Transferencia bancaria (mismas columnas que usa Annly Agenda)
+      banco_nombre: (d.banco_nombre || '').trim() || null,
+      banco_tipo_cuenta: (d.banco_tipo_cuenta || '').trim() || null,
+      banco_numero_cuenta: (d.banco_numero_cuenta || '').trim() || null,
+      banco_titular: (d.banco_titular || '').trim() || null
     };
     const data = await this._q(sb.from('businesses').update(fila).eq('id', this.id).select('*'));
     if (!data || !data.length) throw new Error('No se pudieron guardar los datos (sin permisos).');
