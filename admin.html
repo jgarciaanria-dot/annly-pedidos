@@ -359,6 +359,16 @@ button,input,select,textarea{font-family:inherit;}
             <div class="fg"><label class="flbl" for="d-yappy">Número de Yappy</label><input class="fi" id="d-yappy" inputmode="numeric" placeholder="6000-1111"></div>
             <div class="fg"><label class="flbl" for="d-wa">WhatsApp</label><input class="fi" id="d-wa" inputmode="numeric" placeholder="50760001111"></div>
           </div>
+          <div class="fg" style="margin-top:4px;"><label class="flbl">Transferencia bancaria (opcional)</label>
+            <div class="frow">
+              <div class="fg"><input class="fi" id="d-banco" maxlength="60" placeholder="Banco (ej. Banco General)"></div>
+              <div class="fg"><select class="fi" id="d-tipo-cuenta"><option value="">Tipo de cuenta</option><option>Ahorros</option><option>Corriente</option></select></div>
+            </div>
+            <div class="frow">
+              <div class="fg"><input class="fi" id="d-cuenta" maxlength="40" placeholder="Número de cuenta"></div>
+              <div class="fg"><input class="fi" id="d-titular" maxlength="80" placeholder="Titular de la cuenta"></div>
+            </div>
+            <p class="ayuda" style="margin-top:-6px;">Si lo completas, tus clientes podrán elegir pagar por Yappy o por transferencia.</p></div>
           <div class="fg"><label class="flbl" for="d-dir">Dirección de la tienda (para retiro)</label><input class="fi" id="d-dir"></div>
           <div class="fg"><label class="flbl" for="d-avisos">Correo para avisos de pedidos</label><input class="fi" id="d-avisos" type="email" maxlength="120" placeholder="pedidos@tunegocio.com">
             <p class="ayuda" id="d-avisos-ayuda">Aquí llegan los avisos de pedidos nuevos. Si lo dejas vacío, llegan a tu correo de acceso.</p></div>
@@ -542,7 +552,7 @@ button,input,select,textarea{font-family:inherit;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=4"></script>
+<script src="pedidos.js?v=5"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
 document.getElementById('l-registro').href = ANNLY + '/registro.html';
@@ -610,7 +620,7 @@ async function cargarInicio(){
     { ok: e.articulos > 0, t: 'Define los extras', d: e.articulos ? e.articulos + ' artículos en inventario' : 'Chocolates, globos, peluches: lo que el cliente puede sumar.', tab: 'inventario', b: 'Agregar extras' },
     { ok: e.zonas > 0, t: 'Configura tus zonas de entrega', d: e.zonas ? e.zonas + ' zonas con su precio' : 'Cada zona con su costo de envío. Si solo haces retiro, puedes saltarlo.', tab: 'entregas', b: 'Crear zonas' },
     { ok: e.franjas > 0, t: 'Define tus franjas y cuántos pedidos atiendes', d: e.franjas ? e.franjas + ' franjas activas' : 'Por ejemplo: de 9:00 a 12:00, máximo 5 pedidos.', tab: 'entregas', b: 'Crear franjas' },
-    { ok: e.yappy, t: 'Agrega tu número de Yappy', d: e.yappy ? 'Listo para cobrar' : 'Tus clientes pagan por Yappy y tú confirmas el pago.', tab: 'config', b: 'Agregar Yappy' }
+    { ok: e.yappy, t: 'Agrega cómo te pagan', d: e.yappy ? 'Listo para cobrar' : 'Tu número de Yappy o tu cuenta para transferencias. Tú confirmas cada pago.', tab: 'config', b: 'Agregar pago' }
   ];
   const hechos = pasos.filter(p => p.ok).length;
   document.getElementById('guia-barra').style.width = Math.round(hechos / pasos.length * 100) + '%';
@@ -740,7 +750,8 @@ async function avanzarPedido(id, desdeDetalle){
   if (sig[0] === 'confirmar'){
     const pago = (p.order_payments || []).find(x => x.tipo === 'inicial');
     const comp = pago && pago.comprobante ? `\n\nComprobante: ${pago.comprobante}` : '\n\nEl cliente no dejó comprobante.';
-    if (!confirm(`¿Confirmas que recibiste ${$(p.total)} por Yappy para el pedido ${numPed(p.numero)}?${comp}`)) return;
+    const medio = pago && pago.metodo === 'transferencia' ? 'por transferencia' : 'por Yappy';
+    if (!confirm(`¿Confirmas que recibiste ${$(p.total)} ${medio} para el pedido ${numPed(p.numero)}?${comp}`)) return;
   }
   try {
     if (sig[0] === 'confirmar') await Pedidos.confirmarPago(id);
@@ -763,7 +774,8 @@ async function verPedido(id){
   const mapa = p.address ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.address + ', Panamá') : '';
   const sig = SIGUIENTE[p.estado];
   const EVENTOS = { pedido_recibido: 'Pedido recibido', pago_confirmado: 'Pago confirmado', en_preparacion: 'En preparación', listo: 'Listo', entregado: 'Entregado', cancelado: 'Cancelado' };
-  const pagos = (p.order_payments || []).map(x => `<div class="det-fila"><span>${x.tipo === 'inicial' ? 'Pago' : x.tipo === 'diferencia' ? 'Diferencia' : 'Reembolso'} · ${x.estado}${x.comprobante ? ' · ' + E(x.comprobante) : ''}</span><span>${$(x.monto)}</span></div>`).join('');
+  const MEDIO = { yappy: 'Yappy', transferencia: 'Transferencia' };
+  const pagos = (p.order_payments || []).map(x => `<div class="det-fila"><span>${x.tipo === 'inicial' ? 'Pago' : x.tipo === 'diferencia' ? 'Diferencia' : 'Reembolso'} · ${MEDIO[x.metodo] || E(x.metodo || '')} · ${x.estado}${x.comprobante ? ' · ' + E(x.comprobante) : ''}</span><span>${$(x.monto)}</span></div>`).join('');
   document.getElementById('ped-titulo').innerHTML = `${numPed(p.numero)} <span class="est ${p.estado}" style="vertical-align:3px;">${ESTADOS[p.estado]}</span>`;
   document.getElementById('ped-body').innerHTML = `
     <div class="det-bloque"><h4>Entrega</h4>
@@ -1166,6 +1178,10 @@ async function cargarConfig(){
   document.getElementById('c-max').value = CFG.max_days_ahead;
   const n = Pedidos.negocio;
   document.getElementById('d-yappy').value = n.yappy_numero || '';
+  document.getElementById('d-banco').value = n.banco_nombre || '';
+  document.getElementById('d-tipo-cuenta').value = n.banco_tipo_cuenta || '';
+  document.getElementById('d-cuenta').value = n.banco_numero_cuenta || '';
+  document.getElementById('d-titular').value = n.banco_titular || '';
   document.getElementById('d-wa').value = n.whatsapp || '';
   document.getElementById('d-dir').value = n.direccion || '';
   document.getElementById('d-ig').value = n.instagram || '';
@@ -1187,7 +1203,13 @@ async function guardarDatos(){
   try {
     await Pedidos.guardarConfiguracion({ ...CFG, correo_avisos: avisos || null });
     CFG = { ...CFG, correo_avisos: avisos || null };
-    await Pedidos.guardarDatosNegocio({ yappy_numero: document.getElementById('d-yappy').value, whatsapp: document.getElementById('d-wa').value,
+    const banco = { banco_nombre: document.getElementById('d-banco').value, banco_tipo_cuenta: document.getElementById('d-tipo-cuenta').value,
+      banco_numero_cuenta: document.getElementById('d-cuenta').value, banco_titular: document.getElementById('d-titular').value };
+    const algunoBanco = Object.values(banco).some(v => String(v).trim());
+    if (algunoBanco && !(banco.banco_nombre.trim() && banco.banco_numero_cuenta.trim() && banco.banco_titular.trim())){
+      msg('d-msg', 'Para cobrar por transferencia completa el banco, el número de cuenta y el titular.'); return;
+    }
+    await Pedidos.guardarDatosNegocio({ ...banco, yappy_numero: document.getElementById('d-yappy').value, whatsapp: document.getElementById('d-wa').value,
       direccion: document.getElementById('d-dir').value, instagram: document.getElementById('d-ig').value, tagline: document.getElementById('d-tag').value });
     msg('d-msg', ''); alert('Datos guardados.');
   } catch(e){ msg('d-msg', e.message); }
