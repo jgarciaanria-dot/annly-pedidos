@@ -277,6 +277,20 @@ button,input,select,textarea{font-family:inherit;}
     <!-- Configuración -->
     <section id="tab-config" class="tabsec" hidden>
       <div class="sec">
+        <div class="sec-hdr"><div><h2>Logo de la tienda</h2><p>Aparece junto al nombre en tu tienda. Mejor si es cuadrado.</p></div></div>
+        <div class="sec-body" style="padding-top:14px;">
+          <div class="foto-box">
+            <div id="logo-prev"></div>
+            <div>
+              <label class="btn-add" style="cursor:pointer;"><i class="ti ti-upload"></i> <span id="logo-txt">Subir logo</span><input type="file" id="logo-file" accept="image/*" hidden onchange="subirLogo(this)"></label>
+              <button class="btn-del" id="logo-quitar" style="width:auto;margin:0 0 0 8px;" onclick="quitarLogo()">Quitar</button>
+              <p class="ayuda">JPG, PNG o WebP. Se optimiza solo al subirlo.</p>
+            </div>
+          </div>
+          <p class="msg" id="logo-msg"></p>
+        </div>
+      </div>
+      <div class="sec">
         <div class="sec-hdr"><div><h2>Tiempos de pedido</h2><p>Controlan qué franjas puede elegir el cliente.</p></div></div>
         <div class="sec-body" style="padding-top:14px;">
           <div class="frow">
@@ -450,7 +464,7 @@ button,input,select,textarea{font-family:inherit;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=2"></script>
+<script src="pedidos.js?v=3"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
 document.getElementById('l-registro').href = ANNLY + '/registro.html';
@@ -823,7 +837,26 @@ async function desbloquearFecha(id){
 }
 
 // ---------- Configuración ----------
+function pintarLogo(){
+  const url = Pedidos.negocio.logo_url;
+  document.getElementById('logo-prev').innerHTML = url ? `<img src="${E(url)}" alt="Logo" style="border-radius:50%;object-fit:contain;background:#fff;border:1px solid var(--line);">` : '<div class="foto-vacia" style="border-radius:50%;"><i class="ti ti-building-store"></i></div>';
+  document.getElementById('logo-txt').textContent = url ? 'Cambiar logo' : 'Subir logo';
+  document.getElementById('logo-quitar').style.display = url ? '' : 'none';
+}
+async function subirLogo(input){
+  const f = input.files && input.files[0]; input.value = '';
+  if (!f) return;
+  msg('logo-msg', 'Subiendo logo…');
+  try { await Pedidos.subirLogo(f); pintarLogo(); msg('logo-msg'); }
+  catch(e){ msg('logo-msg', e.message); }
+}
+async function quitarLogo(){
+  if (!confirm('¿Quitar el logo de tu tienda?')) return;
+  try { await Pedidos.quitarLogo(); pintarLogo(); } catch(e){ msg('logo-msg', e.message); }
+}
+
 async function cargarConfig(){
+  pintarLogo();
   try { CFG = await Pedidos.configuracion(); } catch(e){ msg('c-msg', e.message); return; }
   document.getElementById('c-min').value = CFG.min_prep_hours;
   document.getElementById('c-warn').value = CFG.warn_hours;
