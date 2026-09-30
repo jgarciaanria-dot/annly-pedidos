@@ -342,6 +342,41 @@ const Pedidos = {
   },
 
   // -------------------------------------------------------
+  // PANEL · PEDIDOS
+  // -------------------------------------------------------
+  // f = { desde, hasta, estados:[...] } (fechas ISO; sin fechas = todas)
+  async listarPedidos(f = {}) {
+    let q = sb.from('orders').select('*, order_extras(name, qty, unit_price), order_payments(tipo, monto, comprobante, estado)')
+      .eq('business_id', this.id);
+    if (f.desde) q = q.gte('fecha', f.desde);
+    if (f.hasta) q = q.lte('fecha', f.hasta);
+    if (f.estados && f.estados.length) q = q.in('estado', f.estados);
+    q = q.order('fecha', { ascending: true }).order('hora_inicio', { ascending: true }).order('numero', { ascending: true }).limit(500);
+    return (await this._q(q)) || [];
+  },
+  async detallePedido(id) {
+    const [pedido, historial] = await Promise.all([
+      this._q(sb.from('orders').select('*, order_extras(*), order_payments(*)').eq('id', id).eq('business_id', this.id).single()),
+      this._q(sb.from('order_history').select('*').eq('order_id', id).order('created_at', { ascending: true }))
+    ]);
+    return { ...pedido, historial: historial || [] };
+  },
+  async confirmarPago(id) {
+    const { error } = await sb.rpc('pedidos_confirmar_pago', { p_order: id });
+    if (error) throw new Error(this.mensajeError(error));
+  },
+  async cambiarEstado(id, estado) {
+    const { error } = await sb.rpc('pedidos_cambiar_estado', { p_order: id, p_estado: estado });
+    if (error) throw new Error(this.mensajeError(error));
+  },
+  async cancelarPedido(id, motivo, reembolso, devolverStock) {
+    const { error } = await sb.rpc('pedidos_cancelar', {
+      p_order: id, p_motivo: motivo, p_reembolso: Number(reembolso || 0), p_devolver_stock: !!devolverStock
+    });
+    if (error) throw new Error(this.mensajeError(error));
+  },
+
+  // -------------------------------------------------------
   // TIENDA PÚBLICA
   // -------------------------------------------------------
   slugDeLaUrl() {
