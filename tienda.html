@@ -411,6 +411,158 @@ footer{animation:aparecer .6s ease both;}
 }
 </style>
 
+
+<style>
+/* =========================================================
+   HEADER V3 — más protagonismo para logo + nombre
+   Mantiene los mismos IDs y la lógica existente.
+   ========================================================= */
+.barra-top{
+  background:rgba(255,255,255,.94);
+  border-bottom:1px solid color-mix(in srgb,var(--p) 13%,#fff);
+  box-shadow:0 5px 22px -18px rgba(31,27,43,.45);
+}
+
+.barra-top .wrap{
+  height:76px;
+  max-width:1060px;
+  gap:16px;
+}
+
+.marca{
+  position:relative;
+  gap:13px;
+  padding:5px 2px;
+  min-width:0;
+}
+
+.marca::before{
+  content:"";
+  position:absolute;
+  left:-7px;
+  top:50%;
+  width:4px;
+  height:38px;
+  border-radius:999px;
+  background:linear-gradient(180deg,var(--p),var(--s));
+  transform:translateY(-50%);
+  opacity:.9;
+}
+
+.marca img{
+  width:52px;
+  height:52px;
+  border:2px solid color-mix(in srgb,var(--p) 18%,#fff);
+  box-shadow:0 7px 18px -10px color-mix(in srgb,var(--p) 65%,transparent);
+  background:#fff;
+}
+
+.marca strong{
+  position:relative;
+  font-family:'Playfair Display',serif;
+  font-size:22px;
+  line-height:1.05;
+  letter-spacing:-.02em;
+  color:var(--ink);
+  max-width:270px;
+}
+
+/* pequeño detalle visual que hace que la marca se sienta más cuidada */
+.marca strong::after{
+  content:"";
+  display:block;
+  width:24px;
+  height:2px;
+  border-radius:99px;
+  margin-top:5px;
+  background:linear-gradient(90deg,var(--p),var(--s));
+  opacity:.75;
+}
+
+.btn-wa-top{
+  padding:10px 16px;
+  border:1px solid color-mix(in srgb,#fff 15%,var(--p));
+  background:linear-gradient(135deg,var(--p),var(--s));
+  box-shadow:0 12px 25px -15px color-mix(in srgb,var(--p) 75%,transparent);
+}
+
+.btn-wa-top i{
+  font-size:18px;
+}
+
+/* entrada suave del encabezado */
+.barra-top .marca{
+  animation:headerMarca .5s ease both;
+}
+.barra-top .btn-wa-top{
+  animation:headerBtn .5s .08s ease both;
+}
+
+@keyframes headerMarca{
+  from{opacity:0;transform:translateY(-5px);}
+  to{opacity:1;transform:none;}
+}
+@keyframes headerBtn{
+  from{opacity:0;transform:translateY(-4px) scale(.97);}
+  to{opacity:1;transform:none;}
+}
+
+@media(max-width:560px){
+  .barra-top{
+    background:rgba(255,255,255,.96);
+  }
+
+  .barra-top .wrap{
+    height:68px;
+    padding:0 14px;
+    gap:10px;
+  }
+
+  .marca{
+    gap:10px;
+    padding-left:3px;
+  }
+
+  .marca::before{
+    left:-5px;
+    width:3px;
+    height:32px;
+  }
+
+  .marca img{
+    width:46px;
+    height:46px;
+    border-width:1.5px;
+  }
+
+  .marca strong{
+    font-size:19px;
+    max-width:205px;
+  }
+
+  .marca strong::after{
+    width:19px;
+    height:2px;
+    margin-top:4px;
+  }
+
+  .btn-wa-top{
+    width:44px;
+    height:44px;
+    padding:0;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    flex-shrink:0;
+    box-shadow:0 9px 20px -12px color-mix(in srgb,var(--p) 75%,transparent);
+  }
+
+  .btn-wa-top i{
+    font-size:20px;
+  }
+}
+</style>
+
 </head>
 <body>
 
