@@ -134,6 +134,197 @@ const Pedidos = {
   },
 
   // -------------------------------------------------------
+  // PANEL · CATÁLOGO
+  // -------------------------------------------------------
+  async _q(promesa) {
+    const { data, error } = await promesa;
+    if (error) throw new Error(this.mensajeError(error));
+    return data;
+  },
+
+  async listarCategorias() {
+    return (await this._q(sb.from('product_categories').select('*').eq('business_id', this.id)
+      .order('position').order('name'))) || [];
+  },
+  async guardarCategoria(c) {
+    const fila = { name: (c.name || '').trim(), active: c.active !== false, position: c.position || 0 };
+    if (!fila.name) throw new Error('Escribe el nombre de la categoría.');
+    if (c.id) return this._q(sb.from('product_categories').update(fila).eq('id', c.id).eq('business_id', this.id));
+    return this._q(sb.from('product_categories').insert([{ ...fila, business_id: this.id }]).select('id').single());
+  },
+  async borrarCategoria(id) {
+    return this._q(sb.from('product_categories').delete().eq('id', id).eq('business_id', this.id));
+  },
+
+  async listarProductos() {
+    return (await this._q(sb.from('products').select('*, product_extras(item_id, price, position)')
+      .eq('business_id', this.id).order('position').order('name'))) || [];
+  },
+  // p = { id?, name, category_id, description, photo_url, price, estimated_cost, active, extras:[{item_id, price}] }
+  async guardarProducto(p) {
+    const fila = {
+      name: (p.name || '').trim(), category_id: p.category_id || null,
+      description: (p.description || '').trim() || null, photo_url: p.photo_url || null,
+      price: Number(p.price), estimated_cost: Number(p.estimated_cost || 0),
+      active: p.active !== false, position: p.position || 0, updated_at: new Date().toISOString()
+    };
+    if (!fila.name) throw new Error('Escribe el nombre del producto.');
+    if (!(fila.price >= 0) || isNaN(fila.price)) throw new Error('Escribe el precio del producto.');
+    let id = p.id;
+    if (id) await this._q(sb.from('products').update(fila).eq('id', id).eq('business_id', this.id));
+    else id = (await this._q(sb.from('products').insert([{ ...fila, business_id: this.id }]).select('id').single())).id;
+    // Extras: se reemplaza la lista completa del producto
+    await this._q(sb.from('product_extras').delete().eq('product_id', id).eq('business_id', this.id));
+    const extras = (p.extras || []).map((x, i) => ({
+      product_id: id, item_id: x.item_id, business_id: this.id, position: i,
+      price: x.price === '' || x.price == null ? null : Number(x.price)
+    }));
+    if (extras.length) await this._q(sb.from('product_extras').insert(extras));
+    return id;
+  },
+  async borrarProducto(id) {
+    return this._q(sb.from('products').delete().eq('id', id).eq('business_id', this.id));
+  },
+
+  // Foto: se reduce en el navegador (máx. 1200 px, WebP) antes de subirla
+  async subirFoto(file) {
+    const blob = await this._reducirImagen(file, 1200, 0.85);
+    const path = `${this.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+    const { error } = await sb.storage.from('productos').upload(path, blob, { contentType: 'image/webp', upsert: false });
+    if (error) throw new Error('No se pudo subir la foto: ' + this.mensajeError(error));
+    return sb.storage.from('productos').getPublicUrl(path).data.publicUrl;
+  },
+  _reducirImagen(file, max, calidad) {
+    return new Promise((resolve, reject) => {
+      if (!/^image\//.test(file.type)) { reject(new Error('El archivo no es una imagen.')); return; }
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const escala = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * escala); c.height = Math.round(img.height * escala);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(b => b ? resolve(b) : reject(new Error('No se pudo procesar la imagen.')), 'image/webp', calidad);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('No se pudo leer la imagen.')); };
+      img.src = url;
+    });
+  },
+
+  // -------------------------------------------------------
+  // PANEL · INVENTARIO
+  // -------------------------------------------------------
+  async listarArticulos() {
+    const [items, stock] = await Promise.all([
+      this._q(sb.from('inventory_items').select('*').eq('business_id', this.id).order('name')),
+      this._q(sb.from('inventory_stock').select('item_id, stock, stock_bajo').eq('business_id', this.id))
+    ]);
+    return (items || []).map(i => {
+      const st = (stock || []).find(s => s.item_id === i.id) || {};
+      return { ...i, stock: Number(st.stock || 0), stock_bajo: !!st.stock_bajo };
+    });
+  },
+  // a = { id?, name, description, unit_cost, sale_price, stock_min, track_stock, active, stock_inicial? }
+  async guardarArticulo(a) {
+    const fila = {
+      name: (a.name || '').trim(), description: (a.description || '').trim() || null,
+      unit_cost: Number(a.unit_cost || 0), sale_price: Number(a.sale_price || 0),
+      stock_min: Number(a.stock_min || 0), track_stock: a.track_stock !== false,
+      active: a.active !== false, updated_at: new Date().toISOString()
+    };
+    if (!fila.name) throw new Error('Escribe el nombre del artículo.');
+    if (a.id) { await this._q(sb.from('inventory_items').update(fila).eq('id', a.id).eq('business_id', this.id)); return a.id; }
+    const id = (await this._q(sb.from('inventory_items').insert([{ ...fila, business_id: this.id }]).select('id').single())).id;
+    if (fila.track_stock && Number(a.stock_inicial) > 0) {
+      await this.moverInventario(id, 'entrada', Number(a.stock_inicial), fila.unit_cost, 'Stock inicial');
+    }
+    return id;
+  },
+  async moverInventario(itemId, tipo, qty, costo, nota) {
+    const { data, error } = await sb.rpc('pedidos_mover_inventario', {
+      p_item: itemId, p_tipo: tipo, p_qty: qty, p_unit_cost: costo === '' || costo == null ? null : Number(costo), p_nota: nota || null
+    });
+    if (error) throw new Error(this.mensajeError(error));
+    return data;
+  },
+  async movimientos(itemId) {
+    return (await this._q(sb.from('inventory_movements').select('*').eq('item_id', itemId).eq('business_id', this.id)
+      .order('created_at', { ascending: false }).limit(30))) || [];
+  },
+
+  // -------------------------------------------------------
+  // PANEL · ENTREGAS, HORARIOS Y CONFIGURACIÓN
+  // -------------------------------------------------------
+  async configuracion() {
+    const d = await this._q(sb.from('order_settings').select('*').eq('business_id', this.id).maybeSingle());
+    return d || { business_id: this.id, min_prep_hours: 3, warn_hours: 24, pending_expiry_hours: 24, max_days_ahead: 60, acepta_retiro: true, acepta_domicilio: true };
+  },
+  async guardarConfiguracion(c) {
+    return this._q(sb.from('order_settings').upsert([{ ...c, business_id: this.id, updated_at: new Date().toISOString() }], { onConflict: 'business_id' }));
+  },
+  // Datos del negocio que usa la tienda (pago y contacto)
+  async guardarDatosNegocio(d) {
+    const fila = {
+      yappy_numero: (d.yappy_numero || '').replace(/\D/g, '') || null,
+      whatsapp: (d.whatsapp || '').replace(/\D/g, '') || null,
+      direccion: (d.direccion || '').trim() || null,
+      instagram: (d.instagram || '').trim().replace(/^@+/, '') || null,
+      tagline: (d.tagline || '').trim() || null
+    };
+    const data = await this._q(sb.from('businesses').update(fila).eq('id', this.id).select('*'));
+    if (!data || !data.length) throw new Error('No se pudieron guardar los datos (sin permisos).');
+    Object.assign(this.negocio, data[0]);
+  },
+
+  async listarZonas() {
+    return (await this._q(sb.from('order_zones').select('*').eq('business_id', this.id).order('position').order('name'))) || [];
+  },
+  async guardarZona(z) {
+    const fila = { name: (z.name || '').trim(), price: Number(z.price || 0), active: z.active !== false };
+    if (!fila.name) throw new Error('Escribe el nombre de la zona.');
+    if (z.id) return this._q(sb.from('order_zones').update(fila).eq('id', z.id).eq('business_id', this.id));
+    return this._q(sb.from('order_zones').insert([{ ...fila, business_id: this.id }]));
+  },
+  async borrarZona(id) {
+    return this._q(sb.from('order_zones').delete().eq('id', id).eq('business_id', this.id));
+  },
+
+  async listarFranjas() {
+    return (await this._q(sb.from('order_slots').select('*').eq('business_id', this.id).order('weekday').order('start_time'))) || [];
+  },
+  async guardarFranja(f) {
+    const fila = { weekday: Number(f.weekday), start_time: f.start_time, end_time: f.end_time, capacity: Number(f.capacity), active: f.active !== false };
+    if (!fila.start_time || !fila.end_time) throw new Error('Indica la hora de inicio y de fin.');
+    if (fila.end_time <= fila.start_time) throw new Error('La hora de fin debe ser después de la de inicio.');
+    if (!(fila.capacity > 0)) throw new Error('La capacidad debe ser de al menos 1 pedido.');
+    if (f.id) return this._q(sb.from('order_slots').update(fila).eq('id', f.id).eq('business_id', this.id));
+    return this._q(sb.from('order_slots').insert([{ ...fila, business_id: this.id }]));
+  },
+  // Una franja con pedidos no se borra: se desactiva (los pedidos conservan su horario)
+  async borrarFranja(id) {
+    const { count } = await sb.from('orders').select('id', { count: 'exact', head: true }).eq('slot_id', id);
+    if (count) {
+      await this._q(sb.from('order_slots').update({ active: false }).eq('id', id).eq('business_id', this.id));
+      return 'desactivada';
+    }
+    await this._q(sb.from('order_slots').delete().eq('id', id).eq('business_id', this.id));
+    return 'borrada';
+  },
+
+  async listarFechasBloqueadas() {
+    return (await this._q(sb.from('order_blocked_dates').select('*').eq('business_id', this.id)
+      .gte('fecha', this.hoyISO()).order('fecha'))) || [];
+  },
+  async bloquearFecha(fecha, motivo) {
+    if (!fecha) throw new Error('Elige la fecha.');
+    return this._q(sb.from('order_blocked_dates').upsert([{ business_id: this.id, fecha, motivo: (motivo || '').trim() || null }], { onConflict: 'business_id,fecha' }));
+  },
+  async desbloquearFecha(id) {
+    return this._q(sb.from('order_blocked_dates').delete().eq('id', id).eq('business_id', this.id));
+  },
+
+  // -------------------------------------------------------
   // TIENDA PÚBLICA
   // -------------------------------------------------------
   slugDeLaUrl() {
