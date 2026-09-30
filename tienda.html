@@ -365,7 +365,7 @@ footer{animation:aparecer .6s ease both;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=4"></script>
+<script src="/pedidos.js?v=5"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -453,7 +453,9 @@ function pintarPortada(n){
   }
   document.getElementById('t-titulo').innerHTML = html;
   document.getElementById('t-eyebrow').textContent = n.categoria || 'Pedidos en línea';
-  document.getElementById('t-sub').textContent = 'Elige, personaliza y agenda tu entrega en pocos pasos. Pagas con Yappy y te confirmamos por WhatsApp.';
+  const medios = [n.yappy_numero ? 'Yappy' : null, (n.banco_nombre && n.banco_numero_cuenta) ? 'transferencia' : null].filter(Boolean);
+  document.getElementById('t-sub').textContent = 'Elige, personaliza y agenda tu entrega en pocos pasos.' +
+    (medios.length ? ' Pagas con ' + medios.join(' o ') + ' y te confirmamos por WhatsApp.' : ' Te confirmamos por WhatsApp.');
   if (wa){
     const top = document.getElementById('t-wa-top'); top.href = 'https://wa.me/' + wa; top.hidden = false;
     const cta = document.getElementById('t-cta-wa'); cta.href = 'https://wa.me/' + wa; cta.hidden = false;
@@ -697,38 +699,65 @@ function validarDatos(){
 }
 
 // ---- 5. Resumen y pago ----
+// Medios de pago del negocio: Yappy y/o transferencia bancaria
+function mediosPago(){
+  const n = Pedidos.negocio || {};
+  const m = [];
+  if (n.yappy_numero) m.push('yappy');
+  if (n.banco_nombre && n.banco_numero_cuenta && n.banco_titular) m.push('transferencia');
+  return m;
+}
 function paso5(){
-  const m = montos(), n = Pedidos.negocio || {}, yappy = n.yappy_numero || '';
+  const m = montos(), n = Pedidos.negocio || {};
+  const medios = mediosPago();
+  if (!PED.metodo || !medios.includes(PED.metodo)) PED.metodo = medios[0] || null;
   const zona = zonaElegida();
   const filas = [
     [E(PED.prod.nombre), Pedidos.dinero(m.producto)],
     ...extrasElegidos().map(x => ['+ ' + E(x.nombre), Pedidos.dinero(x.precio)]),
     PED.entrega === 'domicilio' ? ['Envío' + (zona && !PED.fueraZona ? ' · ' + E(zona.nombre) : ''), m.envioPendiente ? 'Por confirmar' : Pedidos.dinero(m.envio)] : ['Retiro en tienda', 'Gratis']
   ];
+  const opcion = (val, tit, txt) => `<label class="opc${PED.metodo === val ? ' on' : ''}"><input type="radio" name="metodo" ${PED.metodo === val ? 'checked' : ''} onchange="elegirMetodo('${val}')"><div><strong>${tit}</strong><span>${txt}</span></div></label>`;
+  let detalle = '';
+  if (PED.metodo === 'yappy'){
+    detalle = `<div class="yappy"><div><span class="nota" style="display:block;text-align:left;margin:0;">Envía ${Pedidos.dinero(m.total)} al número</span><b>${E(n.yappy_numero)}</b></div>
+        <button class="copiar" onclick="copiarDato(this, '${String(n.yappy_numero).replace(/\D/g, '')}')">Copiar</button></div>`;
+  } else if (PED.metodo === 'transferencia'){
+    detalle = `<div class="yappy" style="flex-direction:column;align-items:stretch;gap:6px;">
+        <span class="nota" style="text-align:left;margin:0;">Transfiere ${Pedidos.dinero(m.total)} a esta cuenta e incluye tu nombre en la referencia:</span>
+        <div style="font-size:13.5px;line-height:1.6;"><b style="font-size:14px;">${E(n.banco_nombre)}</b>${n.banco_tipo_cuenta ? ' · ' + E(n.banco_tipo_cuenta) : ''}<br>
+          Cuenta: <b style="font-size:14px;">${E(n.banco_numero_cuenta)}</b><br>Titular: ${E(n.banco_titular)}</div>
+        <button class="copiar" style="align-self:flex-start;" onclick="copiarDato(this, '${E(String(n.banco_numero_cuenta).replace(/'/g, ''))}')">Copiar número de cuenta</button></div>`;
+  }
   return `${botonVolver()}<div class="paso-tit">Confirma y paga</div>
     <p class="paso-sub">${fechaLarga(PED.fecha)} · ${hora12(PED.franja.inicio)} – ${hora12(PED.franja.fin)}<br>Para ${E(PED.destinatario.nombre)}</p>
     <div class="resumen">${filas.map(f => `<div><span>${f[0]}</span><span>${f[1]}</span></div>`).join('')}
       <div class="tot"><span>Total a pagar</span><span>${Pedidos.dinero(m.total)}</span></div></div>
     ${m.envioPendiente ? '<div class="aviso">El costo del envío se confirma por WhatsApp y se paga aparte.</div>' : ''}
-    ${yappy ? `<div class="sub">Paga con Yappy</div>
-      <div class="yappy"><div><span class="nota" style="display:block;text-align:left;margin:0;">Envía ${Pedidos.dinero(m.total)} al número</span><b>${E(yappy)}</b></div>
-        <button class="copiar" onclick="copiarYappy(this)">Copiar</button></div>
-      <div class="fg"><label class="flbl" for="p-comp">Número de comprobante de Yappy</label><input class="fi" id="p-comp" maxlength="60" value="${E(PED.comprobante)}" placeholder="Lo encuentras en el detalle del pago"></div>`
+    ${medios.length ? `<div class="sub">¿Cómo pagas?</div>
+      ${medios.includes('yappy') ? opcion('yappy', 'Yappy', 'Pago inmediato desde tu app.') : ''}
+      ${medios.includes('transferencia') ? opcion('transferencia', 'Transferencia bancaria', E(n.banco_nombre)) : ''}
+      ${detalle}
+      <div class="fg"><label class="flbl" for="p-comp">${PED.metodo === 'transferencia' ? 'Número de referencia de la transferencia' : 'Número de comprobante de Yappy'}</label><input class="fi" id="p-comp" maxlength="60" value="${E(PED.comprobante)}" placeholder="${PED.metodo === 'transferencia' ? 'Lo encuentras en tu banca en línea' : 'Lo encuentras en el detalle del pago'}"></div>`
     : '<div class="aviso info">Este negocio coordinará el pago contigo por WhatsApp al confirmar tu pedido.</div>'}
     <p class="err" id="p-err"></p>
     <button class="btn-pedir" id="p-enviar" onclick="enviarPedido()">Enviar pedido</button>
     <p class="nota">Tu pedido queda reservado y el negocio confirma el pago.</p>`;
 }
-function copiarYappy(btn){
-  navigator.clipboard.writeText(String((Pedidos.negocio || {}).yappy_numero || '').replace(/\D/g, '')).then(() => {
-    btn.textContent = '¡Copiado!'; setTimeout(() => { btn.textContent = 'Copiar'; }, 1600);
-  });
+function elegirMetodo(v){
+  const comp = document.getElementById('p-comp');
+  if (comp) PED.comprobante = comp.value;
+  PED.metodo = v; pintarPaso();
+}
+function copiarDato(btn, dato){
+  const antes = btn.textContent;
+  navigator.clipboard.writeText(dato).then(() => { btn.textContent = '¡Copiado!'; setTimeout(() => { btn.textContent = antes; }, 1600); });
 }
 async function enviarPedido(){
   const err = document.getElementById('p-err'), btn = document.getElementById('p-enviar');
   const comp = document.getElementById('p-comp');
   PED.comprobante = comp ? comp.value.trim() : '';
-  if (comp && !PED.comprobante){ err.textContent = 'Escribe el número de comprobante de tu pago por Yappy.'; return; }
+  if (comp && !PED.comprobante){ err.textContent = PED.metodo === 'transferencia' ? 'Escribe el número de referencia de tu transferencia.' : 'Escribe el número de comprobante de tu pago por Yappy.'; return; }
   btn.disabled = true; btn.textContent = 'Enviando…'; err.textContent = '';
   try {
     PED.resultado = await Pedidos.crearPedido({
@@ -739,7 +768,7 @@ async function enviarPedido(){
       direccion: PED.entrega === 'domicilio' ? PED.direccion : null,
       referencia: PED.entrega === 'domicilio' ? PED.referencia : null,
       cliente: PED.cliente, destinatario: PED.destinatario, dedicatoria: PED.dedicatoria,
-      pago: { metodo: 'yappy', comprobante: PED.comprobante || null }
+      pago: { metodo: PED.metodo || 'yappy', comprobante: PED.comprobante || null }
     });
     irPaso(6);
   } catch(e){
