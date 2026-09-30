@@ -380,6 +380,8 @@ button,input,select,textarea{font-family:inherit;}
         <button class="fchip" data-p="manana" onclick="filtroPeriodo('manana')">Mañana</button>
         <button class="fchip" data-p="semana" onclick="filtroPeriodo('semana')">Próximos 7 días</button>
         <button class="fchip" data-p="todos" onclick="filtroPeriodo('todos')">Todos</button>
+        <button class="fchip" data-p="entregados" onclick="filtroPeriodo('entregados')"><i class="ti ti-circle-check"></i> Entregados</button>
+        <button class="fchip" data-p="cancelados" onclick="filtroPeriodo('cancelados')"><i class="ti ti-circle-x"></i> Cancelados</button>
         <input class="buscar" id="f-buscar" placeholder="Buscar por número, cliente o destinatario" oninput="pintarPedidos()">
       </div>
       <div class="filtros" id="f-estado"></div>
@@ -668,9 +670,15 @@ async function cargarPedidos(){
     hoy: { desde: hoy, hasta: hoy },
     manana: { desde: isoMas(1), hasta: isoMas(1) },
     semana: { desde: hoy, hasta: isoMas(7) },
-    todos: {}
+    todos: {},
+    entregados: { estados: ['ENTREGADO'] },
+    cancelados: { estados: ['CANCELADO'] }
   }[F_PERIODO];
-  try { PEDIDOS = await Pedidos.listarPedidos(f); }
+  try {
+    PEDIDOS = await Pedidos.listarPedidos(f);
+    // Historial (entregados y cancelados): lo más reciente primero
+    if (F_PERIODO === 'entregados' || F_PERIODO === 'cancelados') PEDIDOS.reverse();
+  }
   catch(e){ document.getElementById('lista-pedidos').innerHTML = `<p class="vacio-mini">${E(e.message)}</p>`; return; }
   pintarPedidos();
 }
@@ -686,7 +694,8 @@ function pintarPedidos(){
   const lista = base.filter(p => !F_ESTADO || p.estado === F_ESTADO);
   const cont = document.getElementById('lista-pedidos');
   if (!lista.length){
-    cont.innerHTML = `<div class="vacio"><i class="ti ti-receipt"></i><h3>No hay pedidos aquí</h3><p>${F_PERIODO === 'activos' ? 'Cuando un cliente haga un pedido desde tu tienda, aparecerá aquí.' : 'Prueba con otro filtro.'}</p></div>`;
+    const vacios = { activos: 'Cuando un cliente haga un pedido desde tu tienda, aparecerá aquí.', entregados: 'Aún no has entregado pedidos.', cancelados: 'No tienes pedidos cancelados.' };
+    cont.innerHTML = `<div class="vacio"><i class="ti ti-receipt"></i><h3>No hay pedidos aquí</h3><p>${vacios[F_PERIODO] || 'Prueba con otro filtro.'}</p></div>`;
     return;
   }
   // Agrupado por fecha y franja
@@ -707,7 +716,8 @@ function pintarPedidos(){
           ${p.poca_anticipacion && p.estado !== 'CANCELADO' ? '<span class="chip warn">Poca anticipación</span>' : ''}
           ${p.delivery_fee_pendiente && p.estado !== 'CANCELADO' ? '<span class="chip warn">Envío por confirmar</span>' : ''}</div>
         <div class="ped-info"><b>${E(p.product_name)}</b>${extras ? ' + ' + E(extras) : ''}<br>
-          ${E(p.customer_name)} → <b>${E(p.recipient_name)}</b> · ${p.delivery_type === 'retiro' ? 'Retiro en tienda' : 'Domicilio' + (p.zone_name ? ' · ' + E(p.zone_name) : '')}</div>
+          ${E(p.customer_name)} → <b>${E(p.recipient_name)}</b> · ${p.delivery_type === 'retiro' ? 'Retiro en tienda' : 'Domicilio' + (p.zone_name ? ' · ' + E(p.zone_name) : '')}
+          ${p.estado === 'CANCELADO' ? `<br><span style="color:var(--err);">Motivo: ${E(p.cancel_motivo || '—')}${Number(p.cancel_reembolso) > 0 ? ' · reembolso ' + $(p.cancel_reembolso) : ''}</span>` : ''}</div>
       </div>
       <div class="ped-acc">
         <span class="ped-total">${$(p.total)}</span>
