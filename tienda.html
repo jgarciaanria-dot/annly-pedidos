@@ -490,18 +490,39 @@ footer{animation:aparecer .6s ease both;}
   font-size:18px;
 }
 
-/* entrada suave del encabezado */
+/* Entrada del encabezado: el nombre llega suavemente desde la derecha */
 .barra-top .marca{
-  animation:headerMarca .5s ease both;
+  animation:headerMarca .72s cubic-bezier(.22,.75,.2,1) both;
 }
+
+.barra-top .marca strong{
+  display:block;
+  animation:nombreDesdeDerecha .82s cubic-bezier(.22,.75,.2,1) .04s both;
+}
+
 .barra-top .btn-wa-top{
-  animation:headerBtn .5s .08s ease both;
+  animation:headerBtn .62s cubic-bezier(.22,.75,.2,1) .10s both;
 }
 
 @keyframes headerMarca{
-  from{opacity:0;transform:translateY(-5px);}
+  from{opacity:0;transform:translateX(8px);}
   to{opacity:1;transform:none;}
 }
+
+@keyframes nombreDesdeDerecha{
+  from{
+    opacity:0;
+    transform:translateX(34px);
+  }
+  70%{
+    opacity:1;
+  }
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
 @keyframes headerBtn{
   from{opacity:0;transform:translateY(-4px) scale(.97);}
   to{opacity:1;transform:none;}
