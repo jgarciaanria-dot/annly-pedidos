@@ -11,7 +11,8 @@
 /* Los colores salen del negocio (color_primario / color_secundario), como en Annly Agenda */
 :root{ --p:#7C3AED; --s:#EC4899; --ink:#1F1B2B; --ink-soft:#6B6680; --line:#ECE8F2; --bg:#FAF8FC; }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;}
+main{flex:1;width:100%;}
 :focus-visible{outline:2px solid var(--p);outline-offset:2px;}
 .wrap{max-width:980px;margin:0 auto;padding:0 18px;}
 
@@ -58,6 +59,50 @@ header{background:#fff;border-bottom:1px solid var(--line);}
 .btn-pedir:disabled{opacity:.55;cursor:default;}
 .nota{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:8px;}
 
+/* Pasos del pedido */
+.pasos{display:flex;gap:6px;margin:0 0 14px;}
+.pasos span{flex:1;height:4px;border-radius:999px;background:var(--line);}
+.pasos span.on{background:var(--p);}
+.paso-tit{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;}
+.paso-sub{font-size:13px;color:var(--ink-soft);margin:3px 0 14px;line-height:1.5;}
+.volver{border:none;background:none;color:var(--ink-soft);font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:0;margin-bottom:10px;font-family:inherit;}
+.dias{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;}
+.dia{flex:0 0 auto;width:62px;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:8px 0;text-align:center;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink);}
+.dia small{display:block;font-size:11px;color:var(--ink-soft);text-transform:capitalize;}
+.dia b{display:block;font-size:19px;}
+.dia.on{border-color:var(--p);background:color-mix(in srgb,var(--p) 10%,#fff);}
+.franjas{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:14px;}
+.fr{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:11px 12px;text-align:left;cursor:pointer;font-family:inherit;color:var(--ink);}
+.fr b{display:block;font-size:14px;font-family:'DM Sans',sans-serif;}
+.fr small{font-size:11.5px;color:var(--ink-soft);}
+.fr.on{border-color:var(--p);background:color-mix(in srgb,var(--p) 10%,#fff);}
+.fr:disabled{opacity:.45;cursor:default;}
+.opc{display:flex;align-items:flex-start;gap:10px;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer;font-size:13.5px;}
+.opc input{accent-color:var(--p);margin-top:2px;}
+.opc strong{display:block;font-size:14px;}
+.opc span{font-size:12.5px;color:var(--ink-soft);}
+.opc.on{border-color:var(--p);background:color-mix(in srgb,var(--p) 6%,#fff);}
+.fg{margin-bottom:12px;}
+.flbl{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;}
+.fi{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;color:var(--ink);background:#fff;}
+.fi:focus{border-color:var(--p);outline:none;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:480px){.frow{grid-template-columns:1fr;}}
+.aviso{border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.5;margin:10px 0;background:#FFF4E0;color:#8A5A12;}
+.aviso.info{background:color-mix(in srgb,var(--p) 8%,#fff);color:var(--ink);}
+.err{color:#B4432F;font-size:12.5px;min-height:16px;margin-top:8px;}
+.resumen{border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:13.5px;}
+.resumen div{display:flex;justify-content:space-between;gap:10px;padding:4px 0;}
+.resumen div.tot{border-top:1px solid var(--line);margin-top:6px;padding-top:9px;font-family:'DM Sans',sans-serif;font-weight:800;font-size:16px;}
+.yappy{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px dashed color-mix(in srgb,var(--p) 40%,#fff);border-radius:14px;padding:12px 14px;margin:12px 0;}
+.yappy b{font-family:'DM Sans',sans-serif;font-size:18px;}
+.copiar{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+.listo{text-align:center;padding:10px 0 4px;}
+.listo i{font-size:44px;color:var(--p);}
+.listo h3{font-family:'DM Sans',sans-serif;font-size:21px;margin:6px 0 4px;}
+.listo .num{font-family:'DM Sans',sans-serif;font-size:26px;font-weight:800;color:var(--p);margin:6px 0 10px;}
+.btn-sec{width:100%;margin-top:10px;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;}
+
 footer{background:#fff;border-top:1px solid var(--line);padding:26px 0;font-size:13px;color:var(--ink-soft);}
 footer .wrap{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between;}
 footer a{color:var(--p);font-weight:600;text-decoration:none;}
@@ -90,27 +135,17 @@ footer a{color:var(--p);font-weight:600;text-decoration:none;}
   </div>
 </footer>
 
-<!-- Detalle del producto -->
+<!-- Producto y pedido (pasos) -->
 <div class="ov" id="ov-prod" onclick="if(event.target===this)cerrarProducto()">
-  <div class="hoja" role="dialog" aria-modal="true" aria-labelledby="p-nombre">
+  <div class="hoja" role="dialog" aria-modal="true" aria-label="Tu pedido">
     <div id="p-foto"></div>
-    <div class="hoja-body">
-      <div class="hoja-top">
-        <h3 id="p-nombre"></h3>
-        <button class="cerrar" onclick="cerrarProducto()" aria-label="Cerrar">×</button>
-      </div>
-      <p class="hoja-desc" id="p-desc"></p>
-      <div id="p-extras"></div>
-      <div class="total"><span>Total</span><b id="p-total"></b></div>
-      <button class="btn-pedir" id="p-btn" disabled>Elegir fecha y entrega</button>
-      <p class="nota">La fecha, la entrega y el pago se habilitan en la próxima entrega.</p>
-    </div>
+    <div class="hoja-body" id="p-body"></div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=1"></script>
+<script src="/pedidos.js?v=2"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -183,24 +218,268 @@ function pintarProductos(){
     </button>`).join('');
 }
 
+// ================= PEDIDO: pasos =================
+// 1 producto y extras · 2 fecha y franja · 3 entrega · 4 datos · 5 pago · 6 listo
+const PED = {};
+const CFG_DEF = { minPrepHoras: 3, avisoHoras: 24, maxDias: 60, retiro: true, domicilio: true };
+const cfg = () => ({ ...CFG_DEF, ...(CAT.config || {}) });
+const PASOS = 5;
+
+function nuevoPedido(prod){
+  Object.assign(PED, { paso: 1, prod, extras: new Set(), fecha: null, franja: null, franjas: [],
+    entrega: null, zonaId: null, fueraZona: false, direccion: '', referencia: '',
+    cliente: { nombre: '', telefono: '', correo: '' }, destinatario: { nombre: '', telefono: '' }, mismo: false,
+    dedicatoria: '', comprobante: '', resultado: null });
+  const c = cfg();
+  if (c.retiro && !c.domicilio) PED.entrega = 'retiro';
+  if (!c.retiro && c.domicilio) PED.entrega = 'domicilio';
+}
+
 function abrirProducto(id){
-  PROD = CAT.productos.find(p => p.id === id);
-  if (!PROD) return;
-  document.getElementById('p-foto').innerHTML = fotoHtml(PROD, 'hoja-foto');
-  document.getElementById('p-nombre').textContent = PROD.nombre;
-  document.getElementById('p-desc').textContent = PROD.descripcion || '';
-  document.getElementById('p-extras').innerHTML = PROD.extras.length ? '<div class="sub">Agrégale algo especial</div>' + PROD.extras.map(x => `
-    <label class="extra"><input type="checkbox" class="p-extra" value="${x.id}" onchange="recalcular()"><span>${E(x.nombre)}</span><b>+${Pedidos.dinero(x.precio)}</b></label>`).join('') : '';
-  recalcular();
+  const prod = CAT.productos.find(p => p.id === id);
+  if (!prod) return;
+  nuevoPedido(prod);
+  document.getElementById('p-foto').innerHTML = fotoHtml(prod, 'hoja-foto');
+  pintarPaso();
   document.getElementById('ov-prod').classList.add('on');
 }
 function cerrarProducto(){ document.getElementById('ov-prod').classList.remove('on'); }
-function recalcular(){
-  const extras = [...document.querySelectorAll('.p-extra:checked')].map(i => PROD.extras.find(x => x.id === i.value));
-  const total = Number(PROD.precio) + extras.reduce((s, x) => s + Number(x.precio), 0);
-  document.getElementById('p-total').textContent = Pedidos.dinero(total);
-}
 document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarProducto(); });
+
+// ---- Montos (solo para mostrar; el total real lo calcula la base al crear el pedido) ----
+function extrasElegidos(){ return PED.prod.extras.filter(x => PED.extras.has(x.id)); }
+function zonaElegida(){ return (CAT.zonas || []).find(z => z.id === PED.zonaId) || null; }
+function montos(){
+  const extras = extrasElegidos().reduce((s, x) => s + Number(x.precio), 0);
+  const envio = PED.entrega === 'domicilio' && !PED.fueraZona && zonaElegida() ? Number(zonaElegida().precio) : 0;
+  return { producto: Number(PED.prod.precio), extras, envio, total: Number(PED.prod.precio) + extras + envio,
+           envioPendiente: PED.entrega === 'domicilio' && PED.fueraZona };
+}
+
+function barraPasos(){
+  return `<div class="pasos" aria-hidden="true">${Array.from({ length: PASOS }, (_, i) => `<span class="${i < PED.paso ? 'on' : ''}"></span>`).join('')}</div>`;
+}
+function botonVolver(){ return PED.paso > 1 ? `<button class="volver" onclick="irPaso(${PED.paso - 1})"><i class="ti ti-chevron-left"></i> Volver</button>` : ''; }
+function irPaso(n){ PED.paso = n; pintarPaso(); document.querySelector('.hoja').scrollTop = 0; }
+
+function pintarPaso(){
+  document.getElementById('p-foto').style.display = PED.paso === 1 ? '' : 'none';
+  const cuerpo = { 1: paso1, 2: paso2, 3: paso3, 4: paso4, 5: paso5, 6: paso6 }[PED.paso]();
+  document.getElementById('p-body').innerHTML = (PED.paso <= PASOS ? barraPasos() : '') + cuerpo;
+  if (PED.paso === 2 && PED.fecha) cargarFranjas();
+}
+
+// ---- 1. Producto y extras ----
+function paso1(){
+  const p = PED.prod;
+  return `<div class="hoja-top"><h3>${E(p.nombre)}</h3><button class="cerrar" onclick="cerrarProducto()" aria-label="Cerrar">×</button></div>
+    ${p.descripcion ? `<p class="hoja-desc">${E(p.descripcion)}</p>` : ''}
+    ${p.extras.length ? '<div class="sub">Agrégale algo especial</div>' + p.extras.map(x => `
+      <label class="extra"><input type="checkbox" ${PED.extras.has(x.id) ? 'checked' : ''} onchange="toggleExtra('${x.id}', this.checked)"><span>${E(x.nombre)}</span><b>+${Pedidos.dinero(x.precio)}</b></label>`).join('') : ''}
+    <div class="total"><span>Total</span><b id="p-total">${Pedidos.dinero(montos().total)}</b></div>
+    <button class="btn-pedir" onclick="irPaso(2)">Elegir fecha y entrega</button>`;
+}
+function toggleExtra(id, on){
+  if (on) PED.extras.add(id); else PED.extras.delete(id);
+  document.getElementById('p-total').textContent = Pedidos.dinero(montos().total);
+}
+
+// ---- 2. Fecha y franja ----
+const DIAS_CORTOS = ['dom','lun','mar','mié','jue','vie','sáb'];
+function isoDe(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function hora12(t){ const [h, m] = String(t).split(':').map(Number); return (h % 12 || 12) + ':' + String(m).padStart(2, '0') + (h >= 12 ? ' p.m.' : ' a.m.'); }
+function fechaLarga(iso){ return new Date(iso + 'T12:00:00').toLocaleDateString('es-PA', { weekday: 'long', day: 'numeric', month: 'long' }); }
+
+function paso2(){
+  const hoy = new Date(); hoy.setHours(12, 0, 0, 0);
+  const n = Math.min(cfg().maxDias || 60, 21);
+  const dias = Array.from({ length: n + 1 }, (_, i) => { const d = new Date(hoy); d.setDate(hoy.getDate() + i); return d; });
+  return `${botonVolver()}<div class="paso-tit">¿Para cuándo?</div>
+    <p class="paso-sub">Elige el día y la franja en que lo quieres recibir o retirar.</p>
+    <div class="dias" role="listbox" aria-label="Día">${dias.map(d => { const iso = isoDe(d); return `
+      <button class="dia${PED.fecha === iso ? ' on' : ''}" role="option" aria-selected="${PED.fecha === iso}" onclick="elegirFecha('${iso}')">
+        <small>${d.toDateString() === new Date().toDateString() ? 'hoy' : DIAS_CORTOS[d.getDay()]}</small><b>${d.getDate()}</b>
+      </button>`; }).join('')}</div>
+    <div id="p-franjas">${PED.fecha ? '<p class="nota">Buscando horarios…</p>' : '<p class="nota" style="margin-top:14px;">Elige un día para ver los horarios.</p>'}</div>
+    <p class="err" id="p-err2"></p>
+    <button class="btn-pedir" ${PED.franja ? '' : 'disabled'} onclick="irPaso(3)">Continuar</button>`;
+}
+function elegirFecha(iso){ PED.fecha = iso; PED.franja = null; pintarPaso(); }
+async function cargarFranjas(){
+  const cont = document.getElementById('p-franjas');
+  try { PED.franjas = await Pedidos.franjas(PED.fecha); }
+  catch(e){ cont.innerHTML = `<p class="err">${E(e.message)}</p>`; return; }
+  const libres = PED.franjas.filter(f => f.disponible);
+  if (!PED.franjas.length){ cont.innerHTML = '<p class="nota" style="margin-top:14px;">Ese día no hay entregas. Prueba con otro día.</p>'; return; }
+  cont.innerHTML = `<div class="franjas">${PED.franjas.map(f => `
+    <button class="fr${PED.franja && PED.franja.id === f.id ? ' on' : ''}" ${f.disponible ? '' : 'disabled'} onclick="elegirFranja('${f.id}')">
+      <b>${hora12(f.inicio)} – ${hora12(f.fin)}</b>
+      <small>${!f.disponible ? (f.libres > 0 ? 'Muy pronto para prepararlo' : 'Sin cupo') : (f.libres <= 2 ? `Quedan ${f.libres}` : 'Disponible')}</small>
+    </button>`).join('')}</div>
+    ${!libres.length ? '<p class="nota" style="margin-top:10px;">Ese día ya no tenemos cupo. Prueba con otro día.</p>' : ''}
+    ${PED.franja && PED.franja.pocaAnticipacion ? '<div class="aviso">Es poco tiempo: haremos lo posible por tenerlo listo. Si algo cambia, te avisamos por WhatsApp.</div>' : ''}`;
+}
+function elegirFranja(id){ PED.franja = PED.franjas.find(f => f.id === id) || null; pintarPaso(); }
+
+// ---- 3. Entrega ----
+function paso3(){
+  const c = cfg(), zonas = CAT.zonas || [];
+  const opcion = (val, tit, txt) => `<label class="opc${PED.entrega === val ? ' on' : ''}"><input type="radio" name="entrega" ${PED.entrega === val ? 'checked' : ''} onchange="elegirEntrega('${val}')"><div><strong>${tit}</strong><span>${txt}</span></div></label>`;
+  const dir = (Pedidos.negocio && Pedidos.negocio.direccion) || '';
+  let dom = '';
+  if (PED.entrega === 'domicilio'){
+    dom = `<div class="fg" style="margin-top:6px;"><label class="flbl" for="p-zona">Zona de entrega</label>
+      <select class="fi" id="p-zona" onchange="elegirZona(this.value)">
+        <option value="">Elige tu zona…</option>
+        ${zonas.map(z => `<option value="${z.id}"${PED.zonaId === z.id ? ' selected' : ''}>${E(z.nombre)} · ${Pedidos.dinero(z.precio)}</option>`).join('')}
+        <option value="fuera"${PED.fueraZona ? ' selected' : ''}>Mi zona no aparece</option>
+      </select></div>
+      ${PED.fueraZona ? '<div class="aviso">Tu zona está fuera de nuestra cobertura habitual. Te confirmaremos el costo del envío por WhatsApp antes de preparar tu pedido.</div>' : ''}
+      <div class="fg"><label class="flbl" for="p-dir">Dirección de entrega</label><input class="fi" id="p-dir" maxlength="200" value="${E(PED.direccion)}" placeholder="Calle, edificio, apartamento"></div>
+      <div class="fg"><label class="flbl" for="p-ref">Punto de referencia (opcional)</label><input class="fi" id="p-ref" maxlength="160" value="${E(PED.referencia)}" placeholder="Frente al parque, casa azul…"></div>`;
+  }
+  return `${botonVolver()}<div class="paso-tit">¿Cómo lo recibes?</div>
+    <p class="paso-sub">${fechaLarga(PED.fecha)} · ${hora12(PED.franja.inicio)} – ${hora12(PED.franja.fin)}</p>
+    ${c.retiro ? opcion('retiro', 'Retiro en tienda', dir ? E(dir) : 'Pasas a buscarlo en la franja elegida.') : ''}
+    ${c.domicilio ? opcion('domicilio', 'Entrega a domicilio', 'Lo llevamos a la dirección que indiques.') : ''}
+    ${dom}
+    <p class="err" id="p-err"></p>
+    <button class="btn-pedir" onclick="validarEntrega()">Continuar</button>`;
+}
+function guardarDireccion(){
+  const d = document.getElementById('p-dir'), r = document.getElementById('p-ref');
+  if (d) PED.direccion = d.value; if (r) PED.referencia = r.value;
+}
+function elegirEntrega(v){ guardarDireccion(); PED.entrega = v; pintarPaso(); }
+function elegirZona(v){ guardarDireccion(); PED.fueraZona = v === 'fuera'; PED.zonaId = v && v !== 'fuera' ? v : null; pintarPaso(); }
+function validarEntrega(){
+  guardarDireccion();
+  const err = document.getElementById('p-err');
+  if (!PED.entrega){ err.textContent = 'Elige cómo quieres recibir tu pedido.'; return; }
+  if (PED.entrega === 'domicilio'){
+    if (!PED.zonaId && !PED.fueraZona){ err.textContent = 'Elige tu zona de entrega.'; return; }
+    if (!PED.direccion.trim()){ err.textContent = 'Escribe la dirección de entrega.'; return; }
+  }
+  irPaso(4);
+}
+
+// ---- 4. Datos, destinatario y dedicatoria ----
+function paso4(){
+  const c = PED.cliente, d = PED.destinatario;
+  return `${botonVolver()}<div class="paso-tit">Tus datos</div>
+    <p class="paso-sub">Te avisaremos por WhatsApp y correo sobre tu pedido.</p>
+    <div class="frow">
+      <div class="fg"><label class="flbl" for="c-nom">Tu nombre</label><input class="fi" id="c-nom" maxlength="80" autocomplete="name" value="${E(c.nombre)}"></div>
+      <div class="fg"><label class="flbl" for="c-tel">Tu WhatsApp</label><input class="fi" id="c-tel" maxlength="20" inputmode="tel" autocomplete="tel" value="${E(c.telefono)}" placeholder="6000-0000"></div>
+    </div>
+    <div class="fg"><label class="flbl" for="c-mail">Tu correo (opcional)</label><input class="fi" id="c-mail" type="email" maxlength="120" autocomplete="email" value="${E(c.correo)}"></div>
+    <div class="sub">¿Quién lo recibe?</div>
+    <label class="extra"><input type="checkbox" id="d-mismo" ${PED.mismo ? 'checked' : ''} onchange="mismoQueRecibe(this.checked)"><span>Es para mí</span></label>
+    <div id="d-wrap" style="${PED.mismo ? 'display:none;' : ''}">
+      <div class="frow">
+        <div class="fg"><label class="flbl" for="d-nom">Nombre de quien recibe</label><input class="fi" id="d-nom" maxlength="80" value="${E(d.nombre)}"></div>
+        <div class="fg"><label class="flbl" for="d-tel">Su teléfono (opcional)</label><input class="fi" id="d-tel" maxlength="20" inputmode="tel" value="${E(d.telefono)}"></div>
+      </div>
+    </div>
+    <div class="fg"><label class="flbl" for="p-ded">Dedicatoria para la tarjeta (opcional)</label>
+      <textarea class="fi" id="p-ded" rows="3" maxlength="500" oninput="document.getElementById('ded-n').textContent=this.value.length">${E(PED.dedicatoria)}</textarea>
+      <p class="nota" style="text-align:right;margin-top:4px;"><span id="ded-n">${PED.dedicatoria.length}</span>/500</p></div>
+    <p class="err" id="p-err"></p>
+    <button class="btn-pedir" onclick="validarDatos()">Ir al pago</button>`;
+}
+function leerDatos(){
+  const v = id => (document.getElementById(id) || {}).value || '';
+  PED.cliente = { nombre: v('c-nom').trim(), telefono: v('c-tel').trim(), correo: v('c-mail').trim() };
+  PED.destinatario = PED.mismo ? { nombre: PED.cliente.nombre, telefono: PED.cliente.telefono } : { nombre: v('d-nom').trim(), telefono: v('d-tel').trim() };
+  PED.dedicatoria = v('p-ded');
+}
+function mismoQueRecibe(on){ leerDatos(); PED.mismo = on; pintarPaso(); }
+function validarDatos(){
+  leerDatos();
+  const err = document.getElementById('p-err');
+  if (!PED.cliente.nombre){ err.textContent = 'Escribe tu nombre.'; return; }
+  if (PED.cliente.telefono.replace(/\D/g, '').length < 7){ err.textContent = 'Escribe un WhatsApp válido.'; return; }
+  if (PED.cliente.correo && !/^\S+@\S+\.\S+$/.test(PED.cliente.correo)){ err.textContent = 'Revisa tu correo.'; return; }
+  if (!PED.destinatario.nombre){ err.textContent = 'Escribe el nombre de quien recibe el pedido.'; return; }
+  irPaso(5);
+}
+
+// ---- 5. Resumen y pago ----
+function paso5(){
+  const m = montos(), n = Pedidos.negocio || {}, yappy = n.yappy_numero || '';
+  const zona = zonaElegida();
+  const filas = [
+    [E(PED.prod.nombre), Pedidos.dinero(m.producto)],
+    ...extrasElegidos().map(x => ['+ ' + E(x.nombre), Pedidos.dinero(x.precio)]),
+    PED.entrega === 'domicilio' ? ['Envío' + (zona && !PED.fueraZona ? ' · ' + E(zona.nombre) : ''), m.envioPendiente ? 'Por confirmar' : Pedidos.dinero(m.envio)] : ['Retiro en tienda', 'Gratis']
+  ];
+  return `${botonVolver()}<div class="paso-tit">Confirma y paga</div>
+    <p class="paso-sub">${fechaLarga(PED.fecha)} · ${hora12(PED.franja.inicio)} – ${hora12(PED.franja.fin)}<br>Para ${E(PED.destinatario.nombre)}</p>
+    <div class="resumen">${filas.map(f => `<div><span>${f[0]}</span><span>${f[1]}</span></div>`).join('')}
+      <div class="tot"><span>Total a pagar</span><span>${Pedidos.dinero(m.total)}</span></div></div>
+    ${m.envioPendiente ? '<div class="aviso">El costo del envío se confirma por WhatsApp y se paga aparte.</div>' : ''}
+    ${yappy ? `<div class="sub">Paga con Yappy</div>
+      <div class="yappy"><div><span class="nota" style="display:block;text-align:left;margin:0;">Envía ${Pedidos.dinero(m.total)} al número</span><b>${E(yappy)}</b></div>
+        <button class="copiar" onclick="copiarYappy(this)">Copiar</button></div>
+      <div class="fg"><label class="flbl" for="p-comp">Número de comprobante de Yappy</label><input class="fi" id="p-comp" maxlength="60" value="${E(PED.comprobante)}" placeholder="Lo encuentras en el detalle del pago"></div>`
+    : '<div class="aviso info">Este negocio coordinará el pago contigo por WhatsApp al confirmar tu pedido.</div>'}
+    <p class="err" id="p-err"></p>
+    <button class="btn-pedir" id="p-enviar" onclick="enviarPedido()">Enviar pedido</button>
+    <p class="nota">Tu pedido queda reservado y el negocio confirma el pago.</p>`;
+}
+function copiarYappy(btn){
+  navigator.clipboard.writeText(String((Pedidos.negocio || {}).yappy_numero || '').replace(/\D/g, '')).then(() => {
+    btn.textContent = '¡Copiado!'; setTimeout(() => { btn.textContent = 'Copiar'; }, 1600);
+  });
+}
+async function enviarPedido(){
+  const err = document.getElementById('p-err'), btn = document.getElementById('p-enviar');
+  const comp = document.getElementById('p-comp');
+  PED.comprobante = comp ? comp.value.trim() : '';
+  if (comp && !PED.comprobante){ err.textContent = 'Escribe el número de comprobante de tu pago por Yappy.'; return; }
+  btn.disabled = true; btn.textContent = 'Enviando…'; err.textContent = '';
+  try {
+    PED.resultado = await Pedidos.crearPedido({
+      productId: PED.prod.id,
+      extras: extrasElegidos().map(x => ({ itemId: x.id, qty: 1 })),
+      fecha: PED.fecha, slotId: PED.franja.id, entrega: PED.entrega,
+      zonaId: PED.entrega === 'domicilio' && !PED.fueraZona ? PED.zonaId : null,
+      direccion: PED.entrega === 'domicilio' ? PED.direccion : null,
+      referencia: PED.entrega === 'domicilio' ? PED.referencia : null,
+      cliente: PED.cliente, destinatario: PED.destinatario, dedicatoria: PED.dedicatoria,
+      pago: { metodo: 'yappy', comprobante: PED.comprobante || null }
+    });
+    irPaso(6);
+  } catch(e){
+    err.textContent = e.message;
+    btn.disabled = false; btn.textContent = 'Enviar pedido';
+    // Si la franja se llenó mientras tanto, se vuelve a elegir
+    if (/franja|preparar/i.test(e.message)){ PED.franja = null; setTimeout(() => irPaso(2), 1800); }
+  }
+}
+
+// ---- 6. Listo ----
+function paso6(){
+  const r = PED.resultado, n = Pedidos.negocio || {};
+  const numero = '#' + String(r.numero).padStart(6, '0');
+  const wa = String(n.whatsapp || '').replace(/\D/g, '');
+  const texto = encodeURIComponent(`Hola, acabo de hacer el pedido ${numero} (${PED.prod.nombre}) para el ${fechaLarga(PED.fecha)}. A nombre de ${PED.cliente.nombre}.`);
+  return `<div class="listo"><i class="ti ti-circle-check"></i>
+    <h3>¡Pedido recibido!</h3>
+    <div class="num">${numero}</div>
+    <p class="paso-sub">${E(n.nombre || '')} revisará tu pago y te confirmará por WhatsApp.</p></div>
+    <div class="resumen">
+      <div><span>Producto</span><span>${E(PED.prod.nombre)}</span></div>
+      <div><span>Fecha</span><span>${fechaLarga(PED.fecha)}</span></div>
+      <div><span>Franja</span><span>${hora12(PED.franja.inicio)} – ${hora12(PED.franja.fin)}</span></div>
+      <div><span>Entrega</span><span>${PED.entrega === 'retiro' ? 'Retiro en tienda' : 'A domicilio'}</span></div>
+      <div><span>Para</span><span>${E(PED.destinatario.nombre)}</span></div>
+      <div class="tot"><span>Total</span><span>${Pedidos.dinero(r.total)}${r.envioPorConfirmar ? ' + envío' : ''}</span></div>
+    </div>
+    ${r.pocaAnticipacion ? '<div class="aviso">Pediste con poca anticipación: el negocio te confirmará si llega a tiempo.</div>' : ''}
+    ${wa ? `<a class="btn-sec" href="https://wa.me/${wa}?text=${texto}" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i> Escribir por WhatsApp</a>` : ''}
+    <button class="btn-pedir" onclick="cerrarProducto()">Listo</button>`;
+}
 
 arrancar();
 </script>
