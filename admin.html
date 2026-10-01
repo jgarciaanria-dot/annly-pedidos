@@ -195,7 +195,15 @@ button,input,select,textarea{font-family:inherit;}
 
 .topm,.side-fondo,.side-cerrar{display:none;}
 @media(max-width:860px){
-  .app.on{grid-template-columns:1fr;}
+  /* Nada puede ensanchar la página: lo que no cabe se desliza dentro de su propia fila */
+  html,body{overflow-x:clip;}
+  .app.on{grid-template-columns:minmax(0,1fr);}
+  .main{min-width:0;max-width:100vw;}
+  .main > *{min-width:0;max-width:100%;}
+  .filtros{min-width:0;max-width:100%;}
+  .ped{min-width:0;}
+  .ped *{min-width:0;}
+  .ped-acc{flex-wrap:wrap;gap:8px;}
   /* Barra superior fija */
   .topm{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;height:56px;padding:0 10px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
   .topm-btn{width:40px;height:40px;border-radius:12px;border:none;background:none;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--ink);cursor:pointer;text-decoration:none;flex-shrink:0;}
