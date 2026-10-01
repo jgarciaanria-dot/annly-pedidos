@@ -225,6 +225,32 @@ const Pedidos = {
       return { ...i, stock: Number(st.stock || 0), stock_bajo: !!st.stock_bajo };
     });
   },
+  // -------------------------------------------------------
+  // REPORTES (módulo Ventas e Inventario)
+  // -------------------------------------------------------
+  // Pedidos de un rango por fecha de entrega, con extras y pagos (sin el límite de 500 de la lista)
+  async pedidosParaReporte(desde, hasta) {
+    const filas = [];
+    for (let desdeFila = 0; desdeFila < 10000; desdeFila += 1000) {
+      const lote = await this._q(sb.from('orders')
+        .select('id, numero, fecha, estado, total, product_name, product_price, product_cost, delivery_type, zone_name, delivery_fee, cancel_reembolso, customer_name, order_extras(name, qty, unit_price, unit_cost), order_payments(tipo, metodo, monto, estado)')
+        .eq('business_id', this.id).gte('fecha', desde).lte('fecha', hasta)
+        .order('fecha', { ascending: true }).order('numero', { ascending: true })
+        .range(desdeFila, desdeFila + 999));
+      filas.push(...(lote || []));
+      if (!lote || lote.length < 1000) break;
+    }
+    return filas;
+  },
+  // Movimientos de inventario de un rango (todas las fechas en hora local de Panamá)
+  async movimientosRango(desde, hasta) {
+    const ini = new Date(desde + 'T00:00:00').toISOString();
+    const fin = new Date(hasta + 'T23:59:59').toISOString();
+    return (await this._q(sb.from('inventory_movements').select('*')
+      .eq('business_id', this.id).gte('created_at', ini).lte('created_at', fin)
+      .order('created_at', { ascending: true }).limit(5000))) || [];
+  },
+
   // a = { id?, name, description, unit_cost, sale_price, stock_min, track_stock, active, stock_inicial? }
   async guardarArticulo(a) {
     const fila = {
