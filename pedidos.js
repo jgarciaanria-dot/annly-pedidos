@@ -282,6 +282,20 @@ const Pedidos = {
     Object.assign(this.negocio, data[0]);
   },
 
+  // Nombre de la tienda (por si se escribió mal al registrarse). El link (slug) NO cambia,
+  // para no romper los links que el negocio ya compartió.
+  async guardarNombre(nombre) {
+    const limpio = String(nombre || '').replace(/\s+/g, ' ').trim();
+    if (limpio.length < 2) throw new Error('Escribe el nombre de tu tienda.');
+    if (limpio.length > 60) throw new Error('El nombre puede tener hasta 60 caracteres.');
+    const data = await this._q(sb.from('businesses').update({ nombre: limpio }).eq('id', this.id).select('id, nombre'));
+    if (!data || !data.length) throw new Error('No se pudo guardar el nombre (sin permisos).');
+    this.negocio.nombre = data[0].nombre;
+    const enLista = (this.negocios || []).find(x => x.id === this.id);
+    if (enLista) enLista.nombre = data[0].nombre;
+    return data[0].nombre;
+  },
+
   // Logo de la tienda (mismo espacio de fotos, carpeta del negocio)
   async subirLogo(file) {
     const blob = await this._reducirImagen(file, 600, 0.9);
@@ -297,6 +311,43 @@ const Pedidos = {
   async quitarLogo() {
     await this._q(sb.from('businesses').update({ logo_url: null }).eq('id', this.id));
     this.negocio.logo_url = null;
+  },
+
+  // Foto de portada de la tienda (la elige el negocio; sin foto, la tienda usa la de un producto)
+  async subirPortada(file) {
+    const blob = await this._reducirImagen(file, 1600, 0.85);
+    const path = `${this.id}/portada-${Date.now()}.webp`;
+    const { error } = await sb.storage.from('productos').upload(path, blob, { contentType: 'image/webp', upsert: false });
+    if (error) throw new Error('No se pudo subir la portada: ' + this.mensajeError(error));
+    const url = sb.storage.from('productos').getPublicUrl(path).data.publicUrl;
+    const data = await this._q(sb.from('businesses').update({ portada_url: url }).eq('id', this.id).select('portada_url'));
+    if (!data || !data.length) throw new Error('No se pudo guardar la portada (sin permisos).');
+    this.negocio.portada_url = url;
+    return url;
+  },
+  async quitarPortada() {
+    await this._q(sb.from('businesses').update({ portada_url: null }).eq('id', this.id));
+    this.negocio.portada_url = null;
+  },
+
+  // Paleta de colores de la tienda (las mismas 8 del registro de Annly)
+  PALETAS: [
+    { nombre: 'Violeta',         primario: '#7C3AED', secundario: '#EC4899' },
+    { nombre: 'Ámbar Urbano',    primario: '#F77F00', secundario: '#1D1D1D' },
+    { nombre: 'Esmeralda',       primario: '#0F766E', secundario: '#84CC16' },
+    { nombre: 'Coral',           primario: '#E85D4F', secundario: '#F4A261' },
+    { nombre: 'Marino Elegante', primario: '#1E3A5F', secundario: '#C9A96E' },
+    { nombre: 'Carbón & Oro',    primario: '#2D2D2D', secundario: '#C9A96E' },
+    { nombre: 'Rosa Cuarzo',     primario: '#D88C9A', secundario: '#6B3F4D' },
+    { nombre: 'Lavanda Suave',   primario: '#B39DDB', secundario: '#5E3A87' }
+  ],
+  async guardarPaleta(primario, secundario) {
+    const hex = /^#[0-9a-fA-F]{6}$/;
+    if (!hex.test(primario) || !hex.test(secundario)) throw new Error('Colores no válidos.');
+    const data = await this._q(sb.from('businesses').update({ color_primario: primario, color_secundario: secundario })
+      .eq('id', this.id).select('color_primario, color_secundario'));
+    if (!data || !data.length) throw new Error('No se pudieron guardar los colores (sin permisos).');
+    Object.assign(this.negocio, data[0]);
   },
 
   async listarZonas() {
