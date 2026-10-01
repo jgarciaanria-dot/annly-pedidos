@@ -193,6 +193,16 @@ button,input,select,textarea{font-family:inherit;}
 .btn-save{width:100%;margin-top:8px;}
 .btn-del{background:none;border:none;color:var(--err);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:12px;width:100%;}
 
+.portada-box{display:flex;align-items:center;gap:14px;}
+.portada-prev{width:96px;aspect-ratio:4/5;border-radius:60px 60px 14px 14px;overflow:hidden;background:var(--lilac);display:grid;place-items:center;color:var(--violet);font-size:26px;flex-shrink:0;border:1px solid var(--line);}
+.portada-prev img{width:100%;height:100%;object-fit:cover;}
+.paletas{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:6px;}
+.paleta{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:border-color .15s,box-shadow .15s;}
+.paleta:hover{border-color:#DCCFF1;}
+.paleta.on{border-color:var(--violet);box-shadow:0 0 0 3px var(--lilac);}
+.paleta-muestra{width:34px;height:34px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);}
+.paleta span{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.25;}
+.paleta.on span::after{content:" ✓";color:var(--violet);}
 .topm,.side-fondo,.side-cerrar{display:none;}
 @media(max-width:860px){
   /* Nada puede ensanchar la página: lo que no cabe se desliza dentro de su propia fila */
@@ -412,6 +422,15 @@ button,input,select,textarea{font-family:inherit;}
     <!-- Configuración -->
     <section id="tab-config" class="tabsec" hidden>
       <div class="sec">
+        <div class="sec-hdr"><div><h2>Nombre de la tienda</h2><p>Así aparece en tu tienda, en los correos y en el panel.</p></div></div>
+        <div class="sec-body" style="padding-top:14px;">
+          <div class="fg"><label class="flbl" for="d-nombre">Nombre</label><input class="fi" id="d-nombre" maxlength="60" placeholder="Ej: Angel's Details"></div>
+          <p class="ayuda">El link de tu tienda (<b id="d-nombre-link"></b>) no cambia, así siguen funcionando los que ya compartiste.</p>
+          <p class="msg" id="n-msg"></p>
+          <button class="btn btn-grad" style="width:auto;" onclick="guardarNombreTienda()"><i class="ti ti-check"></i> Guardar nombre</button>
+        </div>
+      </div>
+      <div class="sec">
         <div class="sec-hdr"><div><h2>Logo de la tienda</h2><p>Aparece junto al nombre en tu tienda. Mejor si es cuadrado.</p></div></div>
         <div class="sec-body" style="padding-top:14px;">
           <div class="foto-box">
@@ -423,6 +442,28 @@ button,input,select,textarea{font-family:inherit;}
             </div>
           </div>
           <p class="msg" id="logo-msg"></p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Foto de portada</h2><p>La imagen grande de la entrada de tu tienda. Si no subes una, se usa la de uno de tus productos.</p></div></div>
+        <div class="sec-body" style="padding-top:14px;">
+          <div class="portada-box">
+            <div id="portada-prev" class="portada-prev"></div>
+            <div>
+              <label class="btn-add" style="cursor:pointer;"><i class="ti ti-photo-up"></i> <span id="portada-txt">Subir portada</span><input type="file" id="portada-file" accept="image/*" hidden onchange="subirPortada(this)"></label>
+              <button class="btn-del" id="portada-quitar" style="width:auto;margin:0 0 0 8px;" onclick="quitarPortada()">Quitar</button>
+              <p class="ayuda">Mejor vertical (como un retrato): en la tienda se muestra con forma de arco. Se optimiza sola al subirla.</p>
+            </div>
+          </div>
+          <p class="msg" id="portada-msg"></p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Colores de la tienda</h2><p>Botones, títulos y detalles de tu tienda usan estos colores.</p></div></div>
+        <div class="sec-body" style="padding-top:14px;">
+          <div class="paletas" id="paletas"></div>
+          <p class="msg" id="paleta-msg"></p>
+          <button class="btn btn-grad" style="width:auto;" onclick="guardarPaleta()"><i class="ti ti-check"></i> Guardar colores</button>
         </div>
       </div>
       <div class="sec">
@@ -640,7 +681,7 @@ button,input,select,textarea{font-family:inherit;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=5"></script>
+<script src="pedidos.js?v=7"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
 document.getElementById('l-registro').href = ANNLY + '/registro.html';
@@ -1273,14 +1314,60 @@ async function quitarLogo(){
   try { await Pedidos.quitarLogo(); pintarLogo(); } catch(e){ msg('logo-msg', e.message); }
 }
 
+// ---------- Portada ----------
+function pintarPortadaCfg(){
+  const url = Pedidos.negocio.portada_url;
+  document.getElementById('portada-prev').innerHTML = url ? `<img src="${E(url)}" alt="Portada">` : '<i class="ti ti-photo"></i>';
+  document.getElementById('portada-txt').textContent = url ? 'Cambiar portada' : 'Subir portada';
+  document.getElementById('portada-quitar').style.display = url ? '' : 'none';
+}
+async function subirPortada(input){
+  const f = input.files && input.files[0]; input.value = '';
+  if (!f) return;
+  msg('portada-msg', 'Subiendo portada…');
+  try { await Pedidos.subirPortada(f); pintarPortadaCfg(); msg('portada-msg'); }
+  catch(e){ msg('portada-msg', e.message); }
+}
+async function quitarPortada(){
+  if (!confirm('¿Quitar la foto de portada? La tienda volverá a usar la foto de un producto.')) return;
+  try { await Pedidos.quitarPortada(); pintarPortadaCfg(); } catch(e){ msg('portada-msg', e.message); }
+}
+
+// ---------- Paleta de colores ----------
+let PALETA_SEL = 0;
+function pintarPaletas(){
+  const n = Pedidos.negocio;
+  const idx = Pedidos.PALETAS.findIndex(p => (p.primario || '').toLowerCase() === String(n.color_primario || '').toLowerCase()
+    && (p.secundario || '').toLowerCase() === String(n.color_secundario || '').toLowerCase());
+  PALETA_SEL = idx >= 0 ? idx : 0;
+  dibujarPaletas();
+}
+function dibujarPaletas(){
+  document.getElementById('paletas').innerHTML = Pedidos.PALETAS.map((p, i) => `
+    <button type="button" class="paleta${i === PALETA_SEL ? ' on' : ''}" onclick="elegirPaleta(${i})">
+      <span class="paleta-muestra" style="background:linear-gradient(135deg,${p.primario} 0 50%,${p.secundario} 50% 100%);"></span>
+      <span>${E(p.nombre)}</span>
+    </button>`).join('');
+}
+function elegirPaleta(i){ PALETA_SEL = i; dibujarPaletas(); msg('paleta-msg'); }
+async function guardarPaleta(){
+  const p = Pedidos.PALETAS[PALETA_SEL];
+  try { await Pedidos.guardarPaleta(p.primario, p.secundario); msg('paleta-msg'); alert('Colores guardados. Abre tu tienda para verlos.'); }
+  catch(e){ msg('paleta-msg', e.message); }
+}
+
 async function cargarConfig(){
   pintarLogo();
+  pintarPortadaCfg();
+  pintarPaletas();
   try { CFG = await Pedidos.configuracion(); } catch(e){ msg('c-msg', e.message); return; }
   document.getElementById('c-min').value = CFG.min_prep_hours;
   document.getElementById('c-warn').value = CFG.warn_hours;
   document.getElementById('c-exp').value = CFG.pending_expiry_hours;
   document.getElementById('c-max').value = CFG.max_days_ahead;
   const n = Pedidos.negocio;
+  document.getElementById('d-nombre').value = n.nombre || '';
+  document.getElementById('d-nombre-link').textContent = document.getElementById('hdr-sub').textContent;
   document.getElementById('d-yappy').value = n.yappy_numero || '';
   document.getElementById('d-banco').value = n.banco_nombre || '';
   document.getElementById('d-tipo-cuenta').value = n.banco_tipo_cuenta || '';
@@ -1317,6 +1404,17 @@ async function guardarDatos(){
       direccion: document.getElementById('d-dir').value, instagram: document.getElementById('d-ig').value, tagline: document.getElementById('d-tag').value });
     msg('d-msg', ''); alert('Datos guardados.');
   } catch(e){ msg('d-msg', e.message); }
+}
+
+async function guardarNombreTienda(){
+  const v = document.getElementById('d-nombre').value;
+  msg('n-msg');
+  try {
+    const nuevo = await Pedidos.guardarNombre(v);
+    document.getElementById('d-nombre').value = nuevo;
+    pintarEncabezado();
+    alert('Nombre guardado.');
+  } catch(e){ msg('n-msg', e.message); }
 }
 
 // ---------- Acceso ----------
