@@ -233,6 +233,53 @@ button,input,select,textarea{font-family:inherit;}
   #f-periodo .fchip,#f-estado .fchip{flex-shrink:0;white-space:nowrap;}
   .buscar{width:100%;}
 }
+/* ---------- Celular: todas las secciones ---------- */
+@media(max-width:640px){
+  /* Formularios: hojas que suben desde abajo, a todo el ancho */
+  .ov{align-items:flex-end;padding:0;}
+  .modal{max-width:100%;border-radius:20px 20px 0 0;max-height:94vh;}
+  .modal-hdr{padding:14px 16px;}
+  .modal-body{padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px));}
+  /* Letra de 16px en campos: el celular no hace zoom al tocarlos */
+  input,select,textarea{font-size:16px!important;}
+  .frow{grid-template-columns:1fr;gap:0;}
+  .extra-opt{flex-wrap:wrap;}
+  .extra-opt input[type=number]{width:100px;}
+
+  /* Inicio */
+  .hoy{gap:8px;margin-bottom:16px;}
+  .hoy-item{padding:12px 14px;border-radius:14px;}
+  .hoy-item b{font-size:24px;}
+  .guia{padding:16px 16px 6px;}
+  .paso{flex-wrap:wrap;gap:10px 12px;}
+  .paso .chip-btn{margin-left:42px;}
+
+  /* Secciones y listas (Catálogo, Inventario, Configuración) */
+  .sec{border-radius:16px;}
+  .sec-hdr{padding:14px;}
+  .sec-hdr .btn-add{width:100%;justify-content:center;}
+  .sec-body{padding:4px 14px 12px;}
+  .fila{flex-wrap:wrap;gap:10px;}
+  .fila-info{flex:1 1 140px;}
+  .fila-acc{margin-left:auto;}
+  .ico{width:38px;height:38px;}
+  .miniatura{width:46px;height:46px;}
+
+  /* Entregas y horarios: un día por fila */
+  .dias{grid-template-columns:1fr;}
+  .dia{min-height:0;}
+
+  /* Pedidos */
+  .ped{padding:12px 14px;}
+  /* Total a la izquierda y botones a la derecha; si no caben, los botones bajan a todo el ancho */
+  .ped-acc{justify-content:space-between;align-items:center;}
+  .ped-total{flex:0 0 auto;}
+  .ped-acc > div{flex:1 1 auto;justify-content:flex-end;flex-wrap:wrap;}
+  .ped-acc .btn-accion{padding:11px 14px;}
+  .ped-acc .btn-accion:not(.sec){flex:1 1 auto;max-width:240px;}
+  .det-fila{flex-wrap:wrap;}
+  .acc-row > *{flex:1 1 140px;}
+}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;}}
 </style>
 </head>
