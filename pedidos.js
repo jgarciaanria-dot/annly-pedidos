@@ -330,6 +330,79 @@ const Pedidos = {
     this.negocio.portada_url = null;
   },
 
+  // -------------------------------------------------------
+  // PLAN Y MÓDULOS (mismo sistema de suscripción que Agenda)
+  // -------------------------------------------------------
+  // Regla de Annly: durante la prueba solo funciona lo que trae el plan;
+  // los módulos comprados se activan cuando la suscripción pasa a 'active'.
+  plan: null,          // { id, status, vence, code, nombre, precio }
+  modulos: [],         // códigos de módulos activos (pagados aparte)
+
+  async cargarPlan() {
+    const { data, error } = await sb.from('subscriptions').select('id, status, current_period_end, plans(code, name, monthly_price)')
+      .eq('business_id', this.id).neq('status', 'cancelled').order('created_at', { ascending: false }).limit(1).maybeSingle();
+    if (error) console.error('No se pudo leer el plan:', error);
+    this.plan = data ? {
+      id: data.id, status: data.status, vence: data.current_period_end,
+      code: data.plans && data.plans.code, nombre: (data.plans && data.plans.name) || 'Tiendas',
+      precio: Number((data.plans && data.plans.monthly_price) || 0)
+    } : null;
+    this.modulos = this.plan ? await this._modulosActivos(this.plan.id) : [];
+    return this.plan;
+  },
+
+  async _modulosActivos(subId) {
+    const hoy = new Date().toISOString().split('T')[0];
+    const { data } = await sb.from('subscription_items').select('item_code, cancela_el, created_at')
+      .eq('subscription_id', subId).eq('item_type', 'addon').eq('is_active', true);
+    this._modulosDetalle = (data || []).filter(r => !r.cancela_el || r.cancela_el >= hoy);
+    return this._modulosDetalle.map(r => r.item_code);
+  },
+
+  detalleModulo(code) { return (this._modulosDetalle || []).find(r => r.item_code === code) || null; },
+
+  async catalogoModulos() {
+    const { data } = await sb.from('features').select('code, name, description, monthly_price')
+      .eq('is_addon', true).eq('is_active', true).eq('producto', 'pedidos').order('code');
+    return (data || []).map(f => ({ code: f.code, nombre: f.name, descripcion: f.description, precio: Number(f.monthly_price) || 0 }));
+  },
+
+  // ¿Se puede USAR el módulo? Solo con la suscripción activa (no en prueba) y el módulo comprado
+  moduloDisponible(code) {
+    return !!(this.plan && this.plan.status === 'active' && this.modulos.includes(code));
+  },
+
+  async activarModulo(code, nombre, precio) {
+    if (!this.plan) throw new Error('Tu tienda no tiene plan todavía.');
+    const { error } = await sb.from('subscription_items').insert([{
+      subscription_id: this.plan.id, item_type: 'addon', item_code: code,
+      description: nombre, quantity: 1, unit_price: precio, is_active: true
+    }]);
+    if (error) throw new Error('No se pudo activar el módulo: ' + this.mensajeError(error));
+    await this.cargarPlan();
+  },
+
+  // Sigue activo hasta cumplir un mes desde que se activó (no se corta lo ya pagado)
+  async cancelarModulo(code) {
+    const d = this.detalleModulo(code);
+    if (!d) throw new Error('Ese módulo no está activo.');
+    const corte = new Date(d.created_at); corte.setMonth(corte.getMonth() + 1);
+    const fecha = corte.toISOString().split('T')[0];
+    const { error } = await sb.from('subscription_items').update({ cancela_el: fecha })
+      .eq('subscription_id', this.plan.id).eq('item_code', code).eq('item_type', 'addon').eq('is_active', true);
+    if (error) throw new Error('No se pudo cancelar: ' + this.mensajeError(error));
+    await this.cargarPlan();
+    return fecha;
+  },
+
+  // Sin pasarela de pago todavía: el dueño termina la prueba con un clic (igual que en Agenda)
+  async activarSuscripcion() {
+    if (!this.plan) throw new Error('Tu tienda no tiene plan todavía.');
+    const { error } = await sb.from('subscriptions').update({ status: 'active' }).eq('id', this.plan.id);
+    if (error) throw new Error('No se pudo activar el plan: ' + this.mensajeError(error));
+    await this.cargarPlan();
+  },
+
   // Paleta de colores de la tienda (las mismas 8 del registro de Annly)
   PALETAS: [
     { nombre: 'Violeta',         primario: '#7C3AED', secundario: '#EC4899' },
