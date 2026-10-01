@@ -225,6 +225,40 @@ button,input,select,textarea{font-family:inherit;}
 .mod-acc{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;}
 .mod-precio{font-family:'DM Sans',sans-serif;font-weight:800;font-size:18px;}
 .mod-estado{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#E9F7EF;color:#1D7A46;}
+.rep-vts{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:12px;width:fit-content;max-width:100%;}
+.rep-vt{display:flex;align-items:center;gap:6px;border:none;background:none;border-radius:10px;padding:9px 14px;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink-soft);cursor:pointer;}
+.rep-vt.on{background:var(--lilac);color:var(--violet);}
+.rep-vt i{font-size:16px;}
+.rep-fechas{display:flex;align-items:center;gap:8px;margin:-4px 0 10px;}
+.rep-fechas .fi{max-width:180px;}
+.rep-barra{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.rep-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px;}
+.rep-kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:3px;min-width:0;}
+.rep-kpi span{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);}
+.rep-kpi b{font-family:'DM Sans',sans-serif;font-size:22px;font-weight:800;}
+.rep-kpi small{font-size:12px;color:var(--ink-soft);}
+.rep-kpi.grande{background:linear-gradient(135deg,var(--violet),var(--pink));border:none;color:#fff;}
+.rep-kpi.grande span,.rep-kpi.grande small{color:rgba(255,255,255,.85);}
+.rep-kpi.aviso{background:#FFF8EA;border-color:#F6E2B8;}
+.rep-kpi.malo{background:#FDF1F0;border-color:#F5D3CF;}
+.rep-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;min-width:0;}
+.rep-card h3{font-size:15px;margin-bottom:10px;}
+.rep-card h4{font-size:13px;margin:14px 0 8px;color:var(--ink-soft);}
+.rep-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.rep-grid .rep-card{margin-bottom:0;}
+.rep-graf{display:flex;align-items:flex-end;gap:3px;height:170px;padding-top:8px;}
+.rep-bar{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;}
+.rep-bar i{display:block;width:100%;max-width:34px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,var(--violet),var(--pink));}
+.rep-bar span{font-size:9.5px;color:var(--ink-soft);height:12px;white-space:nowrap;}
+.rep-tabla-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.rep-tabla{width:100%;border-collapse:collapse;font-size:13px;}
+.rep-tabla th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap;}
+.rep-tabla td{padding:9px 8px;border-bottom:1px solid #F3F0F7;}
+.rep-tabla .d{text-align:right;white-space:nowrap;}
+.rep-tabla tfoot td{border-bottom:none;border-top:1.5px solid var(--line);}
+.rep-tabla .vacio{text-align:center;color:var(--ink-soft);padding:16px;}
+.rep-bajo{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:#FFF4DE;color:#9A6200;margin-left:4px;}
+@media(max-width:860px){.rep-grid{grid-template-columns:1fr;}.rep-graf{height:140px;}.rep-vts{width:100%;}.rep-vt{flex:1;justify-content:center;padding:9px 6px;}}
 .vitrina{text-align:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:34px 22px;}
 .vitrina-ico{width:62px;height:62px;border-radius:50%;margin:0 auto 12px;background:var(--lilac);color:var(--violet);display:grid;place-items:center;font-size:28px;}
 .vitrina h2{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:6px;}
@@ -720,7 +754,7 @@ button,input,select,textarea{font-family:inherit;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=8"></script>
+<script src="pedidos.js?v=9"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
 document.getElementById('l-registro').href = ANNLY + '/registro.html';
@@ -942,8 +976,232 @@ async function cargarReportes(){
     </div>`;
     return;
   }
-  // El contenido de los reportes llega en la siguiente entrega
-  cont.innerHTML = `<div class="vitrina"><div class="vitrina-ico"><i class="ti ti-tools"></i></div><h2>Reportes en construcción</h2><p>Tu módulo está activo. Los reportes de ventas e inventario aparecerán aquí muy pronto.</p></div>`;
+  if (!REP.desde) fijarRangoRep('mes', true);
+  pintarMarcoRep();
+  await cargarDatosRep();
+}
+
+// ===== Reportes: estado, rango y datos =====
+const REP = { vista: 'ventas', rango: 'mes', desde: '', hasta: '', pedidos: [], articulos: [], movs: [], cargando: false };
+const isoRep = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const fCorta = iso => { const [y, m, d] = iso.split('-'); return d + '/' + m; };
+const pct = (a, b) => b > 0 ? Math.round(a / b * 100) : 0;
+
+function fijarRangoRep(r, sinCargar){
+  const hoy = new Date(); let d = new Date(hoy), h = new Date(hoy);
+  if (r === '7d') d.setDate(d.getDate() - 6);
+  else if (r === 'mes') d = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  else if (r === 'mesant'){ d = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1); h = new Date(hoy.getFullYear(), hoy.getMonth(), 0); }
+  else if (r === 'anio') d = new Date(hoy.getFullYear(), 0, 1);
+  if (r !== 'custom'){ REP.desde = isoRep(d); REP.hasta = isoRep(h); }
+  REP.rango = r;
+  if (!sinCargar){ pintarMarcoRep(); cargarDatosRep(); }
+}
+function rangoPersonalizadoRep(){
+  const d = document.getElementById('rep-desde').value, h = document.getElementById('rep-hasta').value;
+  if (!d || !h || h < d) return;
+  REP.desde = d; REP.hasta = h; REP.rango = 'custom';
+  pintarMarcoRep(); cargarDatosRep();
+}
+function vistaRep(v){ REP.vista = v; pintarMarcoRep(); pintarRep(); }
+
+function pintarMarcoRep(){
+  const cont = document.getElementById('rep-contenido');
+  const chip = (k, t) => `<button class="fchip${REP.rango === k ? ' on' : ''}" onclick="fijarRangoRep('${k}')">${t}</button>`;
+  const vt = (k, i, t) => `<button class="rep-vt${REP.vista === k ? ' on' : ''}" onclick="vistaRep('${k}')"><i class="ti ${i}"></i>${t}</button>`;
+  cont.innerHTML = `
+    <div class="rep-vts">${vt('ventas','ti-chart-line','Ventas')}${vt('inventario','ti-packages','Inventario')}${vt('ganancia','ti-coin','Ganancia')}</div>
+    <div class="filtros rep-rango">${chip('hoy','Hoy')}${chip('7d','7 días')}${chip('mes','Este mes')}${chip('mesant','Mes pasado')}${chip('anio','Este año')}${chip('custom','Elegir fechas')}</div>
+    <div class="rep-fechas"${REP.rango === 'custom' ? '' : ' hidden'}>
+      <input type="date" class="fi" id="rep-desde" value="${REP.desde}" onchange="rangoPersonalizadoRep()">
+      <span>a</span>
+      <input type="date" class="fi" id="rep-hasta" value="${REP.hasta}" onchange="rangoPersonalizadoRep()">
+    </div>
+    <div class="rep-barra">
+      <span class="ayuda" style="margin:0;">Del ${fCorta(REP.desde)} al ${fCorta(REP.hasta)} · por fecha de entrega</span>
+      <button class="chip-btn" onclick="exportarRep()"><i class="ti ti-file-spreadsheet"></i> Exportar a Excel</button>
+    </div>
+    <div id="rep-cuerpo"><p class="ayuda">Cargando…</p></div>`;
+}
+
+async function cargarDatosRep(){
+  const clave = REP.desde + '|' + REP.hasta;
+  REP.clave = clave;
+  document.getElementById('rep-cuerpo').innerHTML = '<p class="ayuda">Cargando…</p>';
+  try {
+    const [pedidos, articulos, movs] = await Promise.all([
+      Pedidos.pedidosParaReporte(REP.desde, REP.hasta),
+      Pedidos.listarArticulos(),
+      Pedidos.movimientosRango(REP.desde, REP.hasta)
+    ]);
+    if (REP.clave !== clave) return; // cambió el rango mientras cargaba
+    Object.assign(REP, { pedidos, articulos, movs });
+    pintarRep();
+  } catch(e){
+    document.getElementById('rep-cuerpo').innerHTML = `<p class="msg">No se pudieron cargar los reportes. ${E(e.message || '')}</p>`;
+  }
+}
+
+function pintarRep(){
+  const el = document.getElementById('rep-cuerpo');
+  if (!el) return;
+  el.innerHTML = REP.vista === 'ventas' ? htmlVentasRep() : (REP.vista === 'inventario' ? htmlInventarioRep() : htmlGananciaRep());
+}
+
+// ---- Cálculos ----
+const VALIDOS = p => !['PENDIENTE', 'CANCELADO'].includes(p.estado);
+const extrasIngreso = p => (p.order_extras || []).reduce((s, x) => s + Number(x.unit_price || 0) * Number(x.qty || 0), 0);
+const extrasCosto = p => (p.order_extras || []).reduce((s, x) => s + Number(x.unit_cost || 0) * Number(x.qty || 0), 0);
+function agrupar(lista, clave, valor){
+  const m = {};
+  lista.forEach(x => { const k = clave(x) || '—'; (m[k] ||= { nombre: k, n: 0, monto: 0 }); m[k].n += 1; m[k].monto += valor(x); });
+  return Object.values(m).sort((a, b) => b.monto - a.monto);
+}
+function tablaRep(cols, filas, pie){
+  return `<div class="rep-tabla-wrap"><table class="rep-tabla"><thead><tr>${cols.map(c => `<th${c.d ? ' class="d"' : ''}>${c.t}</th>`).join('')}</tr></thead>
+    <tbody>${filas.length ? filas.map(f => `<tr>${f.map((v, i) => `<td${cols[i].d ? ' class="d"' : ''}>${v}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${cols.length}" class="vacio">Sin datos en este periodo.</td></tr>`}</tbody>
+    ${pie ? `<tfoot><tr>${pie.map((v, i) => `<td${cols[i].d ? ' class="d"' : ''}>${v}</td>`).join('')}</tr></tfoot>` : ''}</table></div>`;
+}
+const kpi = (t, v, sub, cls) => `<div class="rep-kpi${cls ? ' ' + cls : ''}"><span>${t}</span><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+
+// ---- Ventas ----
+function htmlVentasRep(){
+  const P = REP.pedidos, ok = P.filter(VALIDOS);
+  const ventas = ok.reduce((s, p) => s + Number(p.total || 0), 0);
+  const envios = ok.reduce((s, p) => s + Number(p.delivery_fee || 0), 0);
+  const pend = P.filter(p => p.estado === 'PENDIENTE'), canc = P.filter(p => p.estado === 'CANCELADO');
+  const reemb = canc.reduce((s, p) => s + Number(p.cancel_reembolso || 0), 0);
+
+  // Ventas por día (o por mes si el rango es largo)
+  const dias = Math.round((new Date(REP.hasta) - new Date(REP.desde)) / 86400000) + 1;
+  const porMes = dias > 92;
+  const serie = [];
+  const cur = new Date(REP.desde + 'T00:00:00'), fin = new Date(REP.hasta + 'T00:00:00');
+  while (cur <= fin){
+    const k = porMes ? isoRep(cur).slice(0, 7) : isoRep(cur);
+    if (!serie.length || serie[serie.length - 1].k !== k) serie.push({ k, v: 0 });
+    cur.setDate(cur.getDate() + 1);
+  }
+  ok.forEach(p => { const k = porMes ? p.fecha.slice(0, 7) : p.fecha; const it = serie.find(x => x.k === k); if (it) it.v += Number(p.total || 0); });
+  const max = Math.max(1, ...serie.map(x => x.v));
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const etiqueta = k => porMes ? meses[Number(k.slice(5, 7)) - 1] : fCorta(k);
+  const grafico = `<div class="rep-graf">${serie.map(x => `<div class="rep-bar" title="${etiqueta(x.k)}: ${$(x.v)}"><i style="height:${Math.max(x.v ? 3 : 0, x.v / max * 100)}%"></i><span>${serie.length <= 16 || serie.indexOf(x) % Math.ceil(serie.length / 12) === 0 ? etiqueta(x.k) : ''}</span></div>`).join('')}</div>`;
+
+  const productos = agrupar(ok, p => p.product_name, p => Number(p.product_price || 0));
+  const extras = {}; ok.forEach(p => (p.order_extras || []).forEach(x => { const k = x.name; (extras[k] ||= { nombre: k, n: 0, monto: 0 }); extras[k].n += Number(x.qty || 0); extras[k].monto += Number(x.unit_price || 0) * Number(x.qty || 0); }));
+  const extrasL = Object.values(extras).sort((a, b) => b.monto - a.monto);
+  const entrega = agrupar(ok, p => p.delivery_type === 'retiro' ? 'Retiro en tienda' : 'Domicilio', p => Number(p.total || 0));
+  const zonas = agrupar(ok.filter(p => p.delivery_type !== 'retiro'), p => p.zone_name || 'Sin zona', p => Number(p.total || 0));
+  const MEDIO = { yappy: 'Yappy', transferencia: 'Transferencia', bank: 'Transferencia', efectivo: 'Efectivo' };
+  const medios = agrupar(ok, p => { const pg = (p.order_payments || []).find(x => x.tipo === 'inicial'); return pg ? (MEDIO[pg.metodo] || pg.metodo) : 'Sin registro'; }, p => Number(p.total || 0));
+
+  return `
+    <div class="rep-kpis">
+      ${kpi('Ventas', $(ventas), ok.length + (ok.length === 1 ? ' pedido' : ' pedidos'), 'grande')}
+      ${kpi('Ticket promedio', $(ok.length ? ventas / ok.length : 0))}
+      ${kpi('Envíos cobrados', $(envios))}
+      ${kpi('Por confirmar pago', $(pend.reduce((s, p) => s + Number(p.total || 0), 0)), pend.length + ' pedidos', pend.length ? 'aviso' : '')}
+      ${kpi('Cancelados', String(canc.length), reemb ? 'Reembolsado ' + $(reemb) : '', canc.length ? 'malo' : '')}
+    </div>
+    <div class="rep-card"><h3>Ventas por ${porMes ? 'mes' : 'día'}</h3>${grafico}</div>
+    <div class="rep-grid">
+      <div class="rep-card"><h3>Productos más vendidos</h3>${tablaRep([{t:'Producto'},{t:'Pedidos',d:1},{t:'Monto',d:1}], productos.slice(0, 10).map(x => [E(x.nombre), x.n, $(x.monto)]))}</div>
+      <div class="rep-card"><h3>Extras más pedidos</h3>${tablaRep([{t:'Extra'},{t:'Cant.',d:1},{t:'Monto',d:1}], extrasL.slice(0, 10).map(x => [E(x.nombre), x.n, $(x.monto)]))}</div>
+      <div class="rep-card"><h3>Por forma de entrega</h3>${tablaRep([{t:'Entrega'},{t:'Pedidos',d:1},{t:'Monto',d:1},{t:'%',d:1}], entrega.map(x => [x.nombre, x.n, $(x.monto), pct(x.monto, ventas) + '%']))}
+        ${zonas.length ? `<h4>Por zona</h4>${tablaRep([{t:'Zona'},{t:'Pedidos',d:1},{t:'Monto',d:1}], zonas.map(x => [E(x.nombre), x.n, $(x.monto)]))}` : ''}</div>
+      <div class="rep-card"><h3>Por medio de pago</h3>${tablaRep([{t:'Medio'},{t:'Pedidos',d:1},{t:'Monto',d:1},{t:'%',d:1}], medios.map(x => [E(x.nombre), x.n, $(x.monto), pct(x.monto, ventas) + '%']))}</div>
+    </div>`;
+}
+
+// ---- Inventario ----
+function htmlInventarioRep(){
+  const A = REP.articulos.filter(a => a.track_stock !== false && a.active !== false);
+  const valor = A.reduce((s, a) => s + Math.max(0, a.stock) * Number(a.unit_cost || 0), 0);
+  const bajos = A.filter(a => a.stock_bajo || (Number(a.stock_min || 0) > 0 && a.stock <= Number(a.stock_min)));
+  const mov = {};
+  REP.movs.forEach(m => {
+    const o = (mov[m.item_id] ||= { entro: 0, vendido: 0, salidas: 0, ajustes: 0, costoVendido: 0 });
+    const q = Number(m.qty || 0);
+    if (m.tipo === 'entrada') o.entro += q;
+    else if (m.tipo === 'venta'){ o.vendido += Math.abs(q); o.costoVendido += Math.abs(q) * Number(m.unit_cost || 0); }
+    else if (m.tipo === 'salida') o.salidas += Math.abs(q);
+    else if (m.tipo === 'ajuste') o.ajustes += q;
+  });
+  const nombre = id => (REP.articulos.find(a => a.id === id) || {}).name || '—';
+  const costoVendido = Object.values(mov).reduce((s, o) => s + o.costoVendido, 0);
+  const filasMov = Object.entries(mov).sort((a, b) => b[1].vendido - a[1].vendido)
+    .map(([id, o]) => [E(nombre(id)), o.entro || '—', o.vendido || '—', o.salidas || '—', o.ajustes ? (o.ajustes > 0 ? '+' : '') + o.ajustes : '—']);
+
+  return `
+    <div class="rep-kpis">
+      ${kpi('Inventario valorizado', $(valor), 'a costo, hoy', 'grande')}
+      ${kpi('Artículos con stock', String(A.length))}
+      ${kpi('Bajo el mínimo', String(bajos.length), bajos.length ? 'hay que reponer' : 'todo en orden', bajos.length ? 'aviso' : '')}
+      ${kpi('Costo de lo vendido', $(costoVendido), 'en el periodo')}
+    </div>
+    ${bajos.length ? `<div class="rep-card"><h3>Para reponer</h3>${tablaRep([{t:'Artículo'},{t:'Stock',d:1},{t:'Mínimo',d:1}], bajos.map(a => [E(a.name), a.stock, Number(a.stock_min || 0)]))}</div>` : ''}
+    <div class="rep-card"><h3>Movimientos del periodo</h3>${tablaRep([{t:'Artículo'},{t:'Entró',d:1},{t:'Vendido',d:1},{t:'Salidas',d:1},{t:'Ajustes',d:1}], filasMov)}</div>
+    <div class="rep-card"><h3>Stock actual valorizado</h3>${tablaRep([{t:'Artículo'},{t:'Stock',d:1},{t:'Costo',d:1},{t:'Valor',d:1}],
+      A.slice().sort((a, b) => b.stock * b.unit_cost - a.stock * a.unit_cost).map(a => [E(a.name) + (bajos.includes(a) ? ' <span class="rep-bajo">bajo</span>' : ''), a.stock, $(a.unit_cost || 0), $(Math.max(0, a.stock) * Number(a.unit_cost || 0))]),
+      ['<b>Total</b>', '', '', '<b>' + $(valor) + '</b>'])}</div>`;
+}
+
+// ---- Ganancia por producto ----
+function filasGanancia(){
+  const m = {};
+  REP.pedidos.filter(VALIDOS).forEach(p => {
+    const k = p.product_name || '—';
+    const o = (m[k] ||= { nombre: k, n: 0, ingreso: 0, costo: 0, sinCosto: 0 });
+    o.n += 1;
+    o.ingreso += Number(p.product_price || 0) + extrasIngreso(p);
+    o.costo += Number(p.product_cost || 0) + extrasCosto(p);
+    if (!(Number(p.product_cost) > 0)) o.sinCosto += 1;
+  });
+  return Object.values(m).map(o => ({ ...o, margen: o.ingreso - o.costo })).sort((a, b) => b.margen - a.margen);
+}
+function htmlGananciaRep(){
+  const F = filasGanancia();
+  const ing = F.reduce((s, o) => s + o.ingreso, 0), cos = F.reduce((s, o) => s + o.costo, 0), mar = ing - cos;
+  const sinCosto = F.filter(o => o.sinCosto > 0);
+  return `
+    <div class="rep-kpis">
+      ${kpi('Ganancia', $(mar), pct(mar, ing) + '% de margen', 'grande')}
+      ${kpi('Vendido en productos', $(ing), 'con extras, sin envío')}
+      ${kpi('Costo', $(cos))}
+    </div>
+    ${sinCosto.length ? `<div class="plan-aviso"><i class="ti ti-alert-triangle"></i><div>${sinCosto.length === 1 ? 'Un producto se vendió' : sinCosto.length + ' productos se vendieron'} <b>sin costo cargado</b>, así que su ganancia sale más alta de lo real. Carga el costo en Catálogo para que el cálculo sea exacto.</div></div>` : ''}
+    <div class="rep-card"><h3>Ganancia por producto</h3>${tablaRep([{t:'Producto'},{t:'Pedidos',d:1},{t:'Vendido',d:1},{t:'Costo',d:1},{t:'Ganancia',d:1},{t:'Margen',d:1}],
+      F.map(o => [E(o.nombre) + (o.sinCosto ? ' <span class="rep-bajo">sin costo</span>' : ''), o.n, $(o.ingreso), $(o.costo), '<b>' + $(o.margen) + '</b>', pct(o.margen, o.ingreso) + '%']),
+      ['<b>Total</b>', F.reduce((s, o) => s + o.n, 0), $(ing), $(cos), '<b>' + $(mar) + '</b>', pct(mar, ing) + '%'])}
+      <p class="ayuda">Usa el costo que tenía cada producto y cada extra al momento del pedido. El envío no cuenta como ganancia.</p></div>`;
+}
+
+// ---- Exportar a Excel (CSV) ----
+function exportarRep(){
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const n = v => Number(v || 0).toFixed(2);
+  let filas = [], nombre = '';
+  if (REP.vista === 'ventas'){
+    nombre = 'ventas';
+    filas.push(['Pedido','Fecha entrega','Estado','Cliente','Producto','Precio producto','Extras','Envío','Total','Entrega','Zona','Medio de pago']);
+    REP.pedidos.forEach(p => { const pg = (p.order_payments || []).find(x => x.tipo === 'inicial') || {};
+      filas.push(['#' + String(p.numero).padStart(6, '0'), p.fecha, p.estado, p.customer_name, p.product_name, n(p.product_price), n(extrasIngreso(p)), n(p.delivery_fee), n(p.total), p.delivery_type === 'retiro' ? 'Retiro' : 'Domicilio', p.zone_name || '', pg.metodo || '']); });
+  } else if (REP.vista === 'inventario'){
+    nombre = 'inventario';
+    filas.push(['Artículo','Stock','Mínimo','Costo unitario','Valor','Bajo el mínimo']);
+    REP.articulos.filter(a => a.track_stock !== false).forEach(a => filas.push([a.name, a.stock, Number(a.stock_min || 0), n(a.unit_cost), n(Math.max(0, a.stock) * Number(a.unit_cost || 0)), a.stock_bajo ? 'Sí' : 'No']));
+  } else {
+    nombre = 'ganancia';
+    filas.push(['Producto','Pedidos','Vendido','Costo','Ganancia','Margen %']);
+    filasGanancia().forEach(o => filas.push([o.nombre, o.n, n(o.ingreso), n(o.costo), n(o.margen), pct(o.margen, o.ingreso)]));
+  }
+  const csv = '\ufeff' + filas.map(f => f.map(q).join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = `${nombre}-${Pedidos.negocio.slug}-${REP.desde}-a-${REP.hasta}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
 }
 // Menú del celular (hamburguesa)
 function menuMovil(abrirlo){
