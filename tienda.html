@@ -57,6 +57,8 @@ header{background:#fff;}
 @media(max-width:820px){
   .portada .wrap{grid-template-columns:1fr;padding-top:24px;padding-bottom:24px;gap:18px;}
   .portada-foto{display:none;}
+  /* La portada elegida por el negocio sí se ve en el celular: arriba, más ancha */
+  .portada-foto.propia{display:block;order:-1;max-width:100%;aspect-ratio:16/10;border-radius:22px;}
   .portada h1{font-size:32px;}
 }
 @media(max-width:560px){
@@ -666,7 +668,7 @@ footer{animation:aparecer .6s ease both;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=5"></script>
+<script src="/pedidos.js?v=7"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -772,9 +774,15 @@ function completarPortada(){
   if (c.retiro) items.push(['ti-building-store', 'Retiro en tienda', 'Pasa por tu pedido']);
   items.push(['ti-sparkles', 'Personalízalo', 'Agrega extras y dedicatoria']);
   document.getElementById('t-beneficios').innerHTML = items.map(i => `<div class="beneficio"><i class="ti ${i[0]}"></i><div><b>${i[1]}</b>${i[2]}</div></div>`).join('');
-  // Foto de portada: el primer producto con foto
-  const conFoto = (CAT.productos || []).find(p => p.foto);
+  // Foto de portada: la que eligió el negocio; si no hay, la del primer producto con foto
   const box = document.getElementById('t-portada-foto');
+  if (n.portada_url){
+    box.innerHTML = `<img src="${E(n.portada_url)}" alt="${E(n.nombre || '')}">`;
+    box.classList.add('propia');
+    box.hidden = false;
+    return;
+  }
+  const conFoto = (CAT.productos || []).find(p => p.foto);
   if (conFoto){
     box.innerHTML = `<img src="${E(conFoto.foto)}" alt="${E(conFoto.nombre)}"><div class="sello"><b>${E(conFoto.nombre)}</b>${Pedidos.dinero(conFoto.precio)}</div>`;
     box.hidden = false;
