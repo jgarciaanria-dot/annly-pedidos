@@ -203,6 +203,35 @@ button,input,select,textarea{font-family:inherit;}
 .paleta-muestra{width:34px;height:34px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);}
 .paleta span{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.25;}
 .paleta.on span::after{content:" ✓";color:var(--violet);}
+.tab-lock{margin-left:auto;font-size:14px;color:var(--ink-soft);}
+.plan-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:700;background:var(--lilac);color:var(--violet);margin-left:8px;vertical-align:middle;}
+.plan-chip.prueba{background:#FFF4DE;color:#9A6200;}
+.plan-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:14px;}
+.plan-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.plan-top h2{font-family:'Playfair Display',serif;font-size:24px;}
+.plan-precio{font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;}
+.plan-precio small{font-size:13px;font-weight:600;color:var(--ink-soft);}
+.plan-incluye{list-style:none;display:grid;gap:8px;margin:14px 0 4px;}
+.plan-incluye li{display:flex;gap:9px;font-size:13.5px;line-height:1.45;}
+.plan-incluye i{color:var(--violet);font-size:17px;flex-shrink:0;margin-top:1px;}
+.plan-aviso{display:flex;gap:10px;align-items:flex-start;background:#FFF8EA;border:1px solid #F6E2B8;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5;color:#7A5200;margin:12px 0;}
+.plan-aviso i{font-size:18px;margin-top:1px;}
+.mod-card{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px;}
+.mod-card.on{border-color:var(--violet);box-shadow:0 0 0 3px var(--lilac);}
+.mod-ico{width:46px;height:46px;border-radius:14px;background:var(--lilac);color:var(--violet);display:grid;place-items:center;font-size:22px;flex-shrink:0;}
+.mod-body{flex:1;min-width:0;}
+.mod-body h3{font-size:16px;margin-bottom:4px;}
+.mod-body p{font-size:13px;color:var(--ink-soft);line-height:1.5;}
+.mod-acc{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.mod-precio{font-family:'DM Sans',sans-serif;font-weight:800;font-size:18px;}
+.mod-estado{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:#E9F7EF;color:#1D7A46;}
+.vitrina{text-align:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:34px 22px;}
+.vitrina-ico{width:62px;height:62px;border-radius:50%;margin:0 auto 12px;background:var(--lilac);color:var(--violet);display:grid;place-items:center;font-size:28px;}
+.vitrina h2{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:6px;}
+.vitrina p{font-size:14px;color:var(--ink-soft);line-height:1.55;max-width:460px;margin:0 auto;}
+.vitrina ul{list-style:none;display:grid;gap:8px;max-width:420px;margin:16px auto;text-align:left;}
+.vitrina li{display:flex;gap:9px;font-size:13.5px;}
+.vitrina li i{color:var(--violet);font-size:17px;}
 .topm,.side-fondo,.side-cerrar{display:none;}
 @media(max-width:860px){
   /* Nada puede ensanchar la página: lo que no cabe se desliza dentro de su propia fila */
@@ -340,7 +369,9 @@ button,input,select,textarea{font-family:inherit;}
     <button class="tab" data-tab="catalogo" onclick="irTab('catalogo')"><i class="ti ti-flower"></i>Catálogo</button>
     <button class="tab" data-tab="inventario" onclick="irTab('inventario')"><i class="ti ti-packages"></i>Inventario</button>
     <button class="tab" data-tab="entregas" onclick="irTab('entregas')"><i class="ti ti-truck-delivery"></i>Entregas y horarios</button>
+    <button class="tab" data-tab="reportes" onclick="irTab('reportes')"><i class="ti ti-chart-bar"></i>Reportes<i class="ti ti-lock tab-lock" id="lock-reportes" hidden></i></button>
     <button class="tab" data-tab="config" onclick="irTab('config')"><i class="ti ti-settings"></i>Configuración</button>
+    <button class="tab" data-tab="plan" onclick="irTab('plan')"><i class="ti ti-sparkles"></i>Mi plan</button>
     <div class="tab-sep"></div>
     <button class="tab" onclick="Pedidos.salir()"><i class="ti ti-logout"></i>Cerrar sesión</button>
   </nav>
@@ -420,6 +451,14 @@ button,input,select,textarea{font-family:inherit;}
     </section>
 
     <!-- Configuración -->
+    <section id="tab-reportes" class="tabsec" hidden>
+      <div id="rep-contenido"></div>
+    </section>
+
+    <section id="tab-plan" class="tabsec" hidden>
+      <div id="plan-contenido"></div>
+    </section>
+
     <section id="tab-config" class="tabsec" hidden>
       <div class="sec">
         <div class="sec-hdr"><div><h2>Nombre de la tienda</h2><p>Así aparece en tu tienda, en los correos y en el panel.</p></div></div>
@@ -681,7 +720,7 @@ button,input,select,textarea{font-family:inherit;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=7"></script>
+<script src="pedidos.js?v=8"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
 document.getElementById('l-registro').href = ANNLY + '/registro.html';
@@ -704,6 +743,7 @@ async function arrancar(){
   if (estado === 'es-citas'){ document.getElementById('btn-ir-agenda').href = Pedidos.urlPanelAgenda(); mostrar('aviso-citas'); return; }
   if (estado === 'sin-negocio'){ mostrar('aviso-sin-negocio'); return; }
   mostrar('app');
+  await Pedidos.cargarPlan();
   pintarEncabezado();
   await Pedidos.liberarVencidos();
   await cargarInicio();
@@ -711,7 +751,9 @@ async function arrancar(){
 
 function pintarEncabezado(){
   const n = Pedidos.negocio;
-  document.getElementById('hdr-nombre').textContent = n.nombre;
+  document.getElementById('hdr-nombre').innerHTML = E(n.nombre) + chipPlan();
+  const lock = document.getElementById('lock-reportes');
+  if (lock) lock.hidden = Pedidos.moduloDisponible('PEDIDOS_REPORTES');
   const baseTienda = ((window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.TIENDA_URL) || window.location.origin).replace(/\/$/, '');
   document.getElementById('hdr-sub').textContent = baseTienda.replace(/^https?:\/\//, '') + '/' + n.slug;
   const verM = document.getElementById('topm-ver');
@@ -726,6 +768,7 @@ function pintarEncabezado(){
 
 async function cambiarNegocio(id){
   Pedidos.seleccionarNegocio(id);
+  await Pedidos.cargarPlan();
   pintarEncabezado();
   irTab('inicio');
   await cargarInicio();
@@ -770,7 +813,138 @@ async function cargarInicio(){
 }
 
 // ---------- Pestañas ----------
-const CARGA_TAB = { pedidos: cargarPedidos, catalogo: cargarCatalogo, inventario: cargarInventario, entregas: cargarEntregas, config: cargarConfig };
+const CARGA_TAB = { pedidos: cargarPedidos, catalogo: cargarCatalogo, inventario: cargarInventario, entregas: cargarEntregas, config: cargarConfig, plan: cargarMiPlan, reportes: cargarReportes };
+
+// ---------- Plan ----------
+function fechaPlan(iso){
+  if (!iso) return '';
+  return new Date(iso + 'T00:00:00').toLocaleDateString('es-PA', { day:'numeric', month:'long', year:'numeric' });
+}
+function diasPara(iso){
+  if (!iso) return null;
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  return Math.round((new Date(iso + 'T00:00:00') - hoy) / 86400000);
+}
+function chipPlan(){
+  const p = Pedidos.plan;
+  if (!p) return '';
+  if (p.status === 'trial'){
+    const d = diasPara(p.vence);
+    return `<span class="plan-chip prueba"><i class="ti ti-hourglass"></i>Prueba${d != null && d >= 0 ? ' · ' + d + (d === 1 ? ' día' : ' días') : ''}</span>`;
+  }
+  return `<span class="plan-chip"><i class="ti ti-sparkles"></i>${E(p.nombre)}</span>`;
+}
+
+const REPORTES_INCLUYE = [
+  ['ti-chart-line', 'Ventas por día, semana o mes, con ticket promedio y pedidos cancelados'],
+  ['ti-trophy', 'Productos más vendidos y ventas por zona, entrega y medio de pago'],
+  ['ti-packages', 'Inventario valorizado a costo, insumos bajo el mínimo y movimientos'],
+  ['ti-coin', 'Ganancia por producto: precio de venta menos el costo de sus insumos'],
+  ['ti-file-spreadsheet', 'Exportar todo a Excel']
+];
+
+async function cargarMiPlan(){
+  const cont = document.getElementById('plan-contenido');
+  cont.innerHTML = '<p class="ayuda">Cargando tu plan…</p>';
+  await Pedidos.cargarPlan();
+  pintarEncabezado();
+  const p = Pedidos.plan;
+  if (!p){
+    cont.innerHTML = `<div class="vitrina"><div class="vitrina-ico"><i class="ti ti-alert-circle"></i></div><h2>Tu tienda aún no tiene plan</h2><p>Escríbenos a hola@annly.app y lo activamos.</p></div>`;
+    return;
+  }
+  let catalogo = [];
+  try { catalogo = await Pedidos.catalogoModulos(); } catch(e){ console.error(e); }
+  const enPrueba = p.status === 'trial';
+  const d = diasPara(p.vence);
+
+  const planHtml = `
+    <div class="plan-card">
+      <div class="plan-top">
+        <div>
+          <div class="ayuda" style="margin:0 0 2px;">Tu plan</div>
+          <h2>${E(p.nombre)} ${chipPlan()}</h2>
+        </div>
+        <div class="plan-precio">$${p.precio.toFixed(0)}<small> /mes</small></div>
+      </div>
+      <ul class="plan-incluye">
+        <li><i class="ti ti-check"></i>Tienda en línea con catálogo <b>sin límite</b> de productos</li>
+        <li><i class="ti ti-check"></i>Pedidos con pago por Yappy o transferencia y avisos por correo</li>
+        <li><i class="ti ti-check"></i>Entregas a domicilio por zona, retiro en tienda y franjas horarias</li>
+        <li><i class="ti ti-check"></i>Inventario básico: insumos, stock y alertas de stock bajo</li>
+        <li><i class="ti ti-check"></i>Nombre, logo, portada y colores de tu tienda</li>
+      </ul>
+      ${enPrueba ? `
+        <div class="plan-aviso"><i class="ti ti-hourglass"></i><div>Estás en tu <b>prueba gratis</b>${p.vence ? ' hasta el <b>' + fechaPlan(p.vence) + '</b>' + (d != null && d >= 0 ? ' (' + d + (d === 1 ? ' día' : ' días') + ')' : '') : ''}. Los módulos que compres se activan cuando termines la prueba.</div></div>
+        <button class="btn btn-grad" style="width:auto;" onclick="terminarPrueba()"><i class="ti ti-rocket"></i> Terminar mi prueba y activar mi plan</button>
+        <p class="msg" id="plan-msg"></p>` : `<p class="ayuda" style="margin-top:10px;"><i class="ti ti-circle-check" style="color:#1D7A46;"></i> Plan activo.</p>`}
+    </div>`;
+
+  const modsHtml = catalogo.map(m => {
+    const det = Pedidos.detalleModulo(m.code);
+    const activo = !!det;
+    const incluye = m.code === 'PEDIDOS_REPORTES' ? `<ul class="plan-incluye">${REPORTES_INCLUYE.map(x => `<li><i class="ti ${x[0]}"></i>${x[1]}</li>`).join('')}</ul>` : '';
+    let acciones;
+    if (!activo) acciones = `<button class="btn btn-grad" style="width:auto;" onclick="activarModulo('${m.code}')"><i class="ti ti-plus"></i> Agregar a mi plan</button>`;
+    else if (det.cancela_el) acciones = `<span class="mod-estado" style="background:#FFF4DE;color:#9A6200;">Activo hasta el ${fechaPlan(det.cancela_el)}</span>`;
+    else acciones = `<span class="mod-estado">${enPrueba ? 'Se activa al terminar la prueba' : 'Activo'}</span>
+      <button class="chip-btn" onclick="cancelarModulo('${m.code}')"><i class="ti ti-x"></i> Cancelar</button>`;
+    return `<div class="mod-card${activo ? ' on' : ''}">
+      <div class="mod-ico"><i class="ti ${m.code === 'PEDIDOS_REPORTES' ? 'ti-chart-bar' : 'ti-puzzle'}"></i></div>
+      <div class="mod-body">
+        <h3>${E(m.nombre)}</h3>
+        <p>${E(m.descripcion || '')}</p>
+        ${incluye}
+        <div class="mod-acc"><span class="mod-precio">+$${m.precio.toFixed(0)}<small style="font-size:12px;color:var(--ink-soft);font-weight:600;"> /mes</small></span>${acciones}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML = planHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '') +
+    `<p class="ayuda" style="margin-top:14px;">Por ahora no se hace ningún cobro en línea: al activar, te contactamos para el pago.</p>`;
+}
+
+async function terminarPrueba(){
+  if (!confirm('¿Terminar tu prueba gratis y activar tu plan ahora?')) return;
+  try { await Pedidos.activarSuscripcion(); await cargarMiPlan(); }
+  catch(e){ msg('plan-msg', e.message); }
+}
+async function activarModulo(code){
+  const cat = await Pedidos.catalogoModulos();
+  const m = cat.find(x => x.code === code);
+  if (!m) return;
+  if (!confirm(`¿Agregar "${m.nombre}" por $${m.precio.toFixed(0)}/mes?`)) return;
+  try { await Pedidos.activarModulo(m.code, m.nombre, m.precio); await cargarMiPlan(); }
+  catch(e){ alert(e.message); }
+}
+async function cancelarModulo(code){
+  if (!confirm('¿Cancelar este módulo? Lo sigues teniendo hasta cumplir el mes que ya pagaste.')) return;
+  try { const f = await Pedidos.cancelarModulo(code); await cargarMiPlan(); alert('Queda activo hasta el ' + fechaPlan(f) + '.'); }
+  catch(e){ alert(e.message); }
+}
+
+// ---------- Reportes (módulo Ventas e Inventario) ----------
+async function cargarReportes(){
+  const cont = document.getElementById('rep-contenido');
+  if (!Pedidos.plan) await Pedidos.cargarPlan();
+  if (!Pedidos.moduloDisponible('PEDIDOS_REPORTES')){
+    const p = Pedidos.plan;
+    const comprado = Pedidos.modulos.includes('PEDIDOS_REPORTES');
+    const nota = comprado && p && p.status === 'trial'
+      ? 'Ya lo agregaste a tu plan: se activa cuando termines tu prueba gratis.'
+      : 'Agrégalo a tu plan por <b>$8/mes</b> y conoce de verdad cómo va tu tienda.';
+    cont.innerHTML = `<div class="vitrina">
+      <div class="vitrina-ico"><i class="ti ti-chart-bar"></i></div>
+      <h2>Ventas e Inventario</h2>
+      <p>${nota}</p>
+      <ul>${REPORTES_INCLUYE.map(x => `<li><i class="ti ${x[0]}"></i>${x[1]}</li>`).join('')}</ul>
+      <button class="btn btn-grad" style="width:auto;" onclick="irTab('plan')"><i class="ti ti-sparkles"></i> Ver Mi plan</button>
+    </div>`;
+    return;
+  }
+  // El contenido de los reportes llega en la siguiente entrega
+  cont.innerHTML = `<div class="vitrina"><div class="vitrina-ico"><i class="ti ti-tools"></i></div><h2>Reportes en construcción</h2><p>Tu módulo está activo. Los reportes de ventas e inventario aparecerán aquí muy pronto.</p></div>`;
+}
 // Menú del celular (hamburguesa)
 function menuMovil(abrirlo){
   document.getElementById('app').classList.toggle('menu-on', !!abrirlo);
