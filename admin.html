@@ -193,12 +193,37 @@ button,input,select,textarea{font-family:inherit;}
 .btn-save{width:100%;margin-top:8px;}
 .btn-del{background:none;border:none;color:var(--err);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:12px;width:100%;}
 
+.topm,.side-fondo,.side-cerrar{display:none;}
 @media(max-width:860px){
   .app.on{grid-template-columns:1fr;}
-  .side{flex-direction:row;overflow-x:auto;padding:10px;border-right:none;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;}
-  .side-logo,.tab-sep{display:none;}
-  .tab{white-space:nowrap;padding:9px 12px;}
-  .main{padding:20px 16px 50px;}
+  /* Barra superior fija */
+  .topm{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;height:56px;padding:0 10px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topm-btn{width:40px;height:40px;border-radius:12px;border:none;background:none;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--ink);cursor:pointer;text-decoration:none;flex-shrink:0;}
+  .topm-btn:active{background:var(--lilac);}
+  .topm-tit{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;overflow:hidden;}
+  .topm-logo{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;}
+  .topm-logo span{color:var(--pink);}
+  #topm-seccion{font-size:14px;font-weight:700;color:var(--violet);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* Menú lateral deslizable */
+  .side{position:fixed;top:0;left:0;bottom:0;width:min(280px,82vw);z-index:40;padding:18px 14px;border-right:1px solid var(--line);overflow-y:auto;transform:translateX(-102%);transition:transform .25s ease;box-shadow:12px 0 30px -18px rgba(30,20,60,.35);}
+  .app.menu-on .side{transform:none;}
+  .side-fondo{display:block;position:fixed;inset:0;z-index:35;background:rgba(20,15,35,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;}
+  .app.menu-on .side-fondo{opacity:1;pointer-events:auto;}
+  .side-cerrar{display:flex;position:absolute;top:12px;right:10px;width:36px;height:36px;border-radius:10px;border:none;background:none;align-items:center;justify-content:center;font-size:20px;color:var(--ink-soft);cursor:pointer;}
+  .side-logo{padding-right:40px;}
+  .tab{padding:12px 12px;font-size:15px;}
+  .main{padding:18px 16px 50px;}
+  /* Encabezado de la sección más compacto */
+  .hdr{margin-bottom:16px;}
+  .hdr h1{font-size:20px;}
+  .hdr-actions{width:100%;}
+  .sel-negocio{flex:1 1 100%;}
+  #btn-ver-tienda{display:none;}
+  /* Filtros de pedidos en una fila deslizable */
+  #f-periodo,#f-estado{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  #f-periodo::-webkit-scrollbar,#f-estado::-webkit-scrollbar{display:none;}
+  #f-periodo .fchip,#f-estado .fchip{flex-shrink:0;white-space:nowrap;}
+  .buscar{width:100%;}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;}}
 </style>
@@ -235,7 +260,15 @@ button,input,select,textarea{font-family:inherit;}
 
 <!-- Panel -->
 <div class="app" id="app">
+  <!-- Barra superior (solo celular): hamburguesa + sección actual + ver tienda -->
+  <header class="topm">
+    <button class="topm-btn" onclick="menuMovil(true)" aria-label="Abrir menú"><i class="ti ti-menu-2"></i></button>
+    <div class="topm-tit"><span class="topm-logo">Annly<span>.</span></span><span id="topm-seccion">Inicio</span></div>
+    <a class="topm-btn" id="topm-ver" href="#" target="_blank" rel="noopener" aria-label="Ver mi tienda"><i class="ti ti-external-link"></i></a>
+  </header>
+  <div class="side-fondo" onclick="menuMovil(false)"></div>
   <nav class="side" aria-label="Secciones">
+    <button class="side-cerrar" onclick="menuMovil(false)" aria-label="Cerrar menú"><i class="ti ti-x"></i></button>
     <div class="side-logo">Annly<span>.</span><small>Pedidos</small></div>
     <button class="tab on" data-tab="inicio" onclick="irTab('inicio')"><i class="ti ti-home"></i>Inicio</button>
     <button class="tab" data-tab="pedidos" onclick="irTab('pedidos')"><i class="ti ti-receipt"></i>Pedidos</button>
@@ -384,6 +417,7 @@ button,input,select,textarea{font-family:inherit;}
 
     <!-- Pedidos -->
     <section id="tab-pedidos" class="tabsec" hidden>
+      <div class="filtros"><input class="buscar" id="f-buscar" placeholder="Buscar por número, cliente o destinatario" oninput="pintarPedidos()"></div>
       <div class="filtros" id="f-periodo">
         <button class="fchip on" data-p="activos" onclick="filtroPeriodo('activos')">Por atender</button>
         <button class="fchip" data-p="hoy" onclick="filtroPeriodo('hoy')">Hoy</button>
@@ -392,7 +426,6 @@ button,input,select,textarea{font-family:inherit;}
         <button class="fchip" data-p="todos" onclick="filtroPeriodo('todos')">Todos</button>
         <button class="fchip" data-p="entregados" onclick="filtroPeriodo('entregados')"><i class="ti ti-circle-check"></i> Entregados</button>
         <button class="fchip" data-p="cancelados" onclick="filtroPeriodo('cancelados')"><i class="ti ti-circle-x"></i> Cancelados</button>
-        <input class="buscar" id="f-buscar" placeholder="Buscar por número, cliente o destinatario" oninput="pintarPedidos()">
       </div>
       <div class="filtros" id="f-estado"></div>
       <div id="lista-pedidos"><p class="vacio-mini">Cargando…</p></div>
@@ -583,7 +616,10 @@ async function arrancar(){
 function pintarEncabezado(){
   const n = Pedidos.negocio;
   document.getElementById('hdr-nombre').textContent = n.nombre;
-  document.getElementById('hdr-sub').textContent = 'annly.app/' + n.slug;
+  const baseTienda = ((window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.TIENDA_URL) || window.location.origin).replace(/\/$/, '');
+  document.getElementById('hdr-sub').textContent = baseTienda.replace(/^https?:\/\//, '') + '/' + n.slug;
+  const verM = document.getElementById('topm-ver');
+  if (verM) verM.href = '/' + encodeURIComponent(n.slug);
   document.getElementById('btn-ver-tienda').href = '/' + encodeURIComponent(n.slug);
   const sel = document.getElementById('sel-negocio');
   if (Pedidos.esPlatformAdmin && Pedidos.negocios.length){
@@ -600,7 +636,9 @@ async function cambiarNegocio(id){
 }
 
 function copiarLink(btn){
-  const url = ANNLY + '/' + Pedidos.negocio.slug;
+  // Link directo de la tienda: tienda.annly.app/slug (en Vercel de pruebas, la dirección de ese deploy)
+  const base = ((window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.TIENDA_URL) || window.location.origin).replace(/\/$/, '');
+  const url = base + '/' + encodeURIComponent(Pedidos.negocio.slug);
   navigator.clipboard.writeText(url).then(() => {
     const t = btn.querySelector('span'); const antes = t.textContent;
     t.textContent = '¡Copiado!'; setTimeout(() => { t.textContent = antes; }, 1600);
@@ -637,7 +675,18 @@ async function cargarInicio(){
 
 // ---------- Pestañas ----------
 const CARGA_TAB = { pedidos: cargarPedidos, catalogo: cargarCatalogo, inventario: cargarInventario, entregas: cargarEntregas, config: cargarConfig };
+// Menú del celular (hamburguesa)
+function menuMovil(abrirlo){
+  document.getElementById('app').classList.toggle('menu-on', !!abrirlo);
+  document.body.style.overflow = abrirlo ? 'hidden' : '';
+}
+
 function irTab(tab){
+  menuMovil(false);
+  const btnTab = document.querySelector('.tab[data-tab="' + tab + '"]');
+  const tit = document.getElementById('topm-seccion');
+  if (btnTab && tit) tit.textContent = btnTab.textContent.trim();
+  window.scrollTo({ top: 0 });
   document.querySelectorAll('.tab[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   document.getElementById('tab-inicio').style.display = tab === 'inicio' ? '' : 'none';
   document.querySelectorAll('.tabsec').forEach(x => { x.hidden = x.id !== 'tab-' + tab; });
