@@ -194,8 +194,12 @@ button,input,select,textarea{font-family:inherit;}
 .btn-del{background:none;border:none;color:var(--err);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:12px;width:100%;}
 
 .portada-box{display:flex;align-items:center;gap:14px;}
-.portada-prev{width:96px;aspect-ratio:4/5;border-radius:60px 60px 14px 14px;overflow:hidden;background:var(--lilac);display:grid;place-items:center;color:var(--violet);font-size:26px;flex-shrink:0;border:1px solid var(--line);}
+.portada-prev{width:170px;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:var(--lilac);display:grid;place-items:center;color:var(--violet);font-size:26px;flex-shrink:0;border:1px solid var(--line);}
 .portada-prev img{width:100%;height:100%;object-fit:cover;}
+.portada-prev{position:relative;}
+.portada-prev .velo{position:absolute;inset:0;pointer-events:none;}
+.velo-box{margin-top:14px;max-width:380px;}
+.velo-box input[type=range]{width:100%;accent-color:var(--violet);}
 .paletas{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:6px;}
 .paleta{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:border-color .15s,box-shadow .15s;}
 .paleta:hover{border-color:#DCCFF1;}
@@ -628,8 +632,13 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
             <div>
               <label class="btn-add" style="cursor:pointer;"><i class="ti ti-photo-up"></i> <span id="portada-txt">Subir portada</span><input type="file" id="portada-file" accept="image/*" hidden onchange="subirPortada(this)"></label>
               <button class="btn-del" id="portada-quitar" style="width:auto;margin:0 0 0 8px;" onclick="quitarPortada()">Quitar</button>
-              <p class="ayuda">Mejor vertical (como un retrato): en la tienda se muestra con forma de arco. Se optimiza sola al subirla.</p>
+              <p class="ayuda">Se muestra a todo el ancho, detrás de tu logo. Mejor horizontal. Se optimiza sola al subirla.</p>
             </div>
+          </div>
+          <div class="velo-box" id="velo-box">
+            <label class="flbl" for="d-velo">Tinte de la portada con tu color: <b id="d-velo-txt">5%</b></label>
+            <input type="range" id="d-velo" min="0" max="80" step="5" value="5" oninput="previewVelo()" onchange="guardarVelo()">
+            <p class="ayuda">0% = la foto tal cual · 30–40% = queda de fondo en tu tono · 80% = casi solo color. Se guarda al soltar.</p>
           </div>
           <p class="msg" id="portada-msg"></p>
         </div>
@@ -895,7 +904,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=13"></script>
+<script src="pedidos.js?v=14"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -2213,7 +2222,11 @@ async function quitarLogo(){
 // ---------- Portada ----------
 function pintarPortadaCfg(){
   const url = Pedidos.negocio.portada_url;
-  document.getElementById('portada-prev').innerHTML = url ? `<img src="${E(url)}" alt="Portada">` : '<i class="ti ti-photo"></i>';
+  const v = Number(Pedidos.negocio.portada_velo ?? 5);
+  document.getElementById('d-velo').value = v;
+  document.getElementById('velo-box').style.display = url ? '' : 'none';
+  document.getElementById('portada-prev').innerHTML = url ? `<img src="${E(url)}" alt="Portada"><div class="velo" id="velo-prev"></div>` : '<i class="ti ti-photo"></i>';
+  previewVelo();
   document.getElementById('portada-txt').textContent = url ? 'Cambiar portada' : 'Subir portada';
   document.getElementById('portada-quitar').style.display = url ? '' : 'none';
 }
@@ -2224,6 +2237,17 @@ async function subirPortada(input){
   try { await Pedidos.subirPortada(f); pintarPortadaCfg(); msg('portada-msg'); }
   catch(e){ msg('portada-msg', e.message); }
 }
+function previewVelo(){
+  const v = Number(document.getElementById('d-velo').value);
+  document.getElementById('d-velo-txt').textContent = v + '%';
+  const capa = document.getElementById('velo-prev');
+  if (capa){ capa.style.background = Pedidos.negocio.color_primario || '#7C3AED'; capa.style.opacity = v / 100; }
+}
+async function guardarVelo(){
+  try { await Pedidos.guardarVeloPortada(document.getElementById('d-velo').value); msg('portada-msg'); }
+  catch(e){ msg('portada-msg', e.message); }
+}
+
 async function quitarPortada(){
   if (!confirm('¿Quitar la foto de portada? La tienda volverá a usar la foto de un producto.')) return;
   try { await Pedidos.quitarPortada(); pintarPortadaCfg(); } catch(e){ msg('portada-msg', e.message); }
