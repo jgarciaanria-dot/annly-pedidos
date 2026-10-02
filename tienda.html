@@ -107,6 +107,8 @@ header{background:#fff;}
 .perfil-cover{position:relative;height:200px;overflow:hidden;background:linear-gradient(120deg,color-mix(in srgb,var(--p) 45%,#fff) 0%,var(--p) 55%,color-mix(in srgb,var(--p) 70%,#000) 100%);}
 .perfil-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .perfil-velo{position:absolute;inset:0;background:var(--p);opacity:.05;}
+.perfil-cover.sin-foto{height:120px;background:linear-gradient(120deg,color-mix(in srgb,var(--p) 22%,#fff) 0%,color-mix(in srgb,var(--s) 16%,#fff) 100%);}
+.perfil-cover.sin-foto + .perfil-info{margin-top:-58px;}
 .perfil-fundido{position:absolute;left:0;right:0;bottom:0;height:55%;background:linear-gradient(180deg,transparent 0%,var(--bg) 100%);}
 .perfil-info{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;margin-top:-64px;padding-bottom:6px;}
 .perfil-logo{width:124px;height:124px;border-radius:50%;background:#fff;padding:5px;box-sizing:border-box;box-shadow:0 14px 30px -14px rgba(40,20,10,.55);flex-shrink:0;}
@@ -122,13 +124,15 @@ header{background:#fff;}
 .perfil-ben b{font:700 11.5px/1.25 'DM Sans',sans-serif;color:var(--ink);}
 @media(min-width:820px){
   .perfil-cover{height:300px;}
+  .perfil-cover.sin-foto{height:150px;}
+  .perfil-cover.sin-foto + .perfil-info{margin-top:-84px;}
   .perfil-info{flex-direction:row;align-items:flex-end;text-align:left;gap:28px;margin-top:-84px;}
   .perfil-logo{width:168px;height:168px;padding:6px;}
   .perfil-logo span{font-size:62px;}
-  .perfil-txt{align-items:flex-start;flex:1;padding-bottom:8px;}
-  .perfil-txt h1{font-size:50px;}
+  .perfil-txt{align-items:flex-start;flex:1;min-width:0;padding-bottom:4px;}
+  .perfil-txt h1{font-size:50px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
   .perfil-lema{font-size:19px;}
-  .perfil-bens{display:flex;flex-wrap:wrap;justify-content:flex-end;width:auto;max-width:460px;margin:0 0 12px;}
+  .perfil-bens{display:flex;flex-wrap:wrap;justify-content:flex-start;width:auto;margin:10px 0 0;}
   .perfil-ben{flex-direction:row;gap:7px;padding:8px 13px;border-radius:999px;}
   .perfil-ben i{font-size:17px;}
   .perfil-ben b{font-size:12.5px;}
@@ -692,8 +696,8 @@ footer{animation:aparecer .6s ease both;}
       <div class="perfil-rubro" id="t-eyebrow"></div>
       <h1 id="t-nombre">Cargando…</h1>
       <p class="perfil-lema" id="t-titulo" hidden></p>
+      <div class="perfil-bens" id="t-beneficios"></div>
     </div>
-    <div class="perfil-bens" id="t-beneficios"></div>
   </div>
 </header>
 
@@ -854,11 +858,11 @@ function completarPortada(){
   const bens = document.getElementById('t-beneficios');
   bens.style.setProperty('--n', items.length);
   bens.innerHTML = items.map(i => `<div class="perfil-ben"><i class="ti ${i[0]}"></i><b>${E(i[1])}</b></div>`).join('');
-  // Foto de portada: la que eligió el negocio; si no hay, la del primer producto; sin fotos, el degradado de su color
+  // Foto de portada: solo la que eligió el negocio. Sin portada, una franja suave con su color.
   const box = document.getElementById('t-portada-foto');
-  const foto = n.portada_url || ((CAT.productos || []).find(p => p.foto) || {}).foto;
   const viejo = box.querySelector('img'); if (viejo) viejo.remove();
-  if (foto) box.insertAdjacentHTML('afterbegin', `<img src="${E(foto)}" alt="">`);
+  box.classList.toggle('sin-foto', !n.portada_url);
+  if (n.portada_url) box.insertAdjacentHTML('afterbegin', `<img src="${E(n.portada_url)}" alt="">`);
 }
 
 // Formas de entrega en el pie (cuando ya se cargó el catálogo)
