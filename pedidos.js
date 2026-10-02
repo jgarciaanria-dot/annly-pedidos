@@ -233,7 +233,7 @@ const Pedidos = {
     const filas = [];
     for (let desdeFila = 0; desdeFila < 10000; desdeFila += 1000) {
       const lote = await this._q(sb.from('orders')
-        .select('id, numero, fecha, estado, total, product_name, product_price, product_cost, delivery_type, zone_name, delivery_fee, cancel_reembolso, customer_name, order_extras(name, qty, unit_price, unit_cost), order_payments(tipo, metodo, monto, estado)')
+        .select('id, numero, fecha, estado, total, product_name, product_price, product_cost, delivery_type, zone_name, delivery_fee, cancel_reembolso, customer_name, abono_monto, saldo_pendiente, order_extras(name, qty, unit_price, unit_cost), order_payments(tipo, metodo, monto, estado)')
         .eq('business_id', this.id).gte('fecha', desde).lte('fecha', hasta)
         .order('fecha', { ascending: true }).order('numero', { ascending: true })
         .range(desdeFila, desdeFila + 999));
@@ -558,10 +558,32 @@ const Pedidos = {
   },
 
   // Todos los precios y validaciones se hacen en la base (pedidos_crear)
+  // p.pagoTipo = 'total' | 'abono'. Con abono se usa la función que lo aplica; si aún no existe (SQL pendiente), se crea normal.
   async crearPedido(p) {
-    const { data, error } = await sb.rpc('pedidos_crear', { p: { ...p, businessId: this.id } });
+    const datos = { ...p, businessId: this.id };
+    if (p.pagoTipo === 'abono') {
+      const { data, error } = await sb.rpc('pedidos_crear_con_abono', { p: datos });
+      if (!error) return data;
+      if (!/function|does not exist|schema cache/i.test(error.message || '')) throw new Error(this.mensajeError(error));
+      console.error('pedidos_crear_con_abono no está instalada; se crea el pedido sin abono.', error);
+    }
+    const { data, error } = await sb.rpc('pedidos_crear', { p: datos });
     if (error) throw new Error(this.mensajeError(error));
     return data;
+  },
+
+  // Panel: cobra el saldo de un pedido con abono
+  async registrarSaldo(id, metodo, comprobante) {
+    const { error } = await sb.rpc('pedidos_registrar_saldo', { p_order: id, p_metodo: metodo, p_comprobante: comprobante || null });
+    if (error) throw new Error(this.mensajeError(error));
+  },
+  // Panel: monto del abono de la tienda (null = no acepta abono)
+  async guardarAbono(monto) {
+    const v = monto === '' || monto == null ? null : Math.round(Number(monto) * 100) / 100;
+    if (v != null && !(v > 0)) throw new Error('El abono debe ser mayor que 0, o déjalo vacío para no aceptar abono.');
+    const data = await this._q(sb.from('businesses').update({ abono_pedido: v }).eq('id', this.id).select('abono_pedido'));
+    if (!data || !data.length) throw new Error('No se pudo guardar el abono (sin permisos).');
+    this.negocio.abono_pedido = data[0].abono_pedido;
   },
 
   // -------------------------------------------------------
@@ -585,4 +607,5 @@ const Pedidos = {
   }
 };
 
+Pedidos.cliente = sb; // lo usa la campanita (tiempo real)
 window.Pedidos = Pedidos;
