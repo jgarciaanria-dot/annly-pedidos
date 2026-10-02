@@ -59,9 +59,23 @@ p{font-size:14.5px;line-height:1.55;color:#6B6680;}
     const ico = $('ico'); ico.className = 'ico ' + tipo; ico.innerHTML = '<i class="ti ti-' + icono + '"></i>';
     $('titulo').textContent = titulo; $('texto').innerHTML = texto;
   }
-  function boton(p){
+  // Si el pago se abrió en una ventana aparte, al terminar avisa al panel y se cierra sola
+  const enVentana = !!(window.opener && !window.opener.closed);
+  function avisarPanel(estado){
+    if (!enVentana) return;
+    try { window.opener.postMessage({ tipo: 'annly-pago', estado: estado, id: id }, location.origin); } catch(e){}
+  }
+  function boton(p, estado){
     const b = $('volver');
-    b.href = (p && p.origen === 'pedidos') ? '/admin' : '/admin.html';
+    if (enVentana){
+      b.innerHTML = '<i class="ti ti-x"></i> Cerrar esta ventana';
+      b.href = '#';
+      b.onclick = e => { e.preventDefault(); window.close(); };
+      avisarPanel(estado);
+      if (estado === 'confirmado') { $('ayuda').textContent = 'Esta ventana se cerrará sola en unos segundos.'; setTimeout(() => window.close(), 4000); }
+    } else {
+      b.href = (p && p.origen === 'pedidos') ? '/admin' : '/admin.html';
+    }
     b.hidden = false;
   }
   function resumen(p){
@@ -71,7 +85,7 @@ p{font-size:14.5px;line-height:1.55;color:#6B6680;}
     $('resumen').hidden = false;
   }
 
-  if (!id || !C.url || !C.key){ pintar('mal', 'alert-triangle', 'No encontramos tu pago', 'Vuelve a tu panel y revisa Mi plan.'); boton(null); return; }
+  if (!id || !C.url || !C.key){ pintar('mal', 'alert-triangle', 'No encontramos tu pago', 'Vuelve a tu panel y revisa Mi plan.'); boton(null, 'error'); return; }
 
   // Si PagueloFácil devolvió "Denegada", se avisa de una vez (igual se sigue consultando por si acaso)
   if (/deneg/i.test(q.get('Estado') || '')){
@@ -92,20 +106,20 @@ p{font-size:14.5px;line-height:1.55;color:#6B6680;}
     } catch(e){ console.error(e); }
 
     if (p && p.estado === 'confirmado'){
-      pintar('ok', 'check', '¡Pago confirmado!', 'Gracias. Tu plan quedó activo' + (p.periodo_hasta ? ' hasta el <b>' + fechaLarga(p.periodo_hasta) + '</b>' : '') + '.');
-      resumen(p); boton(p); $('ayuda').textContent = 'Te llegará el recibo de PagueloFácil a tu correo.'; return;
+      pintar('ok', 'check', '¡Pago confirmado!', 'Gracias. Tu membresía está pagada' + (p.periodo_hasta ? ' hasta el <b>' + fechaLarga(p.periodo_hasta) + '</b>' : '') + '.');
+      resumen(p); $('ayuda').textContent = 'Te llegará el recibo de PagueloFácil a tu correo.'; boton(p, 'confirmado'); return;
     }
     if (p && p.estado === 'rechazado'){
       pintar('mal', 'x', 'El pago no se completó', 'No se realizó ningún cobro. Puedes intentarlo de nuevo desde Mi plan.');
-      resumen(p); boton(p); return;
+      resumen(p); boton(p, 'rechazado'); return;
     }
     if (p && p.estado === 'revisar'){
       pintar('rev', 'hourglass', 'Recibimos tu pago', 'Lo estamos revisando y te confirmaremos muy pronto. No necesitas hacer nada más.');
-      resumen(p); boton(p); return;
+      resumen(p); boton(p, 'revisar'); return;
     }
     if (intentos >= 60){ // ~3 minutos
       pintar('rev', 'hourglass', 'Tu pago está en proceso', 'PagueloFácil todavía no nos confirma. Si se completó, tu plan se activará solo en unos minutos; puedes revisarlo en Mi plan.');
-      resumen(p); boton(p); return;
+      resumen(p); boton(p, 'proceso'); return;
     }
     if (intentos === 1 && p) resumen(p);
     setTimeout(consultar, 3000);
