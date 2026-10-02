@@ -356,6 +356,13 @@ const Pedidos = {
     this.negocio.portada_url = url;
     return url;
   },
+  // Cuánto se tiñe la foto de portada con el color de la tienda (0–80 %)
+  async guardarVeloPortada(pct) {
+    const v = Math.min(80, Math.max(0, Math.round(Number(pct) || 0)));
+    const data = await this._q(sb.from('businesses').update({ portada_velo: v }).eq('id', this.id).select('portada_velo'));
+    if (!data || !data.length) throw new Error('No se pudo guardar (sin permisos).');
+    this.negocio.portada_velo = data[0].portada_velo;
+  },
   async quitarPortada() {
     await this._q(sb.from('businesses').update({ portada_url: null }).eq('id', this.id));
     this.negocio.portada_url = null;
