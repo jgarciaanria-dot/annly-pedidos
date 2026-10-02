@@ -668,7 +668,7 @@ footer{animation:aparecer .6s ease both;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=9"></script>
+<script src="/pedidos.js?v=11"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -829,7 +829,7 @@ const cfg = () => ({ ...CFG_DEF, ...(CAT.config || {}) });
 const PASOS = 5;
 
 function nuevoPedido(prod){
-  Object.assign(PED, { paso: 1, prod, extras: new Set(), fecha: null, franja: null, franjas: [],
+  Object.assign(PED, { paso: 1, prod, pagoTipo: null, extras: new Set(), fecha: null, franja: null, franjas: [],
     entrega: null, zonaId: null, fueraZona: false, direccion: '', referencia: '',
     cliente: { nombre: '', telefono: '', correo: '' }, destinatario: { nombre: '', telefono: '' }, mismo: false,
     dedicatoria: '', comprobante: '', resultado: null });
@@ -1016,9 +1016,28 @@ function mediosPago(){
   if (n.banco_nombre && n.banco_numero_cuenta && n.banco_titular) m.push('transferencia');
   return m;
 }
+// Abono: la tienda define un monto fijo; solo se ofrece si el pedido cuesta más que eso
+function abonoDisponible(m){
+  const a = Number((Pedidos.negocio || {}).abono_pedido) || 0;
+  return a > 0 && m.total > a ? a : 0;
+}
+function montoAPagar(m){
+  const a = abonoDisponible(m);
+  return PED.pagoTipo === 'abono' && a ? a : m.total;
+}
+function elegirPagoTipo(v){
+  const comp = document.getElementById('p-comp');
+  if (comp) PED.comprobante = comp.value;
+  PED.pagoTipo = v; pintarPaso();
+}
+
 function paso5(){
   const m = montos(), n = Pedidos.negocio || {};
   const medios = mediosPago();
+  const abono = abonoDisponible(m);
+  if (!abono) PED.pagoTipo = 'total';
+  else if (!PED.pagoTipo) PED.pagoTipo = 'total';
+  const aPagar = montoAPagar(m);
   if (!PED.metodo || !medios.includes(PED.metodo)) PED.metodo = medios[0] || null;
   const zona = zonaElegida();
   const filas = [
@@ -1029,11 +1048,11 @@ function paso5(){
   const opcion = (val, tit, txt) => `<label class="opc${PED.metodo === val ? ' on' : ''}"><input type="radio" name="metodo" ${PED.metodo === val ? 'checked' : ''} onchange="elegirMetodo('${val}')"><div><strong>${tit}</strong><span>${txt}</span></div></label>`;
   let detalle = '';
   if (PED.metodo === 'yappy'){
-    detalle = `<div class="yappy"><div><span class="nota" style="display:block;text-align:left;margin:0;">Envía ${Pedidos.dinero(m.total)} al número</span><b>${E(n.yappy_numero)}</b></div>
+    detalle = `<div class="yappy"><div><span class="nota" style="display:block;text-align:left;margin:0;">Envía ${Pedidos.dinero(aPagar)} al número</span><b>${E(n.yappy_numero)}</b></div>
         <button class="copiar" onclick="copiarDato(this, '${String(n.yappy_numero).replace(/\D/g, '')}')">Copiar</button></div>`;
   } else if (PED.metodo === 'transferencia'){
     detalle = `<div class="yappy" style="flex-direction:column;align-items:stretch;gap:6px;">
-        <span class="nota" style="text-align:left;margin:0;">Transfiere ${Pedidos.dinero(m.total)} a esta cuenta e incluye tu nombre en la referencia:</span>
+        <span class="nota" style="text-align:left;margin:0;">Transfiere ${Pedidos.dinero(aPagar)} a esta cuenta e incluye tu nombre en la referencia:</span>
         <div style="font-size:13.5px;line-height:1.6;"><b style="font-size:14px;">${E(n.banco_nombre)}</b>${n.banco_tipo_cuenta ? ' · ' + E(n.banco_tipo_cuenta) : ''}<br>
           Cuenta: <b style="font-size:14px;">${E(n.banco_numero_cuenta)}</b><br>Titular: ${E(n.banco_titular)}</div>
         <button class="copiar" style="align-self:flex-start;" onclick="copiarDato(this, '${E(String(n.banco_numero_cuenta).replace(/'/g, ''))}')">Copiar número de cuenta</button></div>`;
@@ -1041,9 +1060,12 @@ function paso5(){
   return `${botonVolver()}<div class="paso-tit">Confirma y paga</div>
     <p class="paso-sub">${fechaLarga(PED.fecha)} · ${hora12(PED.franja.inicio)} – ${hora12(PED.franja.fin)}<br>Para ${E(PED.destinatario.nombre)}</p>
     <div class="resumen">${filas.map(f => `<div><span>${f[0]}</span><span>${f[1]}</span></div>`).join('')}
-      <div class="tot"><span>Total a pagar</span><span>${Pedidos.dinero(m.total)}</span></div></div>
+      <div class="tot"><span>Total</span><span>${Pedidos.dinero(m.total)}</span></div></div>
     ${m.envioPendiente ? '<div class="aviso">El costo del envío se confirma por WhatsApp y se paga aparte.</div>' : ''}
-    ${medios.length ? `<div class="sub">¿Cómo pagas?</div>
+    ${abono && medios.length ? `<div class="sub">¿Cuánto pagas ahora?</div>
+      <label class="opc${PED.pagoTipo === 'total' ? ' on' : ''}"><input type="radio" name="pagotipo" ${PED.pagoTipo === 'total' ? 'checked' : ''} onchange="elegirPagoTipo('total')"><div><strong>Pagar todo · ${Pedidos.dinero(m.total)}</strong><span>Tu pedido queda pagado.</span></div></label>
+      <label class="opc${PED.pagoTipo === 'abono' ? ' on' : ''}"><input type="radio" name="pagotipo" ${PED.pagoTipo === 'abono' ? 'checked' : ''} onchange="elegirPagoTipo('abono')"><div><strong>Dejar un abono · ${Pedidos.dinero(abono)}</strong><span>Pagas los ${Pedidos.dinero(m.total - abono)} restantes al recibir tu pedido.</span></div></label>` : ''}
+    ${medios.length ? `<div class="sub">¿Cómo pagas${abono ? ' ' + Pedidos.dinero(aPagar) : ''}?</div>
       ${medios.includes('yappy') ? opcion('yappy', 'Yappy', 'Pago inmediato desde tu app.') : ''}
       ${medios.includes('transferencia') ? opcion('transferencia', 'Transferencia bancaria', E(n.banco_nombre)) : ''}
       ${detalle}
@@ -1077,7 +1099,8 @@ async function enviarPedido(){
       direccion: PED.entrega === 'domicilio' ? PED.direccion : null,
       referencia: PED.entrega === 'domicilio' ? PED.referencia : null,
       cliente: PED.cliente, destinatario: PED.destinatario, dedicatoria: PED.dedicatoria,
-      pago: { metodo: PED.metodo || 'yappy', comprobante: PED.comprobante || null }
+      pago: { metodo: PED.metodo || 'yappy', comprobante: PED.comprobante || null },
+      pagoTipo: PED.pagoTipo === 'abono' ? 'abono' : 'total'
     });
     irPaso(6);
   } catch(e){
@@ -1115,6 +1138,8 @@ function paso6(){
       <div><span>Entrega</span><span>${PED.entrega === 'retiro' ? 'Retiro en tienda' : 'A domicilio'}</span></div>
       <div><span>Para</span><span>${E(PED.destinatario.nombre)}</span></div>
       <div class="tot"><span>Total</span><span>${Pedidos.dinero(r.total)}${r.envioPorConfirmar ? ' + envío' : ''}</span></div>
+      ${r.abono ? `<div><span>Abono enviado</span><span>${Pedidos.dinero(r.abono)}</span></div>
+      <div><span>Pagas al recibir</span><span><b>${Pedidos.dinero(r.saldo)}</b></span></div>` : ''}
     </div>
     ${r.pocaAnticipacion ? '<div class="aviso">Pediste con poca anticipación: el negocio te confirmará si llega a tiempo.</div>' : ''}
     ${wa ? `<a class="btn-sec" href="https://wa.me/${wa}?text=${texto}" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i> Escribir por WhatsApp</a>` : ''}
