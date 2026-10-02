@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Tu pago · Annly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:'DM Sans',system-ui,sans-serif;color:#1F1B2B;background:radial-gradient(circle at 20% 10%,#F3ECFF 0%,transparent 45%),radial-gradient(circle at 85% 90%,#FFE8F3 0%,transparent 45%),#FAF8FC;}
+.card{width:100%;max-width:440px;background:#fff;border:1px solid #ECE8F2;border-radius:24px;padding:34px 28px 28px;text-align:center;box-shadow:0 30px 70px -40px rgba(60,30,110,.45);}
+.marca{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:22px;}
+.marca span{color:#E1306C;}
+.ico{width:76px;height:76px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.ico.espera{background:#F3EEFC;color:#7C3AED;}
+.ico.espera i{animation:giro 1.1s linear infinite;}
+.ico.ok{background:#E6F6EE;color:#159A61;animation:pop .45s cubic-bezier(.2,1.6,.4,1);}
+.ico.mal{background:#FDF1F0;color:#C2455F;}
+.ico.rev{background:#FFF4DE;color:#B7791F;}
+@keyframes giro{to{transform:rotate(360deg);}}
+@keyframes pop{from{transform:scale(.4);opacity:0;}to{transform:none;opacity:1;}}
+h1{font-size:22px;margin-bottom:8px;}
+p{font-size:14.5px;line-height:1.55;color:#6B6680;}
+.resumen{margin:18px 0 4px;padding:14px 16px;border-radius:14px;background:#FAF7FE;border:1px solid #EFE8F8;text-align:left;font-size:13.5px;display:grid;gap:6px;}
+.resumen div{display:flex;justify-content:space-between;gap:12px;}
+.resumen b{font-weight:800;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;width:100%;padding:14px 18px;border-radius:14px;border:0;background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font:800 14.5px 'DM Sans',sans-serif;text-decoration:none;cursor:pointer;}
+.ayuda{margin-top:14px;font-size:12px;color:#9A97A6;}
+</style>
+</head>
+<body>
+<main class="card" aria-live="polite">
+  <div class="marca">Annly<span>.</span></div>
+  <div class="ico espera" id="ico"><i class="ti ti-loader-2"></i></div>
+  <h1 id="titulo">Confirmando tu pago…</h1>
+  <p id="texto">Estamos recibiendo la confirmación de PagueloFácil. No cierres esta página, toma unos segundos.</p>
+  <div class="resumen" id="resumen" hidden></div>
+  <a class="btn" id="volver" href="#" hidden><i class="ti ti-arrow-left"></i> Volver a mi panel</a>
+  <p class="ayuda" id="ayuda"></p>
+</main>
+<script src="/config.js"></script>
+<script>window.PAGO_CFG = { url: (window.PEDIDOS_CONFIG || {}).SUPABASE_URL, key: (window.PEDIDOS_CONFIG || {}).SUPABASE_KEY };</script>
+<script>
+// Página de resultado del pago de la mensualidad (Agenda y Tiendas).
+// Consulta el estado real del pago, que lo marca el webhook de PagueloFácil.
+(function(){
+  const q = new URLSearchParams(location.search);
+  const id = q.get('id');
+  const C = window.PAGO_CFG || {};
+  const $ = s => document.getElementById(s);
+  const dinero = n => '$' + Number(n || 0).toFixed(2);
+  const fechaLarga = iso => iso ? new Date(iso + 'T12:00:00').toLocaleDateString('es-PA', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+  function pintar(tipo, icono, titulo, texto){
+    const ico = $('ico'); ico.className = 'ico ' + tipo; ico.innerHTML = '<i class="ti ti-' + icono + '"></i>';
+    $('titulo').textContent = titulo; $('texto').innerHTML = texto;
+  }
+  function boton(p){
+    const b = $('volver');
+    b.href = (p && p.origen === 'pedidos') ? '/admin' : '/admin.html';
+    b.hidden = false;
+  }
+  function resumen(p){
+    if (!p) return;
+    $('resumen').innerHTML = `<div><span>Negocio</span><b>${esc(p.negocio)}</b></div><div><span>Concepto</span><b>${esc(p.concepto)}</b></div><div><span>Monto</span><b>${dinero(p.monto)}</b></div>`
+      + (p.periodo_hasta ? `<div><span>Plan pagado hasta</span><b>${fechaLarga(p.periodo_hasta)}</b></div>` : '');
+    $('resumen').hidden = false;
+  }
+
+  if (!id || !C.url || !C.key){ pintar('mal', 'alert-triangle', 'No encontramos tu pago', 'Vuelve a tu panel y revisa Mi plan.'); boton(null); return; }
+
+  // Si PagueloFácil devolvió "Denegada", se avisa de una vez (igual se sigue consultando por si acaso)
+  if (/deneg/i.test(q.get('Estado') || '')){
+    pintar('mal', 'x', 'El pago no se completó', esc(q.get('Razon') || 'Tu banco no aprobó el pago. Puedes intentarlo de nuevo desde Mi plan.'));
+  }
+
+  let intentos = 0;
+  async function consultar(){
+    intentos++;
+    let p = null;
+    try {
+      const r = await fetch(C.url + '/rest/v1/rpc/estado_pago_plataforma', {
+        method: 'POST', headers: { apikey: C.key, Authorization: 'Bearer ' + C.key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_id: id })
+      });
+      const d = await r.json();
+      p = Array.isArray(d) ? d[0] : d;
+    } catch(e){ console.error(e); }
+
+    if (p && p.estado === 'confirmado'){
+      pintar('ok', 'check', '¡Pago confirmado!', 'Gracias. Tu plan quedó activo' + (p.periodo_hasta ? ' hasta el <b>' + fechaLarga(p.periodo_hasta) + '</b>' : '') + '.');
+      resumen(p); boton(p); $('ayuda').textContent = 'Te llegará el recibo de PagueloFácil a tu correo.'; return;
+    }
+    if (p && p.estado === 'rechazado'){
+      pintar('mal', 'x', 'El pago no se completó', 'No se realizó ningún cobro. Puedes intentarlo de nuevo desde Mi plan.');
+      resumen(p); boton(p); return;
+    }
+    if (p && p.estado === 'revisar'){
+      pintar('rev', 'hourglass', 'Recibimos tu pago', 'Lo estamos revisando y te confirmaremos muy pronto. No necesitas hacer nada más.');
+      resumen(p); boton(p); return;
+    }
+    if (intentos >= 60){ // ~3 minutos
+      pintar('rev', 'hourglass', 'Tu pago está en proceso', 'PagueloFácil todavía no nos confirma. Si se completó, tu plan se activará solo en unos minutos; puedes revisarlo en Mi plan.');
+      resumen(p); boton(p); return;
+    }
+    if (intentos === 1 && p) resumen(p);
+    setTimeout(consultar, 3000);
+  }
+  consultar();
+})();
+</script>
+</body>
+</html>
