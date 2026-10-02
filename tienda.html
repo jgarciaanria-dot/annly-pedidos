@@ -102,6 +102,37 @@ header{background:#fff;}
 .prod-info span{display:block;font-size:12.5px;color:var(--ink-soft);margin:3px 0 8px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .prod-info b{font-family:'DM Sans',sans-serif;font-size:16px;color:var(--p);}
 .prod-foto-wrap{position:relative;overflow:hidden;}
+/* ---------- Cabecera tipo perfil ---------- */
+.perfil{background:var(--bg);}
+.perfil-cover{position:relative;height:200px;overflow:hidden;background:linear-gradient(120deg,color-mix(in srgb,var(--p) 45%,#fff) 0%,var(--p) 55%,color-mix(in srgb,var(--p) 70%,#000) 100%);}
+.perfil-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.perfil-velo{position:absolute;inset:0;background:var(--p);opacity:.05;}
+.perfil-fundido{position:absolute;left:0;right:0;bottom:0;height:55%;background:linear-gradient(180deg,transparent 0%,var(--bg) 100%);}
+.perfil-info{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;margin-top:-64px;padding-bottom:6px;}
+.perfil-logo{width:124px;height:124px;border-radius:50%;background:#fff;padding:5px;box-sizing:border-box;box-shadow:0 14px 30px -14px rgba(40,20,10,.55);flex-shrink:0;}
+.perfil-logo img,.perfil-logo span{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid var(--p);box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--p) 12%,#fff);font-family:'Playfair Display',serif;font-size:46px;font-weight:700;color:var(--p);}
+.perfil-logo img:not([hidden]) + span{display:none;}
+.perfil-txt{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.perfil-rubro{font:800 11px/1.2 'DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--p);}
+.perfil-txt h1{margin:0;font-family:'Playfair Display',serif;font-size:34px;line-height:1.05;font-weight:700;color:var(--ink);}
+.perfil-lema{margin:4px 0 0;font-family:'Playfair Display',serif;font-style:italic;font-size:17px;line-height:1.35;color:var(--ink-soft);max-width:520px;}
+.perfil-bens{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:8px;width:100%;margin-top:10px;}
+.perfil-ben{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;background:#fff;border:1px solid var(--line);border-radius:14px;text-align:center;}
+.perfil-ben i{font-size:20px;color:var(--p);}
+.perfil-ben b{font:700 11.5px/1.25 'DM Sans',sans-serif;color:var(--ink);}
+@media(min-width:820px){
+  .perfil-cover{height:300px;}
+  .perfil-info{flex-direction:row;align-items:flex-end;text-align:left;gap:28px;margin-top:-84px;}
+  .perfil-logo{width:168px;height:168px;padding:6px;}
+  .perfil-logo span{font-size:62px;}
+  .perfil-txt{align-items:flex-start;flex:1;padding-bottom:8px;}
+  .perfil-txt h1{font-size:50px;}
+  .perfil-lema{font-size:19px;}
+  .perfil-bens{display:flex;flex-wrap:wrap;justify-content:flex-end;width:auto;max-width:460px;margin:0 0 12px;}
+  .perfil-ben{flex-direction:row;gap:7px;padding:8px 13px;border-radius:999px;}
+  .perfil-ben i{font-size:17px;}
+  .perfil-ben b{font-size:12.5px;}
+}
 .hoja-oferta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;font-family:'DM Sans',sans-serif;}
 .hoja-oferta s{color:#9A97A6;}
 .hoja-oferta b{color:#E1306C;font-size:18px;}
@@ -649,40 +680,30 @@ footer{animation:aparecer .6s ease both;}
 </head>
 <body>
 
-<header>
-  <div class="barra-top">
-    <div class="wrap">
-      <a class="marca" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
-        <img id="t-logo" alt="" hidden>
-        <strong id="t-nombre">Cargando…</strong>
-      </a>
-      <a class="btn-wa-top" id="t-wa-top" href="#" target="_blank" rel="noopener" hidden><i class="ti ti-brand-whatsapp"></i><span>Pedidos por WhatsApp</span></a>
-    </div>
+<header class="perfil" id="t-portada" hidden>
+  <!-- Portada: foto de la tienda apenas teñida (5%) y fundida con el fondo; el logo y el nombre son los protagonistas -->
+  <div class="perfil-cover" id="t-portada-foto">
+    <div class="perfil-velo" aria-hidden="true"></div>
+    <div class="perfil-fundido" aria-hidden="true"></div>
   </div>
-  <section class="portada" id="t-portada" hidden>
-    <div class="wrap">
-      <div>
-        <div class="portada-eyebrow" id="t-eyebrow"></div>
-        <h1 id="t-titulo"></h1>
-        <p class="portada-sub" id="t-sub"></p>
-        <div class="portada-cta">
-          <a class="cta principal" href="#catalogo" onclick="document.getElementById('catalogo').scrollIntoView({behavior:'smooth'});return false;"><i class="ti ti-shopping-bag"></i> Ver catálogo</a>
-          <a class="cta secundario" id="t-cta-wa" href="#" target="_blank" rel="noopener" hidden><i class="ti ti-brand-whatsapp"></i> Escríbenos</a>
-        </div>
-        <div class="beneficios" id="t-beneficios"></div>
-      </div>
-      <div class="portada-foto" id="t-portada-foto" hidden></div>
+  <div class="wrap perfil-info">
+    <div class="perfil-logo"><img id="t-logo" alt="" hidden><span id="t-logo-ini" aria-hidden="true"></span></div>
+    <div class="perfil-txt">
+      <div class="perfil-rubro" id="t-eyebrow"></div>
+      <h1 id="t-nombre">Cargando…</h1>
+      <p class="perfil-lema" id="t-titulo" hidden></p>
     </div>
-  </section>
+    <div class="perfil-bens" id="t-beneficios"></div>
+  </div>
 </header>
 
 <main class="wrap">
+  <div class="promo" id="t-promo" hidden></div>
   <div class="cat-titulo" id="catalogo">
     <h2>Nuestro catálogo</h2>
     <p>Elige tu favorito y hazlo especial con un extra</p>
     <div class="corazon" aria-hidden="true"><i class="ti ti-heart"></i></div>
   </div>
-  <div class="promo" id="t-promo" hidden></div>
   <div class="cats" id="t-cats" role="tablist" aria-label="Categorías"></div>
   <div class="grid" id="t-grid"></div>
   <div class="estado" id="t-estado" hidden></div>
@@ -783,6 +804,7 @@ function pintarNegocio(n){
   if (n.color_secundario) r.setProperty('--s', n.color_secundario);
   document.getElementById('t-nombre').textContent = n.nombre;
   if (n.logo_url){ const l = document.getElementById('t-logo'); l.src = n.logo_url; l.alt = n.nombre; l.hidden = false; }
+  else document.getElementById('t-logo-ini').textContent = String(n.nombre || '?').trim().charAt(0).toUpperCase();
   pintarPortada(n);
   const wa = String(n.whatsapp || '').replace(/\D/g, '');
   const ig = String(n.instagram || '').replace(/^@+/, '');
@@ -811,54 +833,32 @@ function pintarNegocio(n){
   }
 }
 
-// ---------- Portada: se arma con los datos de cada negocio ----------
+// ---------- Portada tipo perfil: logo, nombre, rubro y lema de cada negocio ----------
 function pintarPortada(n){
-  const wa = String(n.whatsapp || '').replace(/\D/g, '');
-  // Título: la frase del negocio (sin comillas); la segunda mitad va resaltada con su color
-  const frase = String(n.tagline || '').replace(/^[«"“'\s]+|[»"”'\s]+$/g, '').trim();
-  const titulo = frase || 'Haz tu pedido en línea';
-  // (sin "lookbehind" en la expresión: Safari viejo no lo soporta y rompería la página)
-  const m = titulo.match(/^(.+?[.!?])\s+(.+)$/);
-  let html;
-  if (m) html = `${E(m[1])} <em>${E(m[2])}</em>`;
-  else {
-    const palabras = titulo.split(' ');
-    const corte = Math.ceil(palabras.length / 2);
-    html = palabras.length > 3 ? `${E(palabras.slice(0, corte).join(' '))} <em>${E(palabras.slice(corte).join(' '))}</em>` : `<em>${E(titulo)}</em>`;
-  }
-  document.getElementById('t-titulo').innerHTML = html;
   document.getElementById('t-eyebrow').textContent = n.categoria || 'Pedidos en línea';
-  const medios = [n.yappy_numero ? 'Yappy' : null, (n.banco_nombre && n.banco_numero_cuenta) ? 'transferencia' : null].filter(Boolean);
-  document.getElementById('t-sub').textContent = 'Elige, personaliza y agenda tu entrega en pocos pasos.' +
-    (medios.length ? ' Pagas con ' + medios.join(' o ') + ' y te confirmamos por WhatsApp.' : ' Te confirmamos por WhatsApp.');
-  if (wa){
-    const top = document.getElementById('t-wa-top'); top.href = 'https://wa.me/' + wa; top.hidden = false;
-    const cta = document.getElementById('t-cta-wa'); cta.href = 'https://wa.me/' + wa; cta.hidden = false;
-  }
+  const frase = String(n.tagline || '').replace(/^[«"“'\s]+|[»"”'\s]+$/g, '').trim();
+  const lema = document.getElementById('t-titulo');
+  lema.textContent = frase ? '«' + frase + '»' : '';
+  lema.hidden = !frase;
   document.getElementById('t-portada').hidden = false;
 }
-// Beneficios y foto de portada, cuando ya se cargó el catálogo
+// Datos de la tienda y foto de portada, cuando ya se cargó el catálogo
 function completarPortada(){
   const c = { retiro: true, domicilio: true, ...((CAT && CAT.config) || {}) };
   const n = Pedidos.negocio || {};
   const items = [];
-  if (c.domicilio) items.push(['ti-truck-delivery', 'Entrega a domicilio', 'Eliges día y horario']);
-  if (c.retiro) items.push(['ti-building-store', 'Retiro en tienda', 'Pasa por tu pedido']);
-  items.push(['ti-sparkles', 'Personalízalo', 'Agrega extras y dedicatoria']);
-  document.getElementById('t-beneficios').innerHTML = items.map(i => `<div class="beneficio"><i class="ti ${i[0]}"></i><div><b>${i[1]}</b>${i[2]}</div></div>`).join('');
-  // Foto de portada: la que eligió el negocio; si no hay, la del primer producto con foto
+  if (c.domicilio) items.push(['ti-truck-delivery', 'Entrega a domicilio']);
+  if (c.retiro) items.push(['ti-building-store', 'Retiro en tienda']);
+  const medios = [n.yappy_numero ? 'Yappy' : null, (n.banco_nombre && n.banco_numero_cuenta) ? 'transferencia' : null].filter(Boolean);
+  if (medios.length) items.push(['ti-device-mobile', 'Paga con ' + medios.join(' o ')]);
+  const bens = document.getElementById('t-beneficios');
+  bens.style.setProperty('--n', items.length);
+  bens.innerHTML = items.map(i => `<div class="perfil-ben"><i class="ti ${i[0]}"></i><b>${E(i[1])}</b></div>`).join('');
+  // Foto de portada: la que eligió el negocio; si no hay, la del primer producto; sin fotos, el degradado de su color
   const box = document.getElementById('t-portada-foto');
-  if (n.portada_url){
-    box.innerHTML = `<img src="${E(n.portada_url)}" alt="${E(n.nombre || '')}">`;
-    box.classList.add('propia');
-    box.hidden = false;
-    return;
-  }
-  const conFoto = (CAT.productos || []).find(p => p.foto);
-  if (conFoto){
-    box.innerHTML = `<img src="${E(conFoto.foto)}" alt="${E(conFoto.nombre)}"><div class="sello"><b>${E(conFoto.nombre)}</b>${Pedidos.dinero(conFoto.precio)}</div>`;
-    box.hidden = false;
-  }
+  const foto = n.portada_url || ((CAT.productos || []).find(p => p.foto) || {}).foto;
+  const viejo = box.querySelector('img'); if (viejo) viejo.remove();
+  if (foto) box.insertAdjacentHTML('afterbegin', `<img src="${E(foto)}" alt="">`);
 }
 
 // Formas de entrega en el pie (cuando ya se cargó el catálogo)
