@@ -434,6 +434,24 @@ const Pedidos = {
     return fecha;
   },
 
+  // Pago de la mensualidad con PagueloFácil: el servidor calcula el monto y crea un enlace único
+  async crearEnlaceMensualidad() {
+    const { data, error } = await sb.functions.invoke('pf-crear-enlace', {
+      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin }
+    });
+    if (error) {
+      let msg = error.message;
+      try { const j = await error.context.json(); if (j && j.error) msg = j.error; } catch (_) {}
+      throw new Error(msg);
+    }
+    if (!data || !data.url) throw new Error((data && data.error) || 'No se pudo crear el enlace de pago.');
+    return data;
+  },
+  async pagosDelNegocio() {
+    const { data } = await sb.from('pagos_plataforma').select('*').eq('business_id', this.id).order('creado_en', { ascending: false }).limit(10);
+    return data || [];
+  },
+
   // Sin pasarela de pago todavía: el dueño termina la prueba con un clic (igual que en Agenda)
   async activarSuscripcion() {
     if (!this.plan) throw new Error('Tu tienda no tiene plan todavía.');
