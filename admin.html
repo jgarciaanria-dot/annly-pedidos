@@ -895,7 +895,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=12"></script>
+<script src="pedidos.js?v=13"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -919,11 +919,22 @@ async function arrancar(){
   if (estado === 'es-citas'){ document.getElementById('btn-ir-agenda').href = Pedidos.urlPanelAgenda(); mostrar('aviso-citas'); return; }
   if (estado === 'sin-negocio'){ mostrar('aviso-sin-negocio'); return; }
   mostrar('app');
-  await Pedidos.cargarPlan();
   pintarEncabezado();
+  // Plan, liberación de vencidos y resumen de Inicio van a la vez (en el celular cada espera se nota)
+  await Promise.all([
+    Pedidos.cargarPlan().then(pintarEncabezado),
+    liberarVencidosAHorrar(),
+    cargarInicio()
+  ]);
   iniciarCampana();
-  await Pedidos.liberarVencidos();
-  await cargarInicio();
+}
+
+// Libera pedidos sin pago vencidos, como mucho cada 2 minutos y sin frenar la pantalla
+let ULTIMA_LIBERACION = 0;
+function liberarVencidosAHorrar(){
+  if (Date.now() - ULTIMA_LIBERACION < 120000) return Promise.resolve(0);
+  ULTIMA_LIBERACION = Date.now();
+  return Pedidos.liberarVencidos();
 }
 
 function pintarEncabezado(){
@@ -1085,10 +1096,10 @@ async function renderCalPedidos(recargar){
   if (recargar || CALP.clave !== clave){
     CALP.clave = clave;
     cont.innerHTML = '<p class="vacio-mini">Cargando…</p>';
-    try { CALP.datos = (await Pedidos.listarPedidos({ desde: R.desde, hasta: R.hasta })).filter(p => p.estado !== 'CANCELADO'); }
+    try { CALP.datos = await Pedidos.pedidosCalendario(R.desde, R.hasta); }
     catch(e){ cont.innerHTML = `<p class="vacio-mini">${E(e.message)}</p>`; return; }
     if (CALP.clave !== clave) return;
-    PEDIDOS = CALP.datos.slice(); // para que las acciones del detalle encuentren el pedido
+    PEDIDOS = []; // las acciones usan el pedido completo que carga el detalle (con pagos y extras)
   }
   const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -1610,9 +1621,9 @@ function filtroEstado(e){ F_ESTADO = F_ESTADO === e ? null : e; pintarPedidos();
 
 async function cargarPedidos(){
   pintarModoPed();
-  if (MODO_PED === 'cal'){ await Pedidos.liberarVencidos(); return renderCalPedidos(true); }
+  if (MODO_PED === 'cal'){ liberarVencidosAHorrar(); return renderCalPedidos(true); }
   document.getElementById('lista-pedidos').innerHTML = '<p class="vacio-mini">Cargando…</p>';
-  await Pedidos.liberarVencidos();
+  liberarVencidosAHorrar();
   const hoy = isoMas(0);
   const f = {
     activos: { estados: ['PENDIENTE','CONFIRMADO','EN_PREPARACION','LISTO'] },
