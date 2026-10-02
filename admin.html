@@ -276,6 +276,78 @@ button,input,select,textarea{font-family:inherit;}
 .vitrina li{display:flex;gap:9px;font-size:13.5px;}
 .vitrina li i{color:var(--violet);font-size:17px;}
 .cmp-slot{display:inline-flex;}
+.cal-modo-bar{display:flex;justify-content:flex-end;margin-bottom:10px;}
+.cal-seg{display:inline-flex;gap:3px;background:#F1EDF8;border-radius:12px;padding:3px;}
+.cal-seg button{border:0;background:transparent;border-radius:9px;padding:7px 12px;font:700 12px/1 inherit;color:var(--ink-soft);cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+.cal-seg button.on{background:#fff;color:var(--violet);box-shadow:0 2px 6px -2px rgba(60,30,110,.25);}
+.cal-barra{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.cal-nav{display:flex;align-items:center;gap:6px;}
+.cal-btn{height:34px;padding:0 13px;border-radius:10px;border:1px solid var(--line);background:#fff;font:700 12.5px/1 inherit;cursor:pointer;color:var(--ink);}
+.cal-btn.ico{width:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:16px;}
+.cal-titulo{font-size:17px;font-weight:800;margin-left:6px;}
+.cal-leyenda{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--ink-soft);margin-bottom:10px;align-items:center;}
+.cal-leyenda span{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:-6px;}
+.cal-leyenda .pend{background:#FFF4DE;border:1px solid #F1C873;}
+.cal-leyenda .conf{background:#F4EFFD;border:1px solid #C9B6EE;}
+.cal-leyenda .prep{background:#EAF2FE;border:1px solid #9DBEF0;}
+.cal-leyenda .listo{background:#E6F6EE;border:1px solid #A6DBBE;}
+.cal-leyenda .hecho{background:#F1F0F4;border:1px solid #D6D3DE;}
+.cal-scroll{max-height:72vh;overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff;}
+.cal-grid{display:grid;grid-template-columns:62px repeat(var(--cols),minmax(170px,1fr));position:relative;}
+.cal-grid.semana{grid-template-columns:62px repeat(7,minmax(124px,1fr));}
+.cal-esq,.cal-col-hdr{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);}
+.cal-esq{left:0;z-index:6;}
+.cal-col-hdr{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 6px;border-left:1px solid #F1EEF6;font-family:inherit;}
+button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
+.cal-ini{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--lilac);color:var(--violet);font-size:16px;}
+.cal-col-hdr b{font-size:12.5px;white-space:nowrap;}
+.cal-col-hdr small{font-size:10.5px;color:var(--ink-soft);}
+.cal-col-hdr.dia b{font-size:18px;}
+.cal-col-hdr.hoy b{color:#fff;background:var(--violet);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+.cal-regla{grid-column:1;position:sticky;left:0;z-index:4;background:#fff;}
+.cal-hora{position:relative;}
+.cal-hora span{position:absolute;top:-7px;right:8px;font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
+.cal-hora:first-child span{top:2px;}
+.cal-col{position:relative;border-left:1px solid #F1EEF6;}
+.cal-linea{border-top:1px solid #F3F0F8;box-sizing:border-box;}
+.cal-cita{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:5px 7px;border-radius:9px;border:1px solid #C9B6EE;border-left:4px solid var(--violet);background:#F4EFFD;text-align:left;overflow:hidden;cursor:pointer;font-family:inherit;transition:box-shadow .15s,transform .15s;}
+.cal-cita:hover{box-shadow:0 8px 18px -10px rgba(60,30,110,.5);transform:translateY(-1px);z-index:3;}
+.cal-cita b{font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.cal-cita span{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.cal-cita .cal-tag{font-size:10px;font-weight:800;color:#9A6200;}
+.cal-cita.pend{background:#FFF8EA;border-color:#F1C873;border-left-color:#E0A21B;}
+.cal-cita.prep{background:#EEF4FE;border-color:#9DBEF0;border-left-color:#3B82F6;}
+.cal-cita.listo{background:#EEF8F2;border-color:#A6DBBE;border-left-color:#159A61;}
+.cal-cita.hecho{background:#F6F5F8;border-color:#DEDBE5;border-left-color:#A19DAE;opacity:.8;}
+.cal-ahora{position:absolute;left:0;right:0;height:2px;background:var(--pink);z-index:4;pointer-events:none;}
+.cal-ahora::before{content:"";position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--pink);}
+.cal-mes{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;}
+.cal-mes-hdr{display:grid;grid-template-columns:repeat(7,1fr);background:#FAF8FC;border-bottom:1px solid var(--line);}
+.cal-mes-hdr span{padding:8px;font-size:11px;font-weight:700;color:var(--ink-soft);text-align:center;}
+.cal-mes-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-dia{min-height:100px;border:0;border-right:1px solid #F1EEF6;border-bottom:1px solid #F1EEF6;background:#fff;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px;cursor:pointer;font-family:inherit;text-align:left;}
+.cal-dia:hover{background:#FAF7FE;}
+.cal-dia.fuera{background:#FCFBFD;}
+.cal-dia.fuera .cal-num{color:#C9C6D2;}
+.cal-num{font-size:13px;font-weight:800;}
+.cal-dia.hoy .cal-num{background:var(--violet);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.cal-cnt{font-size:10.5px;font-weight:700;color:var(--violet);}
+.cal-cnt em{font-style:normal;color:#B7791F;}
+.cal-venta{font-size:10.5px;font-weight:700;color:#159A61;}
+.cal-mini{font-size:10.5px;padding:1px 5px;border-radius:5px;background:#F4EFFD;color:#4C3A75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.cal-mini.pend{background:#FFF4DE;color:#7A5200;}
+.cal-mini.prep{background:#EAF2FE;color:#1E4FA0;}
+.cal-mini.listo,.cal-mini.hecho{background:#E6F6EE;color:#1D7A46;}
+.cal-mas{font-size:10px;color:var(--ink-soft);}
+@media(max-width:760px){
+  .cal-titulo{font-size:15px;width:100%;margin:6px 0 0;}
+  .cal-nav{flex-wrap:wrap;}
+  .cal-grid{grid-template-columns:48px repeat(var(--cols),minmax(150px,1fr));}
+  .cal-grid.semana{grid-template-columns:48px repeat(7,minmax(112px,1fr));}
+  .cal-dia{min-height:62px;padding:4px;}
+  .cal-mini,.cal-mas,.cal-venta{display:none;}
+  .cal-cnt{font-size:9.5px;}
+}
 .topm,.side-fondo,.side-cerrar{display:none;}
 @media(max-width:860px){
   /* Nada puede ensanchar la página: lo que no cabe se desliza dentro de su propia fila */
@@ -626,6 +698,14 @@ button,input,select,textarea{font-family:inherit;}
 
     <!-- Pedidos -->
     <section id="tab-pedidos" class="tabsec" hidden>
+      <div class="cal-modo-bar">
+        <div class="cal-seg" id="ped-modo">
+          <button type="button" data-m="cal" onclick="cambiarModoPed('cal')"><i class="ti ti-calendar-week"></i> Calendario</button>
+          <button type="button" data-m="lista" onclick="cambiarModoPed('lista')"><i class="ti ti-list"></i> Lista</button>
+        </div>
+      </div>
+      <div id="cal-pedidos" hidden></div>
+      <div id="ped-lista-wrap">
       <div class="filtros"><input class="buscar" id="f-buscar" placeholder="Buscar por número, cliente o destinatario" oninput="pintarPedidos()"></div>
       <div class="filtros" id="f-periodo">
         <button class="fchip on" data-p="activos" onclick="filtroPeriodo('activos')">Por atender</button>
@@ -638,6 +718,7 @@ button,input,select,textarea{font-family:inherit;}
       </div>
       <div class="filtros" id="f-estado"></div>
       <div id="lista-pedidos"><p class="vacio-mini">Cargando…</p></div>
+      </div>
     </section>
   </main>
 </div>
@@ -911,6 +992,171 @@ async function cargarInicio(){
 
 // ---------- Pestañas ----------
 const CARGA_TAB = { pedidos: cargarPedidos, catalogo: cargarCatalogo, inventario: cargarInventario, entregas: cargarEntregas, config: cargarConfig, plan: cargarMiPlan, reportes: cargarReportes };
+
+// =====================================================================
+// PEDIDOS EN CALENDARIO (Día: Domicilio | Retiro · Semana · Mes)
+// En la computadora abre en calendario; en el celular, en lista. Se recuerda la elección.
+// =====================================================================
+let MODO_PED = (() => { try { return localStorage.getItem('annly_ped_modo') || (window.innerWidth >= 900 ? 'cal' : 'lista'); } catch(e){ return window.innerWidth >= 900 ? 'cal' : 'lista'; } })();
+const CALP = { modo: (() => { try { return localStorage.getItem('annly_calp_modo') || 'dia'; } catch(e){ return 'dia'; } })(), fecha: new Date(), datos: [], clave: '', timer: null };
+const CALP_PX = 60;
+const isoD = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const minP = h => { const [a, b] = String(h || '0:0').split(':').map(Number); return (a || 0) * 60 + (b || 0); };
+const etH = m => { const h = Math.floor(m / 60); return ((h % 12) || 12) + (h >= 12 ? ' p.m.' : ' a.m.'); };
+const etHM = m => { const h = Math.floor(m / 60), mi = m % 60; return ((h % 12) || 12) + ':' + String(mi).padStart(2, '0'); };
+
+function cambiarModoPed(m){ MODO_PED = m; try { localStorage.setItem('annly_ped_modo', m); } catch(e){} cargarPedidos(); }
+function pintarModoPed(){
+  document.querySelectorAll('#ped-modo button').forEach(b => b.classList.toggle('on', b.dataset.m === MODO_PED));
+  document.getElementById('ped-lista-wrap').hidden = MODO_PED === 'cal';
+  document.getElementById('cal-pedidos').hidden = MODO_PED !== 'cal';
+  if (MODO_PED !== 'cal' && CALP.timer){ clearInterval(CALP.timer); CALP.timer = null; }
+}
+function calpModo(m){ CALP.modo = m; try { localStorage.setItem('annly_calp_modo', m); } catch(e){} renderCalPedidos(true); }
+function calpMover(n){
+  const d = new Date(CALP.fecha);
+  if (CALP.modo === 'dia') d.setDate(d.getDate() + n);
+  else if (CALP.modo === 'semana') d.setDate(d.getDate() + 7 * n);
+  else d.setMonth(d.getMonth() + n, 1);
+  CALP.fecha = d; renderCalPedidos(true);
+}
+function calpHoy(){ CALP.fecha = new Date(); renderCalPedidos(true); }
+function calpDia(iso){ CALP.fecha = new Date(iso + 'T00:00:00'); CALP.modo = 'dia'; renderCalPedidos(true); }
+
+// Fechas que muestra la vista actual
+function rangoCalP(){
+  const d = new Date(CALP.fecha); d.setHours(0, 0, 0, 0);
+  if (CALP.modo === 'dia') return { d, dias: [d], desde: isoD(d), hasta: isoD(d) };
+  if (CALP.modo === 'semana'){
+    const lun = new Date(d); lun.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const dias = Array.from({ length: 7 }, (_, i) => { const x = new Date(lun); x.setDate(lun.getDate() + i); return x; });
+    return { d, dias, desde: isoD(dias[0]), hasta: isoD(dias[6]) };
+  }
+  const primero = new Date(d.getFullYear(), d.getMonth(), 1);
+  const ini = new Date(primero); ini.setDate(1 - ((primero.getDay() + 6) % 7));
+  const dias = Array.from({ length: 42 }, (_, i) => { const x = new Date(ini); x.setDate(ini.getDate() + i); return x; });
+  return { d, dias, desde: isoD(dias[0]), hasta: isoD(dias[41]) };
+}
+
+const EST_CAL = { PENDIENTE: 'pend', CONFIRMADO: 'conf', EN_PREPARACION: 'prep', LISTO: 'listo', ENTREGADO: 'hecho' };
+function carrilesP(lista){
+  const ord = lista.slice().sort((a, b) => minP(a.hora_inicio) - minP(b.hora_inicio) || a.numero - b.numero);
+  const fines = [];
+  ord.forEach(p => {
+    const ini = minP(p.hora_inicio);
+    let l = fines.findIndex(f => f <= ini);
+    if (l < 0){ l = fines.length; fines.push(0); }
+    fines[l] = Math.max(ini + 30, minP(p.hora_fin));
+    p._carril = l;
+  });
+  ord.forEach(p => p._carriles = fines.length);
+  return ord;
+}
+function bloqueP(p, ini, conTipo){
+  const a = minP(p.hora_inicio), b = Math.max(a + 30, minP(p.hora_fin));
+  const ancho = 100 / (p._carriles || 1);
+  const saldo = Number(p.saldo_pendiente) > 0;
+  return `<button type="button" class="cal-cita ${EST_CAL[p.estado] || 'conf'}" style="top:${(a - ini) / 60 * CALP_PX}px;height:${Math.max(30, (b - a) / 60 * CALP_PX - 3)}px;left:calc(${ancho * (p._carril || 0)}% + 3px);width:calc(${ancho}% - 6px);" onclick="verPedido('${p.id}')" title="${E(p.product_name || '')} · ${E(p.recipient_name || '')}">
+    <b>${numPed(p.numero)} · ${E(p.product_name || '')}</b>
+    <span>${conTipo ? (p.delivery_type === 'retiro' ? '🛍️ ' : '🚚 ') : ''}Para ${E(p.recipient_name || p.customer_name || '')}${p.zone_name && p.delivery_type !== 'retiro' ? ' · ' + E(p.zone_name) : ''}</span>
+    <span>${etHM(a)}–${etHM(b)} · ${ESTADOS[p.estado] || ''}</span>
+    ${saldo ? `<span class="cal-tag">Saldo ${$(p.saldo_pendiente)}</span>` : ''}
+  </button>`;
+}
+function rangoHorasP(lista){
+  let ini = 8 * 60, fin = 19 * 60;
+  lista.forEach(p => { ini = Math.min(ini, minP(p.hora_inicio)); fin = Math.max(fin, minP(p.hora_fin) || minP(p.hora_inicio) + 60); });
+  return { ini: Math.floor(ini / 60) * 60, fin: Math.ceil(fin / 60) * 60 };
+}
+function reglaP(ini, fin){ let h = ''; for (let m = ini; m < fin; m += 60) h += `<div class="cal-hora" style="height:${CALP_PX}px;"><span>${etH(m)}</span></div>`; return `<div class="cal-regla">${h}</div>`; }
+function lineasP(ini, fin){ let h = ''; for (let m = ini; m < fin; m += 60) h += `<div class="cal-linea" style="height:${CALP_PX}px;"></div>`; return h; }
+function ahoraP(fecha, ini, fin){
+  const hoy = new Date();
+  if (isoD(fecha) !== isoD(hoy)) return '';
+  const m = hoy.getHours() * 60 + hoy.getMinutes();
+  return m < ini || m > fin ? '' : `<div class="cal-ahora" style="top:${(m - ini) / 60 * CALP_PX}px;"></div>`;
+}
+
+async function renderCalPedidos(recargar){
+  const cont = document.getElementById('cal-pedidos');
+  if (!cont) return;
+  const R = rangoCalP();
+  const clave = R.desde + '|' + R.hasta;
+  if (recargar || CALP.clave !== clave){
+    CALP.clave = clave;
+    cont.innerHTML = '<p class="vacio-mini">Cargando…</p>';
+    try { CALP.datos = (await Pedidos.listarPedidos({ desde: R.desde, hasta: R.hasta })).filter(p => p.estado !== 'CANCELADO'); }
+    catch(e){ cont.innerHTML = `<p class="vacio-mini">${E(e.message)}</p>`; return; }
+    if (CALP.clave !== clave) return;
+    PEDIDOS = CALP.datos.slice(); // para que las acciones del detalle encuentren el pedido
+  }
+  const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const d = R.d;
+  let titulo;
+  if (CALP.modo === 'dia') titulo = `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}`;
+  else if (CALP.modo === 'semana') titulo = `${R.dias[0].getDate()} ${MESES[R.dias[0].getMonth()].slice(0, 3)} – ${R.dias[6].getDate()} ${MESES[R.dias[6].getMonth()].slice(0, 3)}`;
+  else titulo = MESES[d.getMonth()].charAt(0).toUpperCase() + MESES[d.getMonth()].slice(1) + ' ' + d.getFullYear();
+
+  const barra = `<div class="cal-barra">
+    <div class="cal-nav"><button type="button" class="cal-btn" onclick="calpHoy()">Hoy</button>
+      <button type="button" class="cal-btn ico" onclick="calpMover(-1)" aria-label="Anterior"><i class="ti ti-chevron-left"></i></button>
+      <button type="button" class="cal-btn ico" onclick="calpMover(1)" aria-label="Siguiente"><i class="ti ti-chevron-right"></i></button>
+      <span class="cal-titulo">${titulo}</span></div>
+    <div class="cal-seg">${[['dia','Día'],['semana','Semana'],['mes','Mes']].map(([k, t]) => `<button type="button" class="${CALP.modo === k ? 'on' : ''}" onclick="calpModo('${k}')">${t}</button>`).join('')}</div>
+  </div>
+  <div class="cal-leyenda"><span class="pend"></span>Pago por confirmar <span class="conf"></span>Confirmado <span class="prep"></span>En preparación <span class="listo"></span>Listo <span class="hecho"></span>Entregado</div>`;
+
+  const P = CALP.datos;
+  let cuerpo = '';
+  if (CALP.modo === 'dia'){
+    const del = P.filter(p => p.fecha === R.desde);
+    const { ini, fin } = rangoHorasP(del);
+    const alto = (fin - ini) / 60 * CALP_PX;
+    const cols = [{ k: 'domicilio', t: 'A domicilio', i: 'ti-truck-delivery' }, { k: 'retiro', t: 'Retiro en tienda', i: 'ti-building-store' }];
+    const deCol = k => del.filter(p => (p.delivery_type === 'retiro' ? 'retiro' : 'domicilio') === k);
+    cuerpo = `<div class="cal-scroll"><div class="cal-grid" style="--cols:2;">
+      <div class="cal-esq"></div>
+      ${cols.map(c => `<div class="cal-col-hdr"><span class="cal-ini"><i class="ti ${c.i}"></i></span><b>${c.t}</b><small>${deCol(c.k).length} pedidos</small></div>`).join('')}
+      ${reglaP(ini, fin)}
+      ${cols.map(c => `<div class="cal-col" style="height:${alto}px;">${lineasP(ini, fin)}${carrilesP(deCol(c.k)).map(p => bloqueP(p, ini, false)).join('')}${ahoraP(d, ini, fin)}</div>`).join('')}
+    </div></div>`;
+  }
+  else if (CALP.modo === 'semana'){
+    const { ini, fin } = rangoHorasP(P);
+    const alto = (fin - ini) / 60 * CALP_PX;
+    const hoyIso = isoD(new Date());
+    cuerpo = `<div class="cal-scroll"><div class="cal-grid semana" style="--cols:7;">
+      <div class="cal-esq"></div>
+      ${R.dias.map(x => `<button type="button" class="cal-col-hdr dia${isoD(x) === hoyIso ? ' hoy' : ''}" onclick="calpDia('${isoD(x)}')"><small>${DIAS[x.getDay()].slice(0, 3)}</small><b>${x.getDate()}</b><small>${P.filter(p => p.fecha === isoD(x)).length} pedidos</small></button>`).join('')}
+      ${reglaP(ini, fin)}
+      ${R.dias.map(x => `<div class="cal-col" style="height:${alto}px;">${lineasP(ini, fin)}${carrilesP(P.filter(p => p.fecha === isoD(x))).map(p => bloqueP(p, ini, true)).join('')}${ahoraP(x, ini, fin)}</div>`).join('')}
+    </div></div>`;
+  }
+  else {
+    const hoyIso = isoD(new Date());
+    cuerpo = `<div class="cal-mes"><div class="cal-mes-hdr">${['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(t => `<span>${t}</span>`).join('')}</div>
+      <div class="cal-mes-grid">${R.dias.map(x => {
+        const iso = isoD(x);
+        const del = P.filter(p => p.fecha === iso).sort((a, b) => minP(a.hora_inicio) - minP(b.hora_inicio));
+        const pend = del.filter(p => p.estado === 'PENDIENTE').length;
+        const venta = del.reduce((s, p) => s + Number(p.total || 0), 0);
+        return `<button type="button" class="cal-dia${x.getMonth() !== d.getMonth() ? ' fuera' : ''}${iso === hoyIso ? ' hoy' : ''}" onclick="calpDia('${iso}')">
+          <span class="cal-num">${x.getDate()}</span>
+          ${del.length ? `<span class="cal-cnt">${del.length} pedido${del.length === 1 ? '' : 's'}${pend ? ` · <em>${pend} ⏳</em>` : ''}</span><span class="cal-venta">${$(venta)}</span>` : ''}
+          ${del.slice(0, 3).map(p => `<span class="cal-mini ${EST_CAL[p.estado] || 'conf'}">${etHM(minP(p.hora_inicio))} ${E((p.product_name || '').split(' ').slice(0, 2).join(' '))}</span>`).join('')}
+          ${del.length > 3 ? `<span class="cal-mas">+${del.length - 3} más</span>` : ''}
+        </button>`;
+      }).join('')}</div></div>`;
+  }
+  cont.innerHTML = barra + cuerpo;
+  const sc = cont.querySelector('.cal-scroll'), ah = cont.querySelector('.cal-ahora');
+  if (sc && ah) sc.scrollTop = Math.max(0, ah.offsetTop - 140);
+  if (CALP.timer) clearInterval(CALP.timer);
+  CALP.timer = setInterval(() => {
+    if (MODO_PED === 'cal' && !document.getElementById('cal-pedidos').hidden && CALP.modo !== 'mes') renderCalPedidos(false);
+  }, 60000);
+}
 
 // ---------- Campanita: pedidos nuevos en tiempo real ----------
 function iniciarCampana(){
@@ -1363,6 +1609,8 @@ function filtroPeriodo(p){
 function filtroEstado(e){ F_ESTADO = F_ESTADO === e ? null : e; pintarPedidos(); }
 
 async function cargarPedidos(){
+  pintarModoPed();
+  if (MODO_PED === 'cal'){ await Pedidos.liberarVencidos(); return renderCalPedidos(true); }
   document.getElementById('lista-pedidos').innerHTML = '<p class="vacio-mini">Cargando…</p>';
   await Pedidos.liberarVencidos();
   const hoy = isoMas(0);
