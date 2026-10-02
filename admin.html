@@ -210,6 +210,7 @@ button,input,select,textarea{font-family:inherit;}
 .tab-lock{margin-left:auto;font-size:14px;color:var(--ink-soft);}
 .oferta-box{background:#FFF6F9;border:1px dashed #F3B7CC;border-radius:14px;padding:12px 12px 10px;margin:0 0 14px;}
 .chip.oferta{background:#FDE7EF;color:#C2185B;}
+.chip.promo{background:#EFE8FC;color:#6D28D9;}
 .switch-lbl{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;cursor:pointer;}
 .switch-lbl input{width:18px;height:18px;accent-color:var(--violet);}
 .temas-promo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
@@ -806,7 +807,15 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
     </div>
     <div class="fg"><label class="flbl">Extras que se pueden agregar</label><div id="prod-extras"></div>
       <p class="ayuda">Deja el precio vacío para usar el del artículo, o escribe uno solo para este producto.</p></div>
-    <label class="check"><input type="checkbox" id="prod-activo" checked> Visible en la tienda</label>
+    <div class="fg"><label class="flbl" for="prod-visib">Dónde aparece</label>
+      <select class="fi" id="prod-visib">
+        <option value="catalogo">En el catálogo (visible para todos)</option>
+        <option value="promo">Solo para promoción (no sale en el catálogo)</option>
+        <option value="oculto">Oculto (no se puede pedir)</option>
+      </select>
+      <p class="ayuda">"Solo para promoción" sirve para productos especiales, por ejemplo uno de temporada: no aparece en el catálogo, pero lo puedes destacar en la promoción y tus clientes lo pueden pedir desde ahí.</p>
+    </div>
+    <input type="checkbox" id="prod-activo" hidden checked>
     <p class="msg" id="prod-msg"></p>
     <button class="btn btn-grad btn-save" id="prod-btn" onclick="guardarProducto()">Guardar producto</button>
     <button class="btn-del" id="prod-borrar" onclick="borrarProducto()">Borrar producto</button>
@@ -904,7 +913,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=14"></script>
+<script src="pedidos.js?v=15"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -1893,7 +1902,7 @@ async function cargarCatalogo(){
   document.getElementById('lista-productos').innerHTML = PRODS.length ? grupos.map(g => `<div class="grupo">${E(g.nombre)}</div>` + g.items.map(p => {
     const nx = (p.product_extras || []).length;
     return `<div class="fila">${p.photo_url ? `<img class="miniatura" src="${E(p.photo_url)}" alt="">` : '<div class="miniatura"><i class="ti ti-flower"></i></div>'}
-      <div class="fila-info"><strong>${E(p.name)}${p.active ? '' : '<span class="chip gris">Oculto</span>'}${ofertaVigente(p) ? `<span class="chip oferta">Oferta ${$(p.precio_oferta)}</span>` : ''}</strong>
+      <div class="fila-info"><strong>${E(p.name)}${p.active ? (p.solo_promo ? '<span class="chip promo">Solo promoción</span>' : '') : '<span class="chip gris">Oculto</span>'}${ofertaVigente(p) ? `<span class="chip oferta">Oferta ${$(p.precio_oferta)}</span>` : ''}</strong>
       <span>${ofertaVigente(p) ? `<s>${$(p.price)}</s> ${$(p.precio_oferta)}` : $(p.price)} · costo ${$(p.estimated_cost)} · ${nx} extra${nx === 1 ? '' : 's'}${p.precio_oferta && !ofertaVigente(p) ? ' · <span style="color:var(--err);">oferta vencida</span>' : ''}</span></div>
       <div class="fila-acc"><button class="ico" onclick="abrirProducto('${p.id}')" aria-label="Editar"><i class="ti ti-edit"></i></button></div></div>`;
   }).join('')).join('') : '<p class="vacio-mini">Agrega tu primer producto con su foto, precio y extras.</p>';
@@ -1932,6 +1941,7 @@ async function abrirProducto(id){
   document.getElementById('prod-oferta').value = editProd && editProd.precio_oferta != null ? editProd.precio_oferta : '';
   document.getElementById('prod-oferta-hasta').value = editProd && editProd.oferta_hasta ? editProd.oferta_hasta : '';
   document.getElementById('prod-activo').checked = editProd ? editProd.active : true;
+  document.getElementById('prod-visib').value = !editProd ? 'catalogo' : (!editProd.active ? 'oculto' : (editProd.solo_promo ? 'promo' : 'catalogo'));
   document.getElementById('prod-cat').innerHTML = '<option value="">Sin categoría</option>' +
     CATS.map(c => `<option value="${c.id}"${editProd && editProd.category_id === c.id ? ' selected' : ''}>${E(c.name)}</option>`).join('');
   const sel = editProd ? (editProd.product_extras || []) : [];
@@ -1978,7 +1988,8 @@ async function guardarProducto(){
       category_id: document.getElementById('prod-cat').value, description: document.getElementById('prod-desc').value,
       photo_url: fotoProd, price: precio, estimated_cost: document.getElementById('prod-costo').value,
       precio_oferta: document.getElementById('prod-oferta').value, oferta_hasta: document.getElementById('prod-oferta-hasta').value,
-      active: document.getElementById('prod-activo').checked, position: editProd ? editProd.position : PRODS.length, extras });
+      active: document.getElementById('prod-visib').value !== 'oculto', solo_promo: document.getElementById('prod-visib').value === 'promo',
+      position: editProd ? editProd.position : PRODS.length, extras });
     cerrar('ov-prod'); cargarCatalogo();
   } catch(e){ msg('prod-msg', e.message); }
   btn.disabled = false;
@@ -2002,8 +2013,9 @@ async function cargarPromoTienda(){
   document.getElementById('pr-vigencia').value = pr.vigencia || '';
   PROMO_T = { ...pr, tema: TEMAS_TIENDA[pr.tema] ? pr.tema : 'fiesta' };
   const sel = document.getElementById('pr-producto');
+  // Se pueden destacar los del catálogo y los "solo para promoción" (los ocultos no se pueden pedir)
   sel.innerHTML = '<option value="">Elige un producto…</option>' + PRODS.filter(p => p.active).map(p =>
-    `<option value="${p.id}"${pr.producto_id === p.id ? ' selected' : ''}>${E(p.name)} · ${ofertaVigente(p) ? 'oferta ' + $(p.precio_oferta) : $(p.price)}</option>`).join('');
+    `<option value="${p.id}"${pr.producto_id === p.id ? ' selected' : ''}>${E(p.name)} · ${ofertaVigente(p) ? 'oferta ' + $(p.precio_oferta) : $(p.price)}${p.solo_promo ? ' · solo promoción' : ''}</option>`).join('');
   sel.onchange = pintarPromoForm;
   pintarPromoForm();
 }
