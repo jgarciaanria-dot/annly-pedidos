@@ -1316,29 +1316,59 @@ async function cargarMiPlan(){
   let pagos = [];
   try { pagos = await Pedidos.pagosDelNegocio(); } catch(e){}
   const ultimos = pagos.filter(x => x.estado === 'confirmado').slice(0, 3);
+  // "Pagada" solo si un pago confirmado cubre la fecha; si no, la fecha es solo el vencimiento
+  const hoyIso = new Date().toISOString().slice(0, 10);
+  const pagadoHasta = pagos.filter(x => x.estado === 'confirmado' && x.periodo_hasta && x.periodo_hasta >= hoyIso).map(x => x.periodo_hasta).sort().pop();
   const mensualidadHtml = `
     <div class="plan-card">
       <h2 style="font-size:20px;margin-bottom:4px;">Tu mensualidad</h2>
-      <p class="ayuda" style="margin:0 0 12px;">${enPrueba ? 'Estás en tu prueba gratis. Al pagar, tu plan y tus módulos quedan activos de inmediato.' : (p.vence ? 'Tu plan está pagado hasta el <b>' + fechaPlan(p.vence) + '</b>.' : '')}</p>
+      <p class="ayuda" style="margin:0 0 12px;">${pagadoHasta ? 'Tu membresía está pagada hasta el <b>' + fechaPlan(pagadoHasta) + '</b>.'
+        : enPrueba ? 'Estás en tu prueba gratis. Al pagar, tu membresía y tus módulos quedan activos de inmediato.'
+        : (p.vence ? 'Tu membresía vence el <b>' + fechaPlan(p.vence) + '</b>. Paga para mantenerla activa.' : '')}</p>
       <div class="pago-lista">
         <div><span>Plan ${E(p.nombre)}</span><b>$${p.precio.toFixed(2)}</b></div>
         ${activos.map(m => `<div><span>${E(m.nombre)}</span><b>$${m.precio.toFixed(2)}</b></div>`).join('')}
         <div class="pago-total"><span>Total del mes</span><b>$${total.toFixed(2)}</b></div>
       </div>
       <button class="btn btn-grad" id="btn-pagar-mes" style="margin-top:12px;" onclick="pagarMensualidad()"><i class="ti ti-lock"></i> Pagar $${total.toFixed(2)} con tarjeta</button>
-      <p class="ayuda" style="margin-top:8px;">Pago seguro con PagueloFácil (Visa, Mastercard o Tafi). Al terminar vuelves aquí y tu plan se actualiza solo.</p>
+      <p class="ayuda" style="margin-top:8px;">Pago seguro con tarjeta de crédito o débito (PagueloFácil). Se abre en una ventana aparte y, al terminar, tu membresía se actualiza sola aquí.</p>
       ${ultimos.length ? `<div class="pago-hist"><b>Últimos pagos</b>${ultimos.map(x => `<span><i class="ti ti-circle-check"></i>${E(x.concepto)} · $${Number(x.monto_pagado || x.monto).toFixed(2)}</span>`).join('')}</div>` : ''}
     </div>`;
 
   cont.innerHTML = planHtml + mensualidadHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '');
 }
 
+// El pago se abre en una ventana aparte; al terminar, pago.html avisa aquí y se cierra sola
+let ESCUCHA_PAGO = false;
 async function pagarMensualidad(){
   const btn = document.getElementById('btn-pagar-mes');
   const antes = btn.innerHTML;
+  const w = 520, h = 780;
+  const x = Math.max(0, (window.screenX || 0) + (window.outerWidth - w) / 2), y = Math.max(0, (window.screenY || 0) + (window.outerHeight - h) / 2);
+  const win = window.open('', 'annly_pago', `width=${w},height=${h},left=${x},top=${y}`); // se abre en el clic, si no el navegador la bloquea
+  if (win) { try { win.document.write('<title>Preparando tu pago…</title><p style="font:15px system-ui;text-align:center;margin-top:45vh;color:#6B6680">Preparando tu pago…</p>'); } catch(e){} }
   btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i> Preparando tu pago…';
-  try { const r = await Pedidos.crearEnlaceMensualidad(); window.location.href = r.url; }
-  catch(e){ alert('No se pudo abrir el pago: ' + (e.message || e)); btn.disabled = false; btn.innerHTML = antes; }
+  try {
+    const r = await Pedidos.crearEnlaceMensualidad();
+    if (win && !win.closed){
+      if (!ESCUCHA_PAGO){
+        ESCUCHA_PAGO = true;
+        window.addEventListener('message', ev => {
+          if (ev.origin !== window.location.origin || !ev.data || ev.data.tipo !== 'annly-pago') return;
+          cargarMiPlan();
+          if (ev.data.estado === 'confirmado') setTimeout(() => alert('¡Pago confirmado! Tu membresía quedó activa.'), 300);
+        });
+      }
+      win.location.href = r.url;
+      btn.innerHTML = '<i class="ti ti-external-link"></i> Completa el pago en la ventana que se abrió';
+      const t = setInterval(() => { if (win.closed){ clearInterval(t); cargarMiPlan(); } }, 1000);
+    } else {
+      window.location.href = r.url; // sin ventanas emergentes: se paga en esta misma pestaña
+    }
+  } catch(e){
+    if (win && !win.closed) win.close();
+    alert('No se pudo abrir el pago: ' + (e.message || e)); btn.disabled = false; btn.innerHTML = antes;
+  }
 }
 
 async function terminarPrueba(){
