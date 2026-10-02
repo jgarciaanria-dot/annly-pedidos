@@ -266,6 +266,7 @@ button,input,select,textarea{font-family:inherit;}
 .vitrina ul{list-style:none;display:grid;gap:8px;max-width:420px;margin:16px auto;text-align:left;}
 .vitrina li{display:flex;gap:9px;font-size:13.5px;}
 .vitrina li i{color:var(--violet);font-size:17px;}
+.cmp-slot{display:inline-flex;}
 .topm,.side-fondo,.side-cerrar{display:none;}
 @media(max-width:860px){
   /* Nada puede ensanchar la página: lo que no cabe se desliza dentro de su propia fila */
@@ -300,6 +301,7 @@ button,input,select,textarea{font-family:inherit;}
   .hdr-actions{width:100%;}
   .sel-negocio{flex:1 1 100%;}
   #btn-ver-tienda{display:none;}
+  .cmp-slot-pc{display:none;}
   /* Filtros de pedidos en una fila deslizable */
   #f-periodo,#f-estado{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
   #f-periodo::-webkit-scrollbar,#f-estado::-webkit-scrollbar{display:none;}
@@ -392,6 +394,7 @@ button,input,select,textarea{font-family:inherit;}
   <header class="topm">
     <button class="topm-btn" onclick="menuMovil(true)" aria-label="Abrir menú"><i class="ti ti-menu-2"></i></button>
     <div class="topm-tit"><span class="topm-logo">Annly<span>.</span></span><span id="topm-seccion">Inicio</span></div>
+    <span class="cmp-slot" id="cmp-slot-m"></span>
     <a class="topm-btn" id="topm-ver" href="#" target="_blank" rel="noopener" aria-label="Ver mi tienda"><i class="ti ti-external-link"></i></a>
   </header>
   <div class="side-fondo" onclick="menuMovil(false)"></div>
@@ -417,6 +420,7 @@ button,input,select,textarea{font-family:inherit;}
         <p id="hdr-sub"></p>
       </div>
       <div class="hdr-actions">
+        <span class="cmp-slot cmp-slot-pc" id="cmp-slot"></span>
         <select class="sel-negocio" id="sel-negocio" style="display:none;" onchange="cambiarNegocio(this.value)" aria-label="Negocio"></select>
         <a class="chip-btn" id="btn-ver-tienda" href="#" target="_blank" rel="noopener"><i class="ti ti-external-link"></i> Ver mi tienda</a>
         <button class="chip-btn" onclick="copiarLink(this)"><i class="ti ti-link"></i> <span>Copiar link</span></button>
@@ -555,6 +559,15 @@ button,input,select,textarea{font-family:inherit;}
         </div>
       </div>
       <div class="sec">
+        <div class="sec-hdr"><div><h2>Abono</h2><p>Para que el cliente pueda apartar su pedido pagando una parte y el resto al recibir.</p></div></div>
+        <div class="sec-body" style="padding-top:14px;">
+          <div class="fg" style="max-width:260px;"><label class="flbl" for="d-abono">Monto del abono ($)</label><input class="fi" id="d-abono" type="number" min="0" step="0.01" placeholder="Ej: 20"></div>
+          <p class="ayuda">Vacío = no se acepta abono y siempre se paga todo. Solo se ofrece en pedidos que cuestan más que el abono. El pedido no se puede marcar entregado hasta que registres el pago del saldo.</p>
+          <p class="msg" id="ab-msg"></p>
+          <button class="btn btn-grad" style="width:auto;" onclick="guardarAbonoCfg()"><i class="ti ti-check"></i> Guardar abono</button>
+        </div>
+      </div>
+      <div class="sec">
         <div class="sec-hdr"><div><h2>Pago y contacto</h2><p>Lo que ve el cliente en tu tienda y al pagar.</p></div></div>
         <div class="sec-body" style="padding-top:14px;">
           <div class="frow">
@@ -607,6 +620,19 @@ button,input,select,textarea{font-family:inherit;}
 <div class="ov" id="ov-ped"><div class="modal" style="max-width:600px;">
   <div class="modal-hdr"><h3 id="ped-titulo">Pedido</h3><button class="modal-x" onclick="cerrar('ov-ped')" aria-label="Cerrar">×</button></div>
   <div class="modal-body" id="ped-body"></div>
+</div></div>
+
+<!-- Modal cobrar saldo -->
+<div class="ov" id="ov-saldo"><div class="modal">
+  <div class="modal-hdr"><h3 id="saldo-titulo">Cobrar saldo</h3><button class="modal-x" onclick="cerrar('ov-saldo')" aria-label="Cerrar">×</button></div>
+  <div class="modal-body">
+    <div class="plan-aviso" id="saldo-resumen" style="margin-top:0;"></div>
+    <div class="fg"><label class="flbl" for="saldo-metodo">¿Cómo te pagó?</label>
+      <select class="fi" id="saldo-metodo"><option value="efectivo">Efectivo</option><option value="yappy">Yappy</option><option value="transferencia">Transferencia</option><option value="tarjeta">Tarjeta</option></select></div>
+    <div class="fg"><label class="flbl" for="saldo-comp">Comprobante o referencia (opcional)</label><input class="fi" id="saldo-comp" maxlength="60"></div>
+    <p class="msg" id="saldo-msg"></p>
+    <button class="btn btn-grad" id="saldo-btn" onclick="guardarCobroSaldo()"><i class="ti ti-check"></i> Registrar pago del saldo</button>
+  </div>
 </div></div>
 
 <!-- Modal cancelar pedido -->
@@ -754,7 +780,8 @@ button,input,select,textarea{font-family:inherit;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=9"></script>
+<script src="pedidos.js?v=11"></script>
+<script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
 document.getElementById('l-registro').href = ANNLY + '/registro.html';
@@ -779,6 +806,7 @@ async function arrancar(){
   mostrar('app');
   await Pedidos.cargarPlan();
   pintarEncabezado();
+  iniciarCampana();
   await Pedidos.liberarVencidos();
   await cargarInicio();
 }
@@ -804,6 +832,7 @@ async function cambiarNegocio(id){
   Pedidos.seleccionarNegocio(id);
   await Pedidos.cargarPlan();
   pintarEncabezado();
+  iniciarCampana();
   irTab('inicio');
   await cargarInicio();
 }
@@ -848,6 +877,34 @@ async function cargarInicio(){
 
 // ---------- Pestañas ----------
 const CARGA_TAB = { pedidos: cargarPedidos, catalogo: cargarCatalogo, inventario: cargarInventario, entregas: cargarEntregas, config: cargarConfig, plan: cargarMiPlan, reportes: cargarReportes };
+
+// ---------- Campanita: pedidos nuevos en tiempo real ----------
+function iniciarCampana(){
+  if (!window.AnnlyCampana) return;
+  window.AnnlyCampana.iniciar({
+    cliente: Pedidos.cliente, negocioId: Pedidos.id, tabla: 'orders',
+    montarEn: [document.getElementById('cmp-slot'), document.getElementById('cmp-slot-m')],
+    cargarRecientes: async () => {
+      let r = await Pedidos.cliente.from('orders').select('id, numero, estado, total, product_name, customer_name, fecha, created_at')
+        .eq('business_id', Pedidos.id).order('created_at', { ascending: false }).limit(20);
+      if (r.error) r = await Pedidos.cliente.from('orders').select('id, numero, estado, total, product_name, customer_name, fecha')
+        .eq('business_id', Pedidos.id).order('numero', { ascending: false }).limit(20);
+      return r.data || [];
+    },
+    describir: f => ({
+      titulo: (f.estado === 'PENDIENTE' ? 'Pago por confirmar · ' : 'Nuevo pedido · ') + numPed(f.numero),
+      detalle: [f.product_name, f.customer_name, f.total != null ? $(f.total) : ''].filter(Boolean).join(' · '),
+      urgente: f.estado === 'PENDIENTE',
+      fecha: f.created_at || null
+    }),
+    alAbrir: f => { irTab('pedidos'); verPedido(f.id); },
+    alLlegar: () => {
+      const t = document.querySelector('.tab.on');
+      if (t && t.dataset.tab === 'pedidos') cargarPedidos();
+      cargarInicioSilencioso();
+    }
+  });
+}
 
 // ---------- Plan ----------
 function fechaPlan(iso){
@@ -1101,6 +1158,7 @@ function htmlVentasRep(){
       ${kpi('Ventas', $(ventas), ok.length + (ok.length === 1 ? ' pedido' : ' pedidos'), 'grande')}
       ${kpi('Ticket promedio', $(ok.length ? ventas / ok.length : 0))}
       ${kpi('Envíos cobrados', $(envios))}
+      ${(() => { const sp = ok.filter(p => Number(p.saldo_pendiente) > 0); return sp.length ? kpi('Saldos por cobrar', $(sp.reduce((s, p) => s + Number(p.saldo_pendiente), 0)), sp.length + ' con abono', 'aviso') : ''; })()}
       ${kpi('Por confirmar pago', $(pend.reduce((s, p) => s + Number(p.total || 0), 0)), pend.length + ' pedidos', pend.length ? 'aviso' : '')}
       ${kpi('Cancelados', String(canc.length), reemb ? 'Reembolsado ' + $(reemb) : '', canc.length ? 'malo' : '')}
     </div>
@@ -1303,7 +1361,8 @@ function pintarPedidos(){
       <div>
         <div class="ped-top"><span class="ped-num">${numPed(p.numero)}</span><span class="est ${p.estado}">${ESTADOS[p.estado]}</span>
           ${p.poca_anticipacion && p.estado !== 'CANCELADO' ? '<span class="chip warn">Poca anticipación</span>' : ''}
-          ${p.delivery_fee_pendiente && p.estado !== 'CANCELADO' ? '<span class="chip warn">Envío por confirmar</span>' : ''}</div>
+          ${p.delivery_fee_pendiente && p.estado !== 'CANCELADO' ? '<span class="chip warn">Envío por confirmar</span>' : ''}
+          ${Number(p.saldo_pendiente) > 0 && p.estado !== 'CANCELADO' ? `<span class="chip warn">Saldo ${$(p.saldo_pendiente)} por cobrar</span>` : ''}</div>
         <div class="ped-info"><b>${E(p.product_name)}</b>${extras ? ' + ' + E(extras) : ''}<br>
           ${E(p.customer_name)} → <b>${E(p.recipient_name)}</b> · ${p.delivery_type === 'retiro' ? 'Retiro en tienda' : 'Domicilio' + (p.zone_name ? ' · ' + E(p.zone_name) : '')}
           ${p.estado === 'CANCELADO' ? `<br><span style="color:var(--err);">Motivo: ${E(p.cancel_motivo || '—')}${Number(p.cancel_reembolso) > 0 ? ' · reembolso ' + $(p.cancel_reembolso) : ''}</span>` : ''}</div>
@@ -1312,12 +1371,46 @@ function pintarPedidos(){
         <span class="ped-total">${$(p.total)}</span>
         <div style="display:flex;gap:6px;">
           <button class="btn-accion sec" onclick="verPedido('${p.id}')">Ver</button>
-          ${sig ? `<button class="btn-accion" onclick="avanzarPedido('${p.id}')">${sig[1]}</button>` : ''}
+          ${botonAccionPedido(p, false)}
         </div>
       </div>
     </div>`;
   });
   cont.innerHTML = html;
+}
+
+// Botón principal de un pedido: con saldo pendiente, "Cobrar saldo" reemplaza a "Marcar entregado"
+function botonAccionPedido(p, desdeDetalle){
+  const sig = SIGUIENTE[p.estado];
+  if (!sig) return '';
+  const saldo = Number(p.saldo_pendiente) || 0;
+  if (sig[0] === 'ENTREGADO' && saldo > 0)
+    return `<button class="btn-accion" onclick="abrirCobroSaldo('${p.id}')"><i class="ti ti-cash"></i> Cobrar saldo ${$(saldo)}</button>`;
+  return `<button class="btn-accion" onclick="avanzarPedido('${p.id}'${desdeDetalle ? ', true' : ''})">${sig[1]}</button>`;
+}
+
+let SALDO_PED = null;
+function abrirCobroSaldo(id){
+  const p = PEDIDOS.find(x => x.id === id) || PED_ACTUAL;
+  if (!p) return;
+  SALDO_PED = p;
+  document.getElementById('saldo-titulo').textContent = 'Cobrar saldo · ' + numPed(p.numero);
+  document.getElementById('saldo-resumen').innerHTML = `<i class="ti ti-cash"></i><div>Total ${$(p.total)} · abono pagado ${$(p.abono_monto)}<br><b>Saldo a cobrar: ${$(p.saldo_pendiente)}</b></div>`;
+  document.getElementById('saldo-comp').value = '';
+  msg('saldo-msg');
+  abrir('ov-saldo');
+}
+async function guardarCobroSaldo(){
+  const p = SALDO_PED; if (!p) return;
+  const btn = document.getElementById('saldo-btn'); btn.disabled = true;
+  try {
+    await Pedidos.registrarSaldo(p.id, document.getElementById('saldo-metodo').value, document.getElementById('saldo-comp').value.trim());
+    cerrar('ov-saldo');
+    await cargarPedidos();
+    if (document.getElementById('ov-ped').classList.contains('on')) verPedido(p.id);
+    cargarInicioSilencioso();
+  } catch(e){ msg('saldo-msg', e.message); }
+  btn.disabled = false;
 }
 
 async function avanzarPedido(id, desdeDetalle){
@@ -1328,7 +1421,9 @@ async function avanzarPedido(id, desdeDetalle){
     const pago = (p.order_payments || []).find(x => x.tipo === 'inicial');
     const comp = pago && pago.comprobante ? `\n\nComprobante: ${pago.comprobante}` : '\n\nEl cliente no dejó comprobante.';
     const medio = pago && pago.metodo === 'transferencia' ? 'por transferencia' : 'por Yappy';
-    if (!confirm(`¿Confirmas que recibiste ${$(p.total)} ${medio} para el pedido ${numPed(p.numero)}?${comp}`)) return;
+    const recibido = pago ? Number(pago.monto) : Number(p.total);
+    const esAbono = Number(p.abono_monto) > 0;
+    if (!confirm(`¿Confirmas que recibiste ${$(recibido)} ${medio}${esAbono ? ' de abono' : ''} para el pedido ${numPed(p.numero)}?${esAbono ? '\n\nEl saldo de ' + $(p.saldo_pendiente) + ' se cobra al entregar.' : ''}${comp}`)) return;
   }
   try {
     if (sig[0] === 'confirmar') await Pedidos.confirmarPago(id);
@@ -1352,7 +1447,7 @@ async function verPedido(id){
   const sig = SIGUIENTE[p.estado];
   const EVENTOS = { pedido_recibido: 'Pedido recibido', pago_confirmado: 'Pago confirmado', en_preparacion: 'En preparación', listo: 'Listo', entregado: 'Entregado', cancelado: 'Cancelado' };
   const MEDIO = { yappy: 'Yappy', transferencia: 'Transferencia' };
-  const pagos = (p.order_payments || []).map(x => `<div class="det-fila"><span>${x.tipo === 'inicial' ? 'Pago' : x.tipo === 'diferencia' ? 'Diferencia' : 'Reembolso'} · ${MEDIO[x.metodo] || E(x.metodo || '')} · ${x.estado}${x.comprobante ? ' · ' + E(x.comprobante) : ''}</span><span>${$(x.monto)}</span></div>`).join('');
+  const pagos = (p.order_payments || []).map(x => `<div class="det-fila"><span>${x.tipo === 'inicial' ? (Number(p.abono_monto) > 0 ? 'Abono' : 'Pago') : x.tipo === 'saldo' ? 'Saldo' : x.tipo === 'diferencia' ? 'Diferencia' : 'Reembolso'} · ${MEDIO[x.metodo] || E(x.metodo || '')} · ${x.estado}${x.comprobante ? ' · ' + E(x.comprobante) : ''}</span><span>${$(x.monto)}</span></div>`).join('');
   document.getElementById('ped-titulo').innerHTML = `${numPed(p.numero)} <span class="est ${p.estado}" style="vertical-align:3px;">${ESTADOS[p.estado]}</span>`;
   document.getElementById('ped-body').innerHTML = `
     <div class="det-bloque"><h4>Entrega</h4>
@@ -1366,6 +1461,8 @@ async function verPedido(id){
       ${(p.order_extras || []).map(x => `<div class="det-fila"><span>+ ${E(x.name)}${Number(x.qty) > 1 ? ' ×' + Number(x.qty) : ''}</span><span>${$(x.unit_price * x.qty)}</span></div>`).join('')}
       ${p.delivery_type === 'domicilio' ? `<div class="det-fila"><span>Envío</span><span>${p.delivery_fee_pendiente ? 'Por confirmar' : $(p.delivery_fee)}</span></div>` : ''}
       <div class="det-fila" style="font-weight:800;border-top:1px solid var(--line);margin-top:4px;padding-top:6px;"><span style="color:var(--ink);">Total</span><span>${$(p.total)}</span></div>
+      ${Number(p.abono_monto) > 0 ? `<div class="det-fila"><span>Abono</span><span>${$(p.abono_monto)}</span></div>
+      <div class="det-fila" style="${Number(p.saldo_pendiente) > 0 ? 'color:#9A6200;font-weight:800;' : ''}"><span>${Number(p.saldo_pendiente) > 0 ? 'Saldo por cobrar al entregar' : 'Saldo'}</span><span>${Number(p.saldo_pendiente) > 0 ? $(p.saldo_pendiente) : 'Pagado'}</span></div>` : ''}
       <div class="det-fila"><span>Margen estimado</span><span>${$(p.total - p.product_cost - (p.order_extras || []).reduce((s, x) => s + x.unit_cost * x.qty, 0) - (p.delivery_fee || 0))}</span></div>
     </div>
     <div class="det-bloque"><h4>Personas</h4>
@@ -1383,7 +1480,7 @@ async function verPedido(id){
     <div class="det-bloque"><h4>Bitácora</h4><div class="bita">${p.historial.map(h => `<div>${EVENTOS[h.evento] || E(h.evento)}${h.detalle && h.detalle.motivo ? ' · ' + E(h.detalle.motivo) : ''}<br><small>${new Date(h.created_at).toLocaleString('es-PA', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}</small></div>`).join('')}</div></div>
     <div class="acc-row">
       <button class="btn-accion sec" onclick="imprimirPedido()"><i class="ti ti-printer"></i> Hoja de preparación</button>
-      ${sig ? `<button class="btn-accion" onclick="avanzarPedido('${p.id}', true)">${sig[1]}</button>` : ''}
+      ${botonAccionPedido(p, true)}
     </div>
     ${!['CANCELADO','ENTREGADO'].includes(p.estado) ? `<button class="btn-del" onclick="abrirCancelacion()">Cancelar pedido</button>` : ''}`;
 }
@@ -1788,7 +1885,14 @@ async function guardarPaleta(){
   catch(e){ msg('paleta-msg', e.message); }
 }
 
+async function guardarAbonoCfg(){
+  msg('ab-msg');
+  try { await Pedidos.guardarAbono(document.getElementById('d-abono').value); alert('Abono guardado.'); }
+  catch(e){ msg('ab-msg', e.message); }
+}
+
 async function cargarConfig(){
+  document.getElementById('d-abono').value = Pedidos.negocio.abono_pedido != null ? Number(Pedidos.negocio.abono_pedido) : '';
   pintarLogo();
   pintarPortadaCfg();
   pintarPaletas();
