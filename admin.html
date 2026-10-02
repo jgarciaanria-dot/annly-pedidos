@@ -204,6 +204,15 @@ button,input,select,textarea{font-family:inherit;}
 .paleta span{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.25;}
 .paleta.on span::after{content:" ✓";color:var(--violet);}
 .tab-lock{margin-left:auto;font-size:14px;color:var(--ink-soft);}
+.oferta-box{background:#FFF6F9;border:1px dashed #F3B7CC;border-radius:14px;padding:12px 12px 10px;margin:0 0 14px;}
+.chip.oferta{background:#FDE7EF;color:#C2185B;}
+.switch-lbl{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;cursor:pointer;}
+.switch-lbl input{width:18px;height:18px;accent-color:var(--violet);}
+.temas-promo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+.tema-op{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:12px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:700 12px/1.2 inherit;}
+.tema-op span{font-size:22px;}
+.tema-op.on{border-color:var(--violet);box-shadow:0 0 0 3px var(--lilac);}
+@media(max-width:640px){.temas-promo{grid-template-columns:repeat(2,minmax(0,1fr));}}
 .plan-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:700;background:var(--lilac);color:var(--violet);margin-left:8px;vertical-align:middle;}
 .plan-chip.prueba{background:#FFF4DE;color:#9A6200;}
 .plan-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:14px;}
@@ -443,6 +452,24 @@ button,input,select,textarea{font-family:inherit;}
     <!-- Catálogo -->
     <section id="tab-catalogo" class="tabsec" hidden>
       <div class="sec">
+        <div class="sec-hdr"><div><h2>Promoción destacada</h2><p>Un banner al inicio de tu tienda que destaca un producto (por ejemplo, para el Día de las Madres).</p></div>
+          <label class="switch-lbl"><input type="checkbox" id="pr-activa" onchange="pintarPromoForm()"> <span id="pr-activa-txt">Apagada</span></label></div>
+        <div class="sec-body" id="promo-form" style="padding-top:14px;">
+          <div class="fg"><label class="flbl">Estilo</label><div class="temas-promo" id="pr-temas"></div></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl" for="pr-etiqueta">Etiqueta</label><input class="fi" id="pr-etiqueta" maxlength="30" placeholder="Ej: DÍA DE LAS MADRES"></div>
+            <div class="fg"><label class="flbl" for="pr-festejo">Título</label><input class="fi" id="pr-festejo" maxlength="60" placeholder="Ej: ¡Sorprende a mamá!"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl" for="pr-producto">Producto destacado</label><select class="fi" id="pr-producto"></select></div>
+            <div class="fg"><label class="flbl" for="pr-vigencia">Vigencia (texto)</label><input class="fi" id="pr-vigencia" maxlength="60" placeholder="Ej: Hasta el 31 de mayo"></div>
+          </div>
+          <p class="ayuda" id="pr-ayuda"></p>
+          <p class="msg" id="pr-msg"></p>
+          <button class="btn btn-grad" style="width:auto;" onclick="guardarPromoTienda()"><i class="ti ti-check"></i> Guardar promoción</button>
+        </div>
+      </div>
+      <div class="sec">
         <div class="sec-hdr"><div><h2>Categorías</h2><p>Agrupan tus productos en la tienda.</p></div>
           <button class="btn-add" onclick="abrirCategoria()"><i class="ti ti-plus"></i> Nueva categoría</button></div>
         <div class="sec-body" id="lista-categorias"></div>
@@ -680,6 +707,13 @@ button,input,select,textarea{font-family:inherit;}
       <div class="fg"><label class="flbl" for="prod-costo">Costo estimado ($)</label><input class="fi" id="prod-costo" type="number" step="0.01" min="0" oninput="margenProducto()"></div>
     </div>
     <p class="ayuda" id="prod-margen" style="margin:-6px 0 12px;"></p>
+    <div class="oferta-box">
+      <div class="frow">
+        <div class="fg"><label class="flbl" for="prod-oferta">Precio de oferta ($) <small style="font-weight:500;color:var(--ink-soft);">opcional</small></label><input class="fi" id="prod-oferta" type="number" step="0.01" min="0" placeholder="Ej: 49.00" oninput="margenProducto()"></div>
+        <div class="fg"><label class="flbl" for="prod-oferta-hasta">Válida hasta <small style="font-weight:500;color:var(--ink-soft);">opcional</small></label><input class="fi" id="prod-oferta-hasta" type="date"></div>
+      </div>
+      <p class="ayuda" style="margin:-4px 0 0;">Si la llenas, tu tienda muestra el precio normal tachado, el de oferta y una etiqueta con el descuento. Vacía = sin oferta. Sin fecha, vale hasta que la quites.</p>
+    </div>
     <div class="fg"><label class="flbl">Extras que se pueden agregar</label><div id="prod-extras"></div>
       <p class="ayuda">Deja el precio vacío para usar el del artículo, o escribe uno solo para este producto.</p></div>
     <label class="check"><input type="checkbox" id="prod-activo" checked> Visible en la tienda</label>
@@ -780,7 +814,7 @@ button,input,select,textarea{font-family:inherit;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=11"></script>
+<script src="pedidos.js?v=12"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -1254,12 +1288,32 @@ function exportarRep(){
     filas.push(['Producto','Pedidos','Vendido','Costo','Ganancia','Margen %']);
     filasGanancia().forEach(o => filas.push([o.nombre, o.n, n(o.ingreso), n(o.costo), n(o.margen), pct(o.margen, o.ingreso)]));
   }
-  const csv = '\ufeff' + filas.map(f => f.map(q).join(',')).join('\r\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  a.download = `${nombre}-${Pedidos.negocio.slug}-${REP.desde}-a-${REP.hasta}.csv`;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  const archivo = `${nombre}-${Pedidos.negocio.slug}-${REP.desde}-a-${REP.hasta}`;
+  // Excel de verdad (.xlsx); si no carga la librería, CSV
+  const csv = () => {
+    const txt = '\ufeff' + filas.map(f => f.map(q).join(',')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' }));
+    a.download = archivo + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  };
+  const conXlsx = X => {
+    // Los montos van como números para poder sumarlos en Excel
+    const datos = filas.map((f, i) => i === 0 ? f : f.map(v => (typeof v === 'string' && /^-?\d+(\.\d+)?$/.test(v)) ? Number(v) : v));
+    const hoja = X.utils.aoa_to_sheet(datos);
+    hoja['!cols'] = filas[0].map((h, i) => ({ wch: Math.min(32, Math.max(String(h).length + 2, ...filas.map(f => String(f[i] ?? '').length + 1))) }));
+    hoja['!autofilter'] = { ref: hoja['!ref'] };
+    const libro = X.utils.book_new();
+    X.utils.book_append_sheet(libro, hoja, nombre.charAt(0).toUpperCase() + nombre.slice(1));
+    X.utils.writeFile(libro, archivo + '.xlsx');
+  };
+  if (window.XLSX) return conXlsx(window.XLSX);
+  const sc = document.createElement('script');
+  sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  sc.onload = () => { try { conXlsx(window.XLSX); } catch(e){ console.error(e); csv(); } };
+  sc.onerror = csv;
+  document.head.appendChild(sc);
 }
 // Menú del celular (hamburguesa)
 function menuMovil(abrirlo){
@@ -1558,6 +1612,7 @@ let editCat = null, editProd = null, fotoProd = null;
 async function cargarCatalogo(){
   try { [CATS, PRODS, ARTS] = await Promise.all([Pedidos.listarCategorias(), Pedidos.listarProductos(), Pedidos.listarArticulos()]); }
   catch(e){ document.getElementById('lista-productos').innerHTML = `<p class="vacio-mini">${E(e.message)}</p>`; return; }
+  cargarPromoTienda();
   document.getElementById('lista-categorias').innerHTML = CATS.length ? CATS.map(c => {
     const n = PRODS.filter(p => p.category_id === c.id).length;
     return `<div class="fila"><div class="fila-info"><strong>${E(c.name)}${c.active ? '' : '<span class="chip gris">Oculta</span>'}</strong><span>${n} producto${n === 1 ? '' : 's'}</span></div>
@@ -1570,8 +1625,8 @@ async function cargarCatalogo(){
   document.getElementById('lista-productos').innerHTML = PRODS.length ? grupos.map(g => `<div class="grupo">${E(g.nombre)}</div>` + g.items.map(p => {
     const nx = (p.product_extras || []).length;
     return `<div class="fila">${p.photo_url ? `<img class="miniatura" src="${E(p.photo_url)}" alt="">` : '<div class="miniatura"><i class="ti ti-flower"></i></div>'}
-      <div class="fila-info"><strong>${E(p.name)}${p.active ? '' : '<span class="chip gris">Oculto</span>'}</strong>
-      <span>${$(p.price)} · costo ${$(p.estimated_cost)} · ${nx} extra${nx === 1 ? '' : 's'}</span></div>
+      <div class="fila-info"><strong>${E(p.name)}${p.active ? '' : '<span class="chip gris">Oculto</span>'}${ofertaVigente(p) ? `<span class="chip oferta">Oferta ${$(p.precio_oferta)}</span>` : ''}</strong>
+      <span>${ofertaVigente(p) ? `<s>${$(p.price)}</s> ${$(p.precio_oferta)}` : $(p.price)} · costo ${$(p.estimated_cost)} · ${nx} extra${nx === 1 ? '' : 's'}${p.precio_oferta && !ofertaVigente(p) ? ' · <span style="color:var(--err);">oferta vencida</span>' : ''}</span></div>
       <div class="fila-acc"><button class="ico" onclick="abrirProducto('${p.id}')" aria-label="Editar"><i class="ti ti-edit"></i></button></div></div>`;
   }).join('')).join('') : '<p class="vacio-mini">Agrega tu primer producto con su foto, precio y extras.</p>';
 }
@@ -1606,6 +1661,8 @@ async function abrirProducto(id){
   document.getElementById('prod-desc').value = editProd ? (editProd.description || '') : '';
   document.getElementById('prod-precio').value = editProd ? editProd.price : '';
   document.getElementById('prod-costo').value = editProd ? editProd.estimated_cost : '';
+  document.getElementById('prod-oferta').value = editProd && editProd.precio_oferta != null ? editProd.precio_oferta : '';
+  document.getElementById('prod-oferta-hasta').value = editProd && editProd.oferta_hasta ? editProd.oferta_hasta : '';
   document.getElementById('prod-activo').checked = editProd ? editProd.active : true;
   document.getElementById('prod-cat').innerHTML = '<option value="">Sin categoría</option>' +
     CATS.map(c => `<option value="${c.id}"${editProd && editProd.category_id === c.id ? ' selected' : ''}>${E(c.name)}</option>`).join('');
@@ -1636,7 +1693,10 @@ async function subirFotoProducto(input){
 function margenProducto(){
   const p = parseFloat(document.getElementById('prod-precio').value) || 0;
   const c = parseFloat(document.getElementById('prod-costo').value) || 0;
-  document.getElementById('prod-margen').textContent = p > 0 ? `Margen: ${$(p - c)} (${Math.round((p - c) / p * 100)}%)` : '';
+  const o = parseFloat(document.getElementById('prod-oferta').value) || 0;
+  let t = p > 0 ? `Margen: ${$(p - c)} (${Math.round((p - c) / p * 100)}%)` : '';
+  if (o > 0 && p > 0 && o < p) t += ` · En oferta: ${Math.round((1 - o / p) * 100)}% menos, margen ${$(o - c)}`;
+  document.getElementById('prod-margen').textContent = t;
 }
 async function guardarProducto(){
   const extras = [...document.querySelectorAll('.px-chk:checked')].map(c => ({
@@ -1649,11 +1709,59 @@ async function guardarProducto(){
     await Pedidos.guardarProducto({ id: editProd && editProd.id, name: document.getElementById('prod-nombre').value,
       category_id: document.getElementById('prod-cat').value, description: document.getElementById('prod-desc').value,
       photo_url: fotoProd, price: precio, estimated_cost: document.getElementById('prod-costo').value,
+      precio_oferta: document.getElementById('prod-oferta').value, oferta_hasta: document.getElementById('prod-oferta-hasta').value,
       active: document.getElementById('prod-activo').checked, position: editProd ? editProd.position : PRODS.length, extras });
     cerrar('ov-prod'); cargarCatalogo();
   } catch(e){ msg('prod-msg', e.message); }
   btn.disabled = false;
 }
+// ¿La oferta del producto está vigente hoy?
+function ofertaVigente(p){
+  const o = Number(p.precio_oferta);
+  if (!(o > 0 && o < Number(p.price))) return false;
+  return !p.oferta_hasta || p.oferta_hasta >= Pedidos.hoyISO();
+}
+
+// ---------- Promoción destacada ----------
+const TEMAS_TIENDA = { fiesta: ['🎉', 'Fiesta'], corazon: ['💝', 'Amor'], regalo: ['🎁', 'Regalo'], flores: ['🌸', 'Flores'] };
+let PROMO_T = null;
+async function cargarPromoTienda(){
+  try { PROMO_T = await Pedidos.promo(); } catch(e){ PROMO_T = null; }
+  const pr = PROMO_T || {};
+  document.getElementById('pr-activa').checked = !!pr.activa;
+  document.getElementById('pr-etiqueta').value = pr.etiqueta || '';
+  document.getElementById('pr-festejo').value = pr.festejo || '';
+  document.getElementById('pr-vigencia').value = pr.vigencia || '';
+  PROMO_T = { ...pr, tema: TEMAS_TIENDA[pr.tema] ? pr.tema : 'fiesta' };
+  const sel = document.getElementById('pr-producto');
+  sel.innerHTML = '<option value="">Elige un producto…</option>' + PRODS.filter(p => p.active).map(p =>
+    `<option value="${p.id}"${pr.producto_id === p.id ? ' selected' : ''}>${E(p.name)} · ${ofertaVigente(p) ? 'oferta ' + $(p.precio_oferta) : $(p.price)}</option>`).join('');
+  sel.onchange = pintarPromoForm;
+  pintarPromoForm();
+}
+function pintarPromoForm(){
+  const on = document.getElementById('pr-activa').checked;
+  document.getElementById('pr-activa-txt').textContent = on ? 'Encendida' : 'Apagada';
+  document.getElementById('promo-form').style.opacity = on ? '1' : '.55';
+  document.getElementById('pr-temas').innerHTML = Object.entries(TEMAS_TIENDA).map(([k, v]) =>
+    `<button type="button" class="tema-op${PROMO_T && PROMO_T.tema === k ? ' on' : ''}" onclick="PROMO_T.tema='${k}';pintarPromoForm()"><span>${v[0]}</span>${v[1]}</button>`).join('');
+  const prod = PRODS.find(p => p.id === document.getElementById('pr-producto').value);
+  document.getElementById('pr-ayuda').innerHTML = !prod ? '' : (ofertaVigente(prod)
+    ? `El banner mostrará <s>${$(prod.price)}</s> <b>${$(prod.precio_oferta)}</b>.`
+    : `Este producto no tiene precio de oferta: el banner mostrará ${$(prod.price)}. Si quieres un descuento, ponle precio de oferta en el producto.`);
+}
+async function guardarPromoTienda(){
+  msg('pr-msg');
+  try {
+    await Pedidos.guardarPromo({
+      activa: document.getElementById('pr-activa').checked, tema: PROMO_T.tema,
+      etiqueta: document.getElementById('pr-etiqueta').value, festejo: document.getElementById('pr-festejo').value,
+      vigencia: document.getElementById('pr-vigencia').value, producto_id: document.getElementById('pr-producto').value || null
+    });
+    alert('Promoción guardada.');
+  } catch(e){ msg('pr-msg', e.message); }
+}
+
 async function borrarProducto(){
   if (!confirm('¿Borrar este producto? Los pedidos que ya lo tienen conservan su nombre y precio.')) return;
   try { await Pedidos.borrarProducto(editProd.id); cerrar('ov-prod'); cargarCatalogo(); } catch(e){ msg('prod-msg', e.message); }
