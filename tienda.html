@@ -768,7 +768,7 @@ footer{animation:aparecer .6s ease both;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=14"></script>
+<script src="/pedidos.js?v=15"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -796,17 +796,20 @@ async function arrancar(){
   }
   pintarNegocio(n);
   // Catálogo, ofertas y promoción se piden a la vez (antes iban uno tras otro)
-  let of = {}, promo = null;
+  let of = {}, promo = null, soloPromo = new Set();
   try {
-    [CAT, of, promo] = await Promise.all([
+    [CAT, of, promo, soloPromo] = await Promise.all([
       Pedidos.catalogo(),
       Pedidos.ofertas().catch(e => { console.error(e); return {}; }),
-      Pedidos.promo().catch(() => null)
+      Pedidos.promo().catch(() => null),
+      Pedidos.soloPromo().catch(() => new Set())
     ]);
   }
   catch(e){ console.error(e); estado('No pudimos cargar el catálogo', 'Recarga la página en un momento.'); return; }
   if (!CAT.productos.length){ estado('Catálogo en preparación', 'Pronto podrás hacer tus pedidos aquí.'); return; }
   // Ofertas vigentes: el precio de oferta pasa a ser el precio (el servidor cobra lo mismo)
+  // Productos "solo para promoción": se pueden pedir, pero no se listan en el catálogo
+  CAT.productos.forEach(p => { p.soloPromo = soloPromo.has(p.id); });
   CAT.productos.forEach(p => { const o = of[p.id]; if (o && o.precio > 0 && o.precio < Number(p.precio)) { p.precioNormal = Number(p.precio); p.precio = o.precio; p.ofertaHasta = o.hasta; } });
   pintarEntregasPie();
   pintarPromoTienda(promo);
@@ -901,7 +904,7 @@ function pintarEntregasPie(){
 
 
 function pintarCategorias(){
-  const usadas = CAT.categorias.filter(c => CAT.productos.some(p => p.categoriaId === c.id));
+  const usadas = CAT.categorias.filter(c => CAT.productos.some(p => p.categoriaId === c.id && !p.soloPromo));
   const cats = [{ id: null, nombre: 'Todo' }, ...usadas];
   document.getElementById('t-cats').innerHTML = cats.length > 2 ? cats.map(c =>
     `<button class="cat${c.id === CAT_SEL ? ' on' : ''}" role="tab" aria-selected="${c.id === CAT_SEL}" onclick="elegirCategoria(${c.id ? `'${c.id}'` : 'null'})">${E(c.nombre)}</button>`).join('') : '';
@@ -976,7 +979,7 @@ function lanzarConfetiPromo(box, t){
 }
 
 function pintarProductos(){
-  const lista = CAT.productos.filter(p => !CAT_SEL || p.categoriaId === CAT_SEL);
+  const lista = CAT.productos.filter(p => !p.soloPromo && (!CAT_SEL || p.categoriaId === CAT_SEL));
   document.getElementById('t-estado').hidden = true;
   document.getElementById('t-grid').innerHTML = lista.map((p, i) => `
     <button class="prod" style="animation-delay:${Math.min(i, 11) * 60}ms" onclick="abrirProducto('${p.id}')">
