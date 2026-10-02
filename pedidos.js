@@ -514,6 +514,13 @@ const Pedidos = {
     q = q.order('fecha', { ascending: true }).order('hora_inicio', { ascending: true }).order('numero', { ascending: true }).limit(500);
     return (await this._q(q)) || [];
   },
+  // Calendario: solo lo que se dibuja (sin extras ni pagos), más liviano para el celular
+  async pedidosCalendario(desde, hasta) {
+    return (await this._q(sb.from('orders')
+      .select('id, numero, fecha, hora_inicio, hora_fin, estado, total, product_name, customer_name, recipient_name, delivery_type, zone_name, saldo_pendiente, abono_monto')
+      .eq('business_id', this.id).gte('fecha', desde).lte('fecha', hasta).neq('estado', 'CANCELADO')
+      .order('fecha', { ascending: true }).order('hora_inicio', { ascending: true }).limit(1000))) || [];
+  },
   async detallePedido(id) {
     const [pedido, historial] = await Promise.all([
       this._q(sb.from('orders').select('*, order_extras(*), order_payments(*)').eq('id', id).eq('business_id', this.id).single()),
