@@ -125,6 +125,15 @@ header{background:#fff;}
 .perfil-ben{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;background:#fff;border:1px solid var(--line);border-radius:999px;}
 .perfil-ben i{font-size:14px;color:var(--p);}
 .perfil-ben b{font:700 11px/1.2 'DM Sans',sans-serif;color:var(--ink);white-space:nowrap;}
+/* Celular: las 3 en una sola línea, con el texto corto */
+.ben-largo{display:none;}
+@media(max-width:819px){
+  .perfil-bens{flex-wrap:nowrap;gap:5px;width:100%;justify-content:center;}
+  .perfil-ben{padding:6px 9px;gap:4px;min-width:0;}
+  .perfil-ben i{font-size:13px;}
+  .perfil-ben b{font-size:10.5px;overflow:hidden;text-overflow:ellipsis;}
+}
+@media(min-width:820px){.ben-largo{display:inline;}.ben-corto{display:none;}}
 @media(min-width:820px){
   .perfil-cover{height:300px;}
   .perfil-cover.sin-foto{height:110px;}
@@ -867,13 +876,15 @@ function completarPortada(){
   const c = { retiro: true, domicilio: true, ...((CAT && CAT.config) || {}) };
   const n = Pedidos.negocio || {};
   const items = [];
-  if (c.domicilio) items.push(['ti-truck-delivery', 'Entrega a domicilio']);
-  if (c.retiro) items.push(['ti-building-store', 'Retiro en tienda']);
-  const medios = [n.yappy_numero ? 'Yappy' : null, (n.banco_nombre && n.banco_numero_cuenta) ? 'transferencia' : null].filter(Boolean);
-  if (medios.length) items.push(['ti-device-mobile', 'Paga con ' + medios.join(' o ')]);
+  // [ícono, texto completo, texto corto para el celular]
+  if (c.domicilio) items.push(['ti-truck-delivery', 'Entrega a domicilio', 'A domicilio']);
+  if (c.retiro) items.push(['ti-building-store', 'Retiro en tienda', 'Retiro en tienda']);
+  const yappy = !!n.yappy_numero, banco = !!(n.banco_nombre && n.banco_numero_cuenta);
+  if (yappy || banco) items.push(['ti-device-mobile',
+    'Paga con ' + [yappy ? 'Yappy' : null, banco ? 'transferencia' : null].filter(Boolean).join(' o '),
+    yappy && banco ? 'Yappy o transf.' : (yappy ? 'Paga con Yappy' : 'Transferencia')]);
   const bens = document.getElementById('t-beneficios');
-  bens.style.setProperty('--n', items.length);
-  bens.innerHTML = items.map(i => `<div class="perfil-ben"><i class="ti ${i[0]}"></i><b>${E(i[1])}</b></div>`).join('');
+  bens.innerHTML = items.map(i => `<div class="perfil-ben"><i class="ti ${i[0]}"></i><b><span class="ben-largo">${E(i[1])}</span><span class="ben-corto">${E(i[2])}</span></b></div>`).join('');
 
 }
 
