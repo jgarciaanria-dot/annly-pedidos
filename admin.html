@@ -611,7 +611,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
         </div>
       </div>
       <div class="sec">
-        <div class="sec-hdr"><div><h2>Logo de la tienda</h2><p>Aparece junto al nombre en tu tienda. Mejor si es cuadrado.</p></div></div>
+        <div class="sec-hdr"><div><h2>Logo de la tienda</h2><p>Es lo primero que ven tus clientes: va grande y en círculo, arriba del nombre de tu tienda.</p></div></div>
         <div class="sec-body" style="padding-top:14px;">
           <div class="foto-box">
             <div id="logo-prev"></div>
@@ -625,7 +625,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
         </div>
       </div>
       <div class="sec">
-        <div class="sec-hdr"><div><h2>Foto de portada</h2><p>La imagen grande de la entrada de tu tienda. Si no subes una, se usa la de uno de tus productos.</p></div></div>
+        <div class="sec-hdr"><div><h2>Foto de portada</h2><p>La foto de fondo detrás de tu logo. Si no subes una, se muestra una franja con el color de tu tienda.</p></div></div>
         <div class="sec-body" style="padding-top:14px;">
           <div class="portada-box">
             <div id="portada-prev" class="portada-prev"></div>
@@ -636,9 +636,9 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
             </div>
           </div>
           <div class="velo-box" id="velo-box">
-            <label class="flbl" for="d-velo">Tinte de la portada con tu color: <b id="d-velo-txt">5%</b></label>
+            <label class="flbl" for="d-velo">Tinte con tu color: <b id="d-velo-txt">5%</b></label>
             <input type="range" id="d-velo" min="0" max="80" step="5" value="5" oninput="previewVelo()" onchange="guardarVelo()">
-            <p class="ayuda">0% = la foto tal cual · 30–40% = queda de fondo en tu tono · 80% = casi solo color. Se guarda al soltar.</p>
+            <p class="ayuda" id="d-velo-ayuda"></p>
           </div>
           <p class="msg" id="portada-msg"></p>
         </div>
@@ -2224,7 +2224,9 @@ function pintarPortadaCfg(){
   const url = Pedidos.negocio.portada_url;
   const v = Number(Pedidos.negocio.portada_velo ?? 5);
   document.getElementById('d-velo').value = v;
-  document.getElementById('velo-box').style.display = url ? '' : 'none';
+  document.getElementById('d-velo-ayuda').textContent = url
+    ? '0% = la foto tal cual · 30–40% = queda de fondo en tu tono · 80% = casi solo color. Se guarda al soltar.'
+    : 'Sin foto, el tinte da más o menos color a la franja de tu portada. Se guarda al soltar.';
   document.getElementById('portada-prev').innerHTML = url ? `<img src="${E(url)}" alt="Portada"><div class="velo" id="velo-prev"></div>` : '<i class="ti ti-photo"></i>';
   previewVelo();
   document.getElementById('portada-txt').textContent = url ? 'Cambiar portada' : 'Subir portada';
