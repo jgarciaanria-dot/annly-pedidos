@@ -230,6 +230,13 @@ button,input,select,textarea{font-family:inherit;}
 .plan-incluye i{color:var(--violet);font-size:17px;flex-shrink:0;margin-top:1px;}
 .plan-aviso{display:flex;gap:10px;align-items:flex-start;background:#FFF8EA;border:1px solid #F6E2B8;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5;color:#7A5200;margin:12px 0;}
 .plan-aviso i{font-size:18px;margin-top:1px;}
+.pago-lista{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+.pago-lista div{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;font-size:13.5px;border-bottom:1px solid #F3F0F7;}
+.pago-lista div:last-child{border-bottom:0;}
+.pago-total{background:var(--lilac);font-weight:800;}
+.pago-hist{margin-top:12px;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-soft);}
+.pago-hist b{color:var(--ink);}
+.pago-hist i{color:#159A61;margin-right:5px;}
 .mod-card{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px;}
 .mod-card.on{border-color:var(--violet);box-shadow:0 0 0 3px var(--lilac);}
 .mod-ico{width:46px;height:46px;border-radius:14px;background:var(--lilac);color:var(--violet);display:grid;place-items:center;font-size:22px;flex-shrink:0;}
@@ -913,7 +920,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=15"></script>
+<script src="pedidos.js?v=16"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -1300,8 +1307,35 @@ async function cargarMiPlan(){
     </div>`;
   }).join('');
 
-  cont.innerHTML = planHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '') +
-    `<p class="ayuda" style="margin-top:14px;">Por ahora no se hace ningún cobro en línea: al activar, te contactamos para el pago.</p>`;
+  // Mensualidad: plan + módulos activos, pagada con tarjeta (PagueloFácil)
+  const activos = catalogo.filter(m => Pedidos.modulos.includes(m.code));
+  const total = p.precio + activos.reduce((t, m) => t + m.precio, 0);
+  let pagos = [];
+  try { pagos = await Pedidos.pagosDelNegocio(); } catch(e){}
+  const ultimos = pagos.filter(x => x.estado === 'confirmado').slice(0, 3);
+  const mensualidadHtml = `
+    <div class="plan-card">
+      <h2 style="font-size:20px;margin-bottom:4px;">Tu mensualidad</h2>
+      <p class="ayuda" style="margin:0 0 12px;">${enPrueba ? 'Estás en tu prueba gratis. Al pagar, tu plan y tus módulos quedan activos de inmediato.' : (p.vence ? 'Tu plan está pagado hasta el <b>' + fechaPlan(p.vence) + '</b>.' : '')}</p>
+      <div class="pago-lista">
+        <div><span>Plan ${E(p.nombre)}</span><b>$${p.precio.toFixed(2)}</b></div>
+        ${activos.map(m => `<div><span>${E(m.nombre)}</span><b>$${m.precio.toFixed(2)}</b></div>`).join('')}
+        <div class="pago-total"><span>Total del mes</span><b>$${total.toFixed(2)}</b></div>
+      </div>
+      <button class="btn btn-grad" id="btn-pagar-mes" style="margin-top:12px;" onclick="pagarMensualidad()"><i class="ti ti-lock"></i> Pagar $${total.toFixed(2)} con tarjeta</button>
+      <p class="ayuda" style="margin-top:8px;">Pago seguro con PagueloFácil (Visa, Mastercard o Tafi). Al terminar vuelves aquí y tu plan se actualiza solo.</p>
+      ${ultimos.length ? `<div class="pago-hist"><b>Últimos pagos</b>${ultimos.map(x => `<span><i class="ti ti-circle-check"></i>${E(x.concepto)} · $${Number(x.monto_pagado || x.monto).toFixed(2)}</span>`).join('')}</div>` : ''}
+    </div>`;
+
+  cont.innerHTML = planHtml + mensualidadHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '');
+}
+
+async function pagarMensualidad(){
+  const btn = document.getElementById('btn-pagar-mes');
+  const antes = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i> Preparando tu pago…';
+  try { const r = await Pedidos.crearEnlaceMensualidad(); window.location.href = r.url; }
+  catch(e){ alert('No se pudo abrir el pago: ' + (e.message || e)); btn.disabled = false; btn.innerHTML = antes; }
 }
 
 async function terminarPrueba(){
