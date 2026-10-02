@@ -844,10 +844,12 @@ function pintarNegocio(n){
   const flot = document.getElementById('t-wa-flot');
   if (wa){ flot.href = 'https://wa.me/' + wa; flot.hidden = false; }
   document.getElementById('t-footer').hidden = false;
-  // Con el pie a la vista, el botón flotante se esconde para no taparlo
+  // El botón flotante se esconde solo cuando el WhatsApp del pie ya está a la vista
+  // (antes bastaba con que asomara el borde del pie, y con pocos productos nunca se veía)
   if ('IntersectionObserver' in window){
-    new IntersectionObserver(ents => ents.forEach(en => flot.classList.toggle('oculto', en.isIntersecting)), { threshold: 0.05 })
-      .observe(document.getElementById('t-footer'));
+    const waPie = document.querySelector('#t-pie-redes .red.wa');
+    if (waPie) new IntersectionObserver(ents => ents.forEach(en => flot.classList.toggle('oculto', en.isIntersecting)), { threshold: 0.6 })
+      .observe(waPie);
   }
 }
 
