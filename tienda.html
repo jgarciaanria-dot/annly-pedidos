@@ -117,12 +117,12 @@ header{background:#fff;}
 .perfil-txt{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .perfil-rubro{font:800 11px/1.2 'DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--p);}
 .perfil-txt h1{margin:0;font-family:'Playfair Display',serif;font-size:34px;line-height:1.05;font-weight:700;color:var(--ink);}
-.perfil-lema{margin:4px 0 0;font-family:'Playfair Display',serif;font-style:italic;font-size:17px;line-height:1.35;color:var(--ink-soft);max-width:520px;}
-.perfil-bens{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:8px;width:100%;margin-top:10px;}
+.perfil-lema{margin:4px 0 0;font-family:'Playfair Display',serif;font-style:italic;font-size:15.5px;line-height:1.35;color:var(--ink-soft);max-width:520px;}
+.perfil-bens{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;}
 .promo:not([hidden]) + .cat-titulo{padding-top:6px;}
-.perfil-ben{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;background:#fff;border:1px solid var(--line);border-radius:14px;text-align:center;}
-.perfil-ben i{font-size:20px;color:var(--p);}
-.perfil-ben b{font:700 11.5px/1.25 'DM Sans',sans-serif;color:var(--ink);}
+.perfil-ben{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;background:#fff;border:1px solid var(--line);border-radius:999px;}
+.perfil-ben i{font-size:14px;color:var(--p);}
+.perfil-ben b{font:700 11px/1.2 'DM Sans',sans-serif;color:var(--ink);white-space:nowrap;}
 @media(min-width:820px){
   .perfil-cover{height:300px;}
   .perfil-cover.sin-foto{height:150px;}
@@ -756,7 +756,7 @@ footer{animation:aparecer .6s ease both;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=13"></script>
+<script src="/pedidos.js?v=14"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -865,6 +865,8 @@ function completarPortada(){
   const viejo = box.querySelector('img'); if (viejo) viejo.remove();
   box.classList.toggle('sin-foto', !n.portada_url);
   if (n.portada_url) box.insertAdjacentHTML('afterbegin', `<img src="${E(n.portada_url)}" alt="">`);
+  const velo = box.querySelector('.perfil-velo');
+  if (velo) velo.style.opacity = String(Math.min(80, Math.max(0, Number(n.portada_velo ?? 5))) / 100);
 }
 
 // Formas de entrega en el pie (cuando ya se cargó el catálogo)
