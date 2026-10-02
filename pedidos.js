@@ -166,6 +166,7 @@ const Pedidos = {
       name: (p.name || '').trim(), category_id: p.category_id || null,
       description: (p.description || '').trim() || null, photo_url: p.photo_url || null,
       price: Number(p.price), estimated_cost: Number(p.estimated_cost || 0),
+      solo_promo: !!p.solo_promo,
       precio_oferta: p.precio_oferta === '' || p.precio_oferta == null ? null : Number(p.precio_oferta),
       oferta_hasta: p.oferta_hasta || null,
       active: p.active !== false, position: p.position || 0, updated_at: new Date().toISOString()
@@ -575,6 +576,13 @@ const Pedidos = {
     const { data, error } = await sb.rpc('pedidos_ofertas', { p_business: this.id });
     if (error) { console.error('Ofertas no disponibles:', error); return {}; }
     return Object.fromEntries((data || []).map(o => [o.id, { precio: Number(o.precio_oferta), hasta: o.oferta_hasta }]));
+  },
+
+  // Productos "solo para promoción": se pueden pedir, pero no van en el catálogo
+  async soloPromo() {
+    const { data, error } = await sb.rpc('pedidos_solo_promo', { p_business: this.id });
+    if (error) { console.error('Solo promoción no disponible:', error); return new Set(); }
+    return new Set((data || []).map(r => r.id));
   },
 
   // Promoción destacada (misma tabla que Agenda: promo_banner)
