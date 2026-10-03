@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/pago", "destination": "/pago.html" },
     { "source": "/:slug([a-z0-9-]+)", "destination": "/tienda.html" }
   ]
 }
