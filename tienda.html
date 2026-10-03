@@ -76,7 +76,7 @@ header{background:#fff;}
   .beneficio{font-size:11px;gap:7px;}
   .beneficio i{width:28px;height:28px;font-size:14px;}
   .beneficio b{font-size:11.5px;}
-  .cat-titulo{padding:20px 0 0;}
+  .cat-titulo{padding:14px 0 0;}
   .cat-titulo h2{font-size:21px;}
   .cat-titulo p{font-size:12px;}
   .cats{justify-content:flex-start;}
@@ -101,6 +101,115 @@ header{background:#fff;}
 .prod-info strong{display:block;font-family:'DM Sans',sans-serif;font-size:15px;}
 .prod-info span{display:block;font-size:12.5px;color:var(--ink-soft);margin:3px 0 8px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .prod-info b{font-family:'DM Sans',sans-serif;font-size:16px;color:var(--p);}
+.prod-foto-wrap{position:relative;overflow:hidden;}
+/* ---------- Cabecera tipo perfil ---------- */
+.perfil{background:var(--bg);}
+.perfil-cover{position:relative;height:200px;overflow:hidden;background:linear-gradient(120deg,color-mix(in srgb,var(--p) 45%,#fff) 0%,var(--p) 55%,color-mix(in srgb,var(--p) 70%,#000) 100%);}
+.perfil-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.perfil-velo{position:absolute;inset:0;background:var(--p);opacity:.05;transition:none;}
+.perfil-cover.sin-foto{height:76px;background:linear-gradient(120deg,color-mix(in srgb,var(--p) 22%,#fff) 0%,color-mix(in srgb,var(--s) 16%,#fff) 100%);}
+.perfil-cover.sin-foto + .perfil-info{margin-top:-58px;}
+/* Sin foto, el logo un poco más chico y casi pegado arriba */
+.perfil-cover.sin-foto + .perfil-info .perfil-logo{width:112px;height:112px;}
+.perfil-fundido{position:absolute;left:0;right:0;bottom:0;height:55%;background:linear-gradient(180deg,transparent 0%,var(--bg) 100%);}
+.perfil-info{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;margin-top:-64px;padding-bottom:6px;}
+.perfil-logo{width:124px;height:124px;border-radius:50%;background:#fff;padding:5px;box-sizing:border-box;box-shadow:0 14px 30px -14px rgba(40,20,10,.55);flex-shrink:0;}
+.perfil-logo img,.perfil-logo span{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid var(--p);box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--p) 12%,#fff);font-family:'Playfair Display',serif;font-size:46px;font-weight:700;color:var(--p);}
+.perfil-logo img:not([hidden]) + span{display:none;}
+.perfil-txt{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.perfil-rubro{font:800 11px/1.2 'DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--p);}
+.perfil-txt h1{margin:0;font-family:'Playfair Display',serif;font-size:34px;line-height:1.05;font-weight:700;color:var(--ink);}
+.perfil-lema{margin:4px 0 0;font-family:'Playfair Display',serif;font-style:italic;font-size:15.5px;line-height:1.35;color:var(--ink-soft);max-width:520px;}
+.perfil-bens{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px;}
+.promo:not([hidden]) + .cat-titulo{padding-top:6px;}
+.perfil-ben{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;background:#fff;border:1px solid var(--line);border-radius:999px;}
+.perfil-ben i{font-size:14px;color:var(--p);}
+.perfil-ben b{font:700 11px/1.2 'DM Sans',sans-serif;color:var(--ink);white-space:nowrap;}
+/* Celular: las 3 en una sola línea, con el texto corto */
+.ben-largo{display:none;}
+@media(max-width:819px){
+  .perfil-bens{flex-wrap:nowrap;gap:5px;width:100%;justify-content:center;}
+  .perfil-ben{padding:6px 9px;gap:4px;min-width:0;}
+  .perfil-ben i{font-size:13px;}
+  .perfil-ben b{font-size:10.5px;overflow:hidden;text-overflow:ellipsis;}
+}
+@media(min-width:820px){.ben-largo{display:inline;}.ben-corto{display:none;}}
+@media(min-width:820px){
+  .perfil-cover{height:300px;}
+  .perfil-cover.sin-foto{height:110px;}
+  .perfil-cover.sin-foto + .perfil-info{margin-top:-84px;}
+  .perfil-cover.sin-foto + .perfil-info .perfil-logo{width:150px;height:150px;}
+  .perfil-info{flex-direction:row;align-items:flex-end;text-align:left;gap:28px;margin-top:-84px;}
+  .perfil-logo{width:168px;height:168px;padding:6px;}
+  .perfil-logo span{font-size:62px;}
+  .perfil-txt{align-items:flex-start;flex:1;min-width:0;padding-bottom:4px;}
+  .perfil-txt h1{font-size:50px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .perfil-lema{font-size:19px;}
+  .perfil-bens{display:flex;flex-wrap:wrap;justify-content:flex-start;width:auto;margin:10px 0 0;}
+  .perfil-ben{flex-direction:row;gap:7px;padding:8px 13px;border-radius:999px;}
+  .perfil-ben i{font-size:17px;}
+  .perfil-ben b{font-size:12.5px;}
+}
+.hoja-oferta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;font-family:'DM Sans',sans-serif;}
+.hoja-oferta s{color:#9A97A6;}
+.hoja-oferta b{color:#E1306C;font-size:18px;}
+.hoja-oferta small{color:#8A8796;font-size:12px;}
+.hablador{position:absolute;top:10px;left:10px;background:#E1306C;color:#fff;font:800 12.5px/1 'DM Sans',sans-serif;padding:7px 10px;border-radius:999px;box-shadow:0 6px 14px -6px rgba(225,48,108,.7);transform:rotate(-6deg);}
+.precio-oferta s{font-size:.78em;font-weight:500;color:#9A97A6;margin-right:4px;}
+.precio-oferta{color:#E1306C!important;}
+.promo{position:relative;display:flex;align-items:center;gap:18px;border-radius:24px;padding:22px 22px 22px 24px;margin:4px 0 18px;color:#fff;overflow:hidden;box-shadow:0 18px 40px -24px rgba(60,20,90,.6);}
+.promo[hidden]{display:none;}
+.promo-txt{flex:1;min-width:0;position:relative;z-index:1;}
+/* Entrada: el banner sube con rebote, luego entran el texto y la foto */
+.promo.entra{animation:promoEntra .8s cubic-bezier(.2,1.4,.4,1) both;}
+.promo.entra .promo-etq{animation:promoPop .5s .35s cubic-bezier(.2,1.6,.4,1) both;}
+.promo.entra h2{animation:promoSube .55s .45s ease both;}
+.promo.entra .promo-prod,.promo.entra .promo-precio,.promo.entra .promo-vig{animation:promoSube .55s .58s ease both;}
+.promo.entra .promo-cta{animation:promoSube .55s .7s ease both, promoLatido 2.4s 1.6s ease-in-out infinite;}
+.promo.entra .promo-foto{animation:promoFoto .9s .3s cubic-bezier(.2,1.3,.4,1) both;}
+.promo.entra .promo-precio span{animation:promoPop .5s 1s cubic-bezier(.2,1.6,.4,1) both;}
+@keyframes promoEntra{from{opacity:0;transform:translateY(26px) scale(.96);}to{opacity:1;transform:none;}}
+@keyframes promoSube{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+@keyframes promoPop{from{opacity:0;transform:scale(.4);}to{opacity:1;transform:scale(1);}}
+@keyframes promoFoto{from{opacity:0;transform:rotate(14deg) scale(.7);}to{opacity:1;transform:rotate(3deg) scale(1);}}
+@keyframes promoLatido{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+/* Brillo que cruza el banner una vez */
+.promo-brillo{position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.35) 50%,transparent 65%);transform:translateX(-110%);}
+.promo.entra .promo-brillo{animation:promoBrillo 1.3s 1.1s ease-out both;}
+@keyframes promoBrillo{to{transform:translateX(110%);}}
+/* Confeti */
+.promo-etq{cursor:pointer;}
+.promo-confeti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2;}
+.promo-confeti i{position:absolute;top:-16px;font-style:normal;line-height:1;opacity:0;animation-name:promoCae;animation-timing-function:cubic-bezier(.3,.6,.5,1);animation-fill-mode:forwards;}
+@keyframes promoCae{0%{opacity:0;transform:translate(0,0) rotate(0);}10%{opacity:1;}100%{opacity:0;transform:translate(var(--dx),260px) rotate(var(--rot));}}
+@media(max-width:560px){.promo.entra .promo-foto{animation-name:promoFotoM;}}
+@keyframes promoFotoM{from{opacity:0;transform:scale(.7) rotate(8deg);}to{opacity:1;transform:rotate(3deg);}}
+@media(prefers-reduced-motion:reduce){.promo.entra,.promo.entra *{animation:none!important;}}
+.promo-etq{display:inline-block;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 11px;font:800 11px/1 'DM Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;}
+.promo h2{font-family:'Playfair Display',serif;font-size:26px;line-height:1.15;margin:10px 0 6px;}
+.promo-prod{font-size:14px;opacity:.92;}
+.promo-precio{margin:6px 0 2px;font-family:'DM Sans',sans-serif;}
+.promo-precio s{opacity:.75;margin-right:4px;}
+.promo-precio b{font-size:24px;}
+.promo-precio span{display:inline-block;background:#fff;color:#E1306C;border-radius:999px;padding:3px 8px;font-size:12px;font-weight:800;margin-left:6px;vertical-align:4px;}
+.promo-vig{font-size:12px;opacity:.85;}
+.promo-cta{margin-top:12px;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;background:#fff;color:#2B2838;font:800 13.5px/1 'DM Sans',sans-serif;padding:11px 18px;cursor:pointer;}
+.promo-foto{width:150px;height:150px;border-radius:20px;object-fit:cover;flex-shrink:0;box-shadow:0 12px 26px -12px rgba(0,0,0,.45);transform:rotate(3deg);position:relative;z-index:1;}
+.promo-emoji{display:grid;place-items:center;font-size:64px;background:rgba(255,255,255,.2);}
+@media(max-width:560px){
+  .promo{flex-direction:row;align-items:center;gap:12px;padding:14px 14px 14px 16px;border-radius:20px;margin:2px 0 14px;}
+  .promo-etq{font-size:9.5px;padding:4px 8px;}
+  .promo h2{font-size:17px;margin:7px 0 2px;}
+  .promo-prod{font-size:12.5px;}
+  .promo-precio{margin:3px 0 0;}
+  .promo-precio b{font-size:18px;}
+  .promo-precio s{font-size:12px;}
+  .promo-precio span{font-size:10.5px;padding:2px 6px;}
+  .promo-vig{font-size:11px;}
+  .promo-cta{margin-top:8px;padding:8px 13px;font-size:12px;}
+  .promo-foto{width:96px;height:96px;border-radius:16px;align-self:center;}
+  .promo-emoji{font-size:40px;}
+}
 
 .estado{text-align:center;padding:70px 20px;color:var(--ink-soft);font-size:14px;line-height:1.6;}
 .estado h2{font-family:'DM Sans',sans-serif;color:var(--ink);font-size:18px;margin-bottom:6px;}
@@ -589,34 +698,25 @@ footer{animation:aparecer .6s ease both;}
 </head>
 <body>
 
-<header>
-  <div class="barra-top">
-    <div class="wrap">
-      <a class="marca" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
-        <img id="t-logo" alt="" hidden>
-        <strong id="t-nombre">Cargando…</strong>
-      </a>
-      <a class="btn-wa-top" id="t-wa-top" href="#" target="_blank" rel="noopener" hidden><i class="ti ti-brand-whatsapp"></i><span>Pedidos por WhatsApp</span></a>
+<header class="perfil" id="t-portada" hidden>
+  <!-- Portada: foto de la tienda apenas teñida (5%) y fundida con el fondo; el logo y el nombre son los protagonistas -->
+  <div class="perfil-cover" id="t-portada-foto">
+    <div class="perfil-velo" aria-hidden="true"></div>
+    <div class="perfil-fundido" aria-hidden="true"></div>
+  </div>
+  <div class="wrap perfil-info">
+    <div class="perfil-logo"><img id="t-logo" alt="" hidden><span id="t-logo-ini" aria-hidden="true"></span></div>
+    <div class="perfil-txt">
+      <div class="perfil-rubro" id="t-eyebrow"></div>
+      <h1 id="t-nombre">Cargando…</h1>
+      <p class="perfil-lema" id="t-titulo" hidden></p>
+      <div class="perfil-bens" id="t-beneficios"></div>
     </div>
   </div>
-  <section class="portada" id="t-portada" hidden>
-    <div class="wrap">
-      <div>
-        <div class="portada-eyebrow" id="t-eyebrow"></div>
-        <h1 id="t-titulo"></h1>
-        <p class="portada-sub" id="t-sub"></p>
-        <div class="portada-cta">
-          <a class="cta principal" href="#catalogo" onclick="document.getElementById('catalogo').scrollIntoView({behavior:'smooth'});return false;"><i class="ti ti-shopping-bag"></i> Ver catálogo</a>
-          <a class="cta secundario" id="t-cta-wa" href="#" target="_blank" rel="noopener" hidden><i class="ti ti-brand-whatsapp"></i> Escríbenos</a>
-        </div>
-        <div class="beneficios" id="t-beneficios"></div>
-      </div>
-      <div class="portada-foto" id="t-portada-foto" hidden></div>
-    </div>
-  </section>
 </header>
 
 <main class="wrap">
+  <div class="promo" id="t-promo" hidden></div>
   <div class="cat-titulo" id="catalogo">
     <h2>Nuestro catálogo</h2>
     <p>Elige tu favorito y hazlo especial con un extra</p>
@@ -668,7 +768,7 @@ footer{animation:aparecer .6s ease both;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=10"></script>
+<script src="/pedidos.js?v=16"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -695,10 +795,24 @@ async function arrancar(){
     return;
   }
   pintarNegocio(n);
-  try { CAT = await Pedidos.catalogo(); }
+  // Catálogo, ofertas y promoción se piden a la vez (antes iban uno tras otro)
+  let of = {}, promo = null, soloPromo = new Set();
+  try {
+    [CAT, of, promo, soloPromo] = await Promise.all([
+      Pedidos.catalogo(),
+      Pedidos.ofertas().catch(e => { console.error(e); return {}; }),
+      Pedidos.promo().catch(() => null),
+      Pedidos.soloPromo().catch(() => new Set())
+    ]);
+  }
   catch(e){ console.error(e); estado('No pudimos cargar el catálogo', 'Recarga la página en un momento.'); return; }
   if (!CAT.productos.length){ estado('Catálogo en preparación', 'Pronto podrás hacer tus pedidos aquí.'); return; }
+  // Ofertas vigentes: el precio de oferta pasa a ser el precio (el servidor cobra lo mismo)
+  // Productos "solo para promoción": se pueden pedir, pero no se listan en el catálogo
+  CAT.productos.forEach(p => { p.soloPromo = soloPromo.has(p.id); });
+  CAT.productos.forEach(p => { const o = of[p.id]; if (o && o.precio > 0 && o.precio < Number(p.precio)) { p.precioNormal = Number(p.precio); p.precio = o.precio; p.ofertaHasta = o.hasta; } });
   pintarEntregasPie();
+  pintarPromoTienda(promo);
   completarPortada();
   pintarCategorias();
   pintarProductos();
@@ -711,6 +825,7 @@ function pintarNegocio(n){
   if (n.color_secundario) r.setProperty('--s', n.color_secundario);
   document.getElementById('t-nombre').textContent = n.nombre;
   if (n.logo_url){ const l = document.getElementById('t-logo'); l.src = n.logo_url; l.alt = n.nombre; l.hidden = false; }
+  else document.getElementById('t-logo-ini').textContent = String(n.nombre || '?').trim().charAt(0).toUpperCase();
   pintarPortada(n);
   const wa = String(n.whatsapp || '').replace(/\D/g, '');
   const ig = String(n.instagram || '').replace(/^@+/, '');
@@ -732,61 +847,50 @@ function pintarNegocio(n){
   const flot = document.getElementById('t-wa-flot');
   if (wa){ flot.href = 'https://wa.me/' + wa; flot.hidden = false; }
   document.getElementById('t-footer').hidden = false;
-  // Con el pie a la vista, el botón flotante se esconde para no taparlo
+  // El botón flotante se esconde solo cuando el WhatsApp del pie ya está a la vista
+  // (antes bastaba con que asomara el borde del pie, y con pocos productos nunca se veía)
   if ('IntersectionObserver' in window){
-    new IntersectionObserver(ents => ents.forEach(en => flot.classList.toggle('oculto', en.isIntersecting)), { threshold: 0.05 })
-      .observe(document.getElementById('t-footer'));
+    const waPie = document.querySelector('#t-pie-redes .red.wa');
+    if (waPie) new IntersectionObserver(ents => ents.forEach(en => flot.classList.toggle('oculto', en.isIntersecting)), { threshold: 0.6 })
+      .observe(waPie);
   }
 }
 
-// ---------- Portada: se arma con los datos de cada negocio ----------
+// ---------- Portada tipo perfil: logo, nombre, rubro y lema de cada negocio ----------
 function pintarPortada(n){
-  const wa = String(n.whatsapp || '').replace(/\D/g, '');
-  // Título: la frase del negocio (sin comillas); la segunda mitad va resaltada con su color
-  const frase = String(n.tagline || '').replace(/^[«"“'\s]+|[»"”'\s]+$/g, '').trim();
-  const titulo = frase || 'Haz tu pedido en línea';
-  // (sin "lookbehind" en la expresión: Safari viejo no lo soporta y rompería la página)
-  const m = titulo.match(/^(.+?[.!?])\s+(.+)$/);
-  let html;
-  if (m) html = `${E(m[1])} <em>${E(m[2])}</em>`;
-  else {
-    const palabras = titulo.split(' ');
-    const corte = Math.ceil(palabras.length / 2);
-    html = palabras.length > 3 ? `${E(palabras.slice(0, corte).join(' '))} <em>${E(palabras.slice(corte).join(' '))}</em>` : `<em>${E(titulo)}</em>`;
-  }
-  document.getElementById('t-titulo').innerHTML = html;
   document.getElementById('t-eyebrow').textContent = n.categoria || 'Pedidos en línea';
-  const medios = [n.yappy_numero ? 'Yappy' : null, (n.banco_nombre && n.banco_numero_cuenta) ? 'transferencia' : null].filter(Boolean);
-  document.getElementById('t-sub').textContent = 'Elige, personaliza y agenda tu entrega en pocos pasos.' +
-    (medios.length ? ' Pagas con ' + medios.join(' o ') + ' y te confirmamos por WhatsApp.' : ' Te confirmamos por WhatsApp.');
-  if (wa){
-    const top = document.getElementById('t-wa-top'); top.href = 'https://wa.me/' + wa; top.hidden = false;
-    const cta = document.getElementById('t-cta-wa'); cta.href = 'https://wa.me/' + wa; cta.hidden = false;
-  }
+  const frase = String(n.tagline || '').replace(/^[«"“'\s]+|[»"”'\s]+$/g, '').trim();
+  const lema = document.getElementById('t-titulo');
+  lema.textContent = frase ? '«' + frase + '»' : '';
+  lema.hidden = !frase;
+  armarCoverPortada(n);
   document.getElementById('t-portada').hidden = false;
 }
-// Beneficios y foto de portada, cuando ya se cargó el catálogo
+// Foto de portada (solo la que eligió el negocio) o, sin foto, la franja suave; y su tinte.
+// Se arma antes de mostrar la cabecera, así no hay un salto de un tono a otro al cargar.
+function armarCoverPortada(n){
+  const box = document.getElementById('t-portada-foto');
+  const viejo = box.querySelector('img'); if (viejo) viejo.remove();
+  box.classList.toggle('sin-foto', !n.portada_url);
+  if (n.portada_url) box.insertAdjacentHTML('afterbegin', `<img src="${E(n.portada_url)}" alt="">`);
+  const velo = box.querySelector('.perfil-velo');
+  if (velo) velo.style.opacity = String(Math.min(80, Math.max(0, Number(n.portada_velo ?? 5))) / 100);
+}
+// Datos de la tienda y foto de portada, cuando ya se cargó el catálogo
 function completarPortada(){
   const c = { retiro: true, domicilio: true, ...((CAT && CAT.config) || {}) };
   const n = Pedidos.negocio || {};
   const items = [];
-  if (c.domicilio) items.push(['ti-truck-delivery', 'Entrega a domicilio', 'Eliges día y horario']);
-  if (c.retiro) items.push(['ti-building-store', 'Retiro en tienda', 'Pasa por tu pedido']);
-  items.push(['ti-sparkles', 'Personalízalo', 'Agrega extras y dedicatoria']);
-  document.getElementById('t-beneficios').innerHTML = items.map(i => `<div class="beneficio"><i class="ti ${i[0]}"></i><div><b>${i[1]}</b>${i[2]}</div></div>`).join('');
-  // Foto de portada: la que eligió el negocio; si no hay, la del primer producto con foto
-  const box = document.getElementById('t-portada-foto');
-  if (n.portada_url){
-    box.innerHTML = `<img src="${E(n.portada_url)}" alt="${E(n.nombre || '')}">`;
-    box.classList.add('propia');
-    box.hidden = false;
-    return;
-  }
-  const conFoto = (CAT.productos || []).find(p => p.foto);
-  if (conFoto){
-    box.innerHTML = `<img src="${E(conFoto.foto)}" alt="${E(conFoto.nombre)}"><div class="sello"><b>${E(conFoto.nombre)}</b>${Pedidos.dinero(conFoto.precio)}</div>`;
-    box.hidden = false;
-  }
+  // [ícono, texto completo, texto corto para el celular]
+  if (c.domicilio) items.push(['ti-truck-delivery', 'Entrega a domicilio', 'A domicilio']);
+  if (c.retiro) items.push(['ti-building-store', 'Retiro en tienda', 'Retiro en tienda']);
+  const yappy = !!n.yappy_numero, banco = !!(n.banco_nombre && n.banco_numero_cuenta);
+  if (yappy || banco) items.push(['ti-device-mobile',
+    'Paga con ' + [yappy ? 'Yappy' : null, banco ? 'transferencia' : null].filter(Boolean).join(' o '),
+    yappy && banco ? 'Yappy o transf.' : (yappy ? 'Paga con Yappy' : 'Transferencia')]);
+  const bens = document.getElementById('t-beneficios');
+  bens.innerHTML = items.map(i => `<div class="perfil-ben"><i class="ti ${i[0]}"></i><b><span class="ben-largo">${E(i[1])}</span><span class="ben-corto">${E(i[2])}</span></b></div>`).join('');
+
 }
 
 // Formas de entrega en el pie (cuando ya se cargó el catálogo)
@@ -800,7 +904,7 @@ function pintarEntregasPie(){
 
 
 function pintarCategorias(){
-  const usadas = CAT.categorias.filter(c => CAT.productos.some(p => p.categoriaId === c.id));
+  const usadas = CAT.categorias.filter(c => CAT.productos.some(p => p.categoriaId === c.id && !p.soloPromo));
   const cats = [{ id: null, nombre: 'Todo' }, ...usadas];
   document.getElementById('t-cats').innerHTML = cats.length > 2 ? cats.map(c =>
     `<button class="cat${c.id === CAT_SEL ? ' on' : ''}" role="tab" aria-selected="${c.id === CAT_SEL}" onclick="elegirCategoria(${c.id ? `'${c.id}'` : 'null'})">${E(c.nombre)}</button>`).join('') : '';
@@ -811,13 +915,76 @@ function fotoHtml(p, clase){
   return p.foto ? `<img class="${clase}" src="${E(p.foto)}" alt="${E(p.nombre)}" loading="lazy">` : `<div class="${clase}"><i class="ti ti-flower"></i></div>`;
 }
 
+// Precio con oferta: normal tachado + precio de oferta
+const descuento = p => Math.round((1 - p.precio / p.precioNormal) * 100);
+function precioHtml(p){
+  return p.precioNormal
+    ? `<b class="precio-oferta"><s>${Pedidos.dinero(p.precioNormal)}</s> ${Pedidos.dinero(p.precio)}</b>`
+    : `<b>${Pedidos.dinero(p.precio)}</b>`;
+}
+
+// ---- Promoción destacada (banner al inicio del catálogo) ----
+const TEMAS_P = {
+  fiesta:  { emoji: '🎉', fondo: 'linear-gradient(135deg,#A89BD9,#7A6AB5)', conf: ['#FFD166','#FF6B9A','#7BDFF2','#FFFFFF','#B8F2A0'], formas: ['■','●','▲'] },
+  corazon: { emoji: '💝', fondo: 'linear-gradient(135deg,#F0A8B8,#D67D95)', conf: ['#FFFFFF','#FFD1DC','#E1306C','#FF8FAB'], formas: ['❤','●','❤'] },
+  regalo:  { emoji: '🎁', fondo: 'linear-gradient(135deg,#E9B872,#C98B3C)', conf: ['#FFFFFF','#FFE29A','#E1306C','#8E5BD9'], formas: ['■','●','★'] },
+  flores:  { emoji: '🌸', fondo: 'linear-gradient(135deg,#F2A7C3,#B0679E)', conf: ['#FFFFFF','#FFD1E8','#FFE29A','#C8F0D2'], formas: ['✿','●','❀'] }
+};
+function pintarPromoTienda(pr){
+  const box = document.getElementById('t-promo');
+  if (!box) return;
+  const prod = pr && pr.activa && pr.producto_id ? CAT.productos.find(p => p.id === pr.producto_id) : null;
+  if (!prod){ box.hidden = true; box.innerHTML = ''; return; }
+  const t = TEMAS_P[pr.tema] || TEMAS_P.fiesta;
+  box.style.background = t.fondo;
+  box.innerHTML = `
+    <div class="promo-txt">
+      <span class="promo-etq">${t.emoji} ${E(pr.etiqueta || 'PROMOCIÓN')}</span>
+      <h2>${E(pr.festejo || '¡Oferta especial!')}</h2>
+      <p class="promo-prod">${E(prod.nombre)}</p>
+      <p class="promo-precio">${prod.precioNormal ? `<s>${Pedidos.dinero(prod.precioNormal)}</s> ` : ''}<b>${Pedidos.dinero(prod.precio)}</b>${prod.precioNormal ? ` <span>-${descuento(prod)}%</span>` : ''}</p>
+      ${pr.vigencia ? `<p class="promo-vig">${E(pr.vigencia)}</p>` : ''}
+      <button class="promo-cta" onclick="abrirProducto('${prod.id}')">Lo quiero <i class="ti ti-arrow-right"></i></button>
+    </div>
+    ${prod.foto ? `<img class="promo-foto" src="${E(prod.foto)}" alt="${E(prod.nombre)}">` : `<div class="promo-foto promo-emoji">${t.emoji}</div>`}
+    <div class="promo-brillo" aria-hidden="true"></div>
+    <div class="promo-confeti" aria-hidden="true"></div>`;
+  box.hidden = false;
+  box.classList.remove('entra'); void box.offsetWidth; box.classList.add('entra');
+  lanzarConfetiPromo(box, t);
+  // Al tocar la etiqueta, otra lluvia de confeti
+  box.querySelector('.promo-etq').onclick = () => lanzarConfetiPromo(box, t);
+}
+
+// Confeti que cae dentro del banner (respeta "reducir movimiento" del teléfono)
+function lanzarConfetiPromo(box, t){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const capa = box.querySelector('.promo-confeti');
+  if (!capa) return;
+  capa.innerHTML = '';
+  const n = window.innerWidth < 560 ? 34 : 54;
+  for (let i = 0; i < n; i++){
+    const c = document.createElement('i');
+    c.textContent = t.formas[i % t.formas.length];
+    c.style.left = (Math.random() * 100) + '%';
+    c.style.color = t.conf[i % t.conf.length];
+    c.style.fontSize = (9 + Math.random() * 10) + 'px';
+    c.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+    c.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    c.style.animationDuration = (1.8 + Math.random() * 1.8) + 's';
+    c.style.animationDelay = (0.25 + Math.random() * 0.9) + 's';
+    capa.appendChild(c);
+  }
+  setTimeout(() => { capa.innerHTML = ''; }, 4600);
+}
+
 function pintarProductos(){
-  const lista = CAT.productos.filter(p => !CAT_SEL || p.categoriaId === CAT_SEL);
+  const lista = CAT.productos.filter(p => !p.soloPromo && (!CAT_SEL || p.categoriaId === CAT_SEL));
   document.getElementById('t-estado').hidden = true;
   document.getElementById('t-grid').innerHTML = lista.map((p, i) => `
     <button class="prod" style="animation-delay:${Math.min(i, 11) * 60}ms" onclick="abrirProducto('${p.id}')">
-      ${fotoHtml(p, 'prod-foto')}
-      <div class="prod-info"><strong>${E(p.nombre)}</strong>${p.descripcion ? `<span>${E(p.descripcion)}</span>` : ''}<b>${Pedidos.dinero(p.precio)}</b></div>
+      <div class="prod-foto-wrap">${fotoHtml(p, 'prod-foto')}${p.precioNormal ? `<span class="hablador">-${descuento(p)}%</span>` : ''}</div>
+      <div class="prod-info"><strong>${E(p.nombre)}</strong>${p.descripcion ? `<span>${E(p.descripcion)}</span>` : ''}${precioHtml(p)}</div>
     </button>`).join('');
 }
 
@@ -877,6 +1044,7 @@ function paso1(){
   const p = PED.prod;
   return `<div class="hoja-top"><h3>${E(p.nombre)}</h3><button class="cerrar" onclick="cerrarProducto()" aria-label="Cerrar">×</button></div>
     ${p.descripcion ? `<p class="hoja-desc">${E(p.descripcion)}</p>` : ''}
+    ${p.precioNormal ? `<div class="hoja-oferta"><span class="hablador" style="position:static;transform:none;">-${descuento(p)}%</span> <s>${Pedidos.dinero(p.precioNormal)}</s> <b>${Pedidos.dinero(p.precio)}</b>${p.ofertaHasta ? ` <small>hasta el ${fechaLarga(p.ofertaHasta)}</small>` : ''}</div>` : ''}
     ${p.extras.length ? '<div class="sub">Agrégale algo especial</div>' + p.extras.map(x => `
       <label class="extra"><input type="checkbox" ${PED.extras.has(x.id) ? 'checked' : ''} onchange="toggleExtra('${x.id}', this.checked)"><span>${E(x.nombre)}</span><b>+${Pedidos.dinero(x.precio)}</b></label>`).join('') : ''}
     <div class="total"><span>Total</span><b id="p-total">${Pedidos.dinero(montos().total)}</b></div>

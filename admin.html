@@ -194,8 +194,12 @@ button,input,select,textarea{font-family:inherit;}
 .btn-del{background:none;border:none;color:var(--err);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:12px;width:100%;}
 
 .portada-box{display:flex;align-items:center;gap:14px;}
-.portada-prev{width:96px;aspect-ratio:4/5;border-radius:60px 60px 14px 14px;overflow:hidden;background:var(--lilac);display:grid;place-items:center;color:var(--violet);font-size:26px;flex-shrink:0;border:1px solid var(--line);}
+.portada-prev{width:170px;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:var(--lilac);display:grid;place-items:center;color:var(--violet);font-size:26px;flex-shrink:0;border:1px solid var(--line);}
 .portada-prev img{width:100%;height:100%;object-fit:cover;}
+.portada-prev{position:relative;}
+.portada-prev .velo{position:absolute;inset:0;pointer-events:none;}
+.velo-box{margin-top:14px;max-width:380px;}
+.velo-box input[type=range]{width:100%;accent-color:var(--violet);}
 .paletas{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:6px;}
 .paleta{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:border-color .15s,box-shadow .15s;}
 .paleta:hover{border-color:#DCCFF1;}
@@ -204,6 +208,16 @@ button,input,select,textarea{font-family:inherit;}
 .paleta span{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.25;}
 .paleta.on span::after{content:" ✓";color:var(--violet);}
 .tab-lock{margin-left:auto;font-size:14px;color:var(--ink-soft);}
+.oferta-box{background:#FFF6F9;border:1px dashed #F3B7CC;border-radius:14px;padding:12px 12px 10px;margin:0 0 14px;}
+.chip.oferta{background:#FDE7EF;color:#C2185B;}
+.chip.promo{background:#EFE8FC;color:#6D28D9;}
+.switch-lbl{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;cursor:pointer;}
+.switch-lbl input{width:18px;height:18px;accent-color:var(--violet);}
+.temas-promo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+.tema-op{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:12px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:700 12px/1.2 inherit;}
+.tema-op span{font-size:22px;}
+.tema-op.on{border-color:var(--violet);box-shadow:0 0 0 3px var(--lilac);}
+@media(max-width:640px){.temas-promo{grid-template-columns:repeat(2,minmax(0,1fr));}}
 .plan-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:700;background:var(--lilac);color:var(--violet);margin-left:8px;vertical-align:middle;}
 .plan-chip.prueba{background:#FFF4DE;color:#9A6200;}
 .plan-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:14px;}
@@ -216,6 +230,13 @@ button,input,select,textarea{font-family:inherit;}
 .plan-incluye i{color:var(--violet);font-size:17px;flex-shrink:0;margin-top:1px;}
 .plan-aviso{display:flex;gap:10px;align-items:flex-start;background:#FFF8EA;border:1px solid #F6E2B8;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5;color:#7A5200;margin:12px 0;}
 .plan-aviso i{font-size:18px;margin-top:1px;}
+.pago-lista{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+.pago-lista div{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;font-size:13.5px;border-bottom:1px solid #F3F0F7;}
+.pago-lista div:last-child{border-bottom:0;}
+.pago-total{background:var(--lilac);font-weight:800;}
+.pago-hist{margin-top:12px;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-soft);}
+.pago-hist b{color:var(--ink);}
+.pago-hist i{color:#159A61;margin-right:5px;}
 .mod-card{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px;}
 .mod-card.on{border-color:var(--violet);box-shadow:0 0 0 3px var(--lilac);}
 .mod-ico{width:46px;height:46px;border-radius:14px;background:var(--lilac);color:var(--violet);display:grid;place-items:center;font-size:22px;flex-shrink:0;}
@@ -266,6 +287,88 @@ button,input,select,textarea{font-family:inherit;}
 .vitrina ul{list-style:none;display:grid;gap:8px;max-width:420px;margin:16px auto;text-align:left;}
 .vitrina li{display:flex;gap:9px;font-size:13.5px;}
 .vitrina li i{color:var(--violet);font-size:17px;}
+.cmp-slot{display:inline-flex;}
+.aviso-pago{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:12px 14px 12px 16px;border-radius:16px;background:#FFF8EA;border:1px solid #F6E2B8;color:#7A5200;flex-wrap:wrap;}
+.aviso-pago[hidden]{display:none;}
+.aviso-pago > i{font-size:22px;}
+.aviso-pago > div{flex:1;min-width:180px;display:flex;flex-direction:column;gap:2px;}
+.aviso-pago b{font-size:14px;}
+.aviso-pago span{font-size:12.5px;opacity:.9;}
+.aviso-pago.vencido{background:#FDF1F0;border-color:#F5D3CF;color:#9B2C3B;}
+.aviso-x{border:0;background:none;font-size:22px;line-height:1;color:inherit;opacity:.6;cursor:pointer;padding:0 4px;}
+@media(max-width:640px){.aviso-pago .btn{flex:1 1 100%;}}
+.cal-modo-bar{display:flex;justify-content:flex-end;margin-bottom:10px;}
+.cal-seg{display:inline-flex;gap:3px;background:#F1EDF8;border-radius:12px;padding:3px;}
+.cal-seg button{border:0;background:transparent;border-radius:9px;padding:7px 12px;font:700 12px/1 inherit;color:var(--ink-soft);cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+.cal-seg button.on{background:#fff;color:var(--violet);box-shadow:0 2px 6px -2px rgba(60,30,110,.25);}
+.cal-barra{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.cal-nav{display:flex;align-items:center;gap:6px;}
+.cal-btn{height:34px;padding:0 13px;border-radius:10px;border:1px solid var(--line);background:#fff;font:700 12.5px/1 inherit;cursor:pointer;color:var(--ink);}
+.cal-btn.ico{width:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:16px;}
+.cal-titulo{font-size:17px;font-weight:800;margin-left:6px;}
+.cal-leyenda{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--ink-soft);margin-bottom:10px;align-items:center;}
+.cal-leyenda span{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:-6px;}
+.cal-leyenda .pend{background:#FFF4DE;border:1px solid #F1C873;}
+.cal-leyenda .conf{background:#F4EFFD;border:1px solid #C9B6EE;}
+.cal-leyenda .prep{background:#EAF2FE;border:1px solid #9DBEF0;}
+.cal-leyenda .listo{background:#E6F6EE;border:1px solid #A6DBBE;}
+.cal-leyenda .hecho{background:#F1F0F4;border:1px solid #D6D3DE;}
+.cal-scroll{max-height:72vh;overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff;}
+.cal-grid{display:grid;grid-template-columns:62px repeat(var(--cols),minmax(170px,1fr));position:relative;}
+.cal-grid.semana{grid-template-columns:62px repeat(7,minmax(124px,1fr));}
+.cal-esq,.cal-col-hdr{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);}
+.cal-esq{left:0;z-index:6;}
+.cal-col-hdr{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 6px;border-left:1px solid #F1EEF6;font-family:inherit;}
+button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
+.cal-ini{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--lilac);color:var(--violet);font-size:16px;}
+.cal-col-hdr b{font-size:12.5px;white-space:nowrap;}
+.cal-col-hdr small{font-size:10.5px;color:var(--ink-soft);}
+.cal-col-hdr.dia b{font-size:18px;}
+.cal-col-hdr.hoy b{color:#fff;background:var(--violet);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+.cal-regla{grid-column:1;position:sticky;left:0;z-index:4;background:#fff;}
+.cal-hora{position:relative;}
+.cal-hora span{position:absolute;top:-7px;right:8px;font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
+.cal-hora:first-child span{top:2px;}
+.cal-col{position:relative;border-left:1px solid #F1EEF6;}
+.cal-linea{border-top:1px solid #F3F0F8;box-sizing:border-box;}
+.cal-cita{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:5px 7px;border-radius:9px;border:1px solid #C9B6EE;border-left:4px solid var(--violet);background:#F4EFFD;text-align:left;overflow:hidden;cursor:pointer;font-family:inherit;transition:box-shadow .15s,transform .15s;}
+.cal-cita:hover{box-shadow:0 8px 18px -10px rgba(60,30,110,.5);transform:translateY(-1px);z-index:3;}
+.cal-cita b{font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.cal-cita span{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.cal-cita .cal-tag{font-size:10px;font-weight:800;color:#9A6200;}
+.cal-cita.pend{background:#FFF8EA;border-color:#F1C873;border-left-color:#E0A21B;}
+.cal-cita.prep{background:#EEF4FE;border-color:#9DBEF0;border-left-color:#3B82F6;}
+.cal-cita.listo{background:#EEF8F2;border-color:#A6DBBE;border-left-color:#159A61;}
+.cal-cita.hecho{background:#F6F5F8;border-color:#DEDBE5;border-left-color:#A19DAE;opacity:.8;}
+.cal-ahora{position:absolute;left:0;right:0;height:2px;background:var(--pink);z-index:4;pointer-events:none;}
+.cal-ahora::before{content:"";position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--pink);}
+.cal-mes{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;}
+.cal-mes-hdr{display:grid;grid-template-columns:repeat(7,1fr);background:#FAF8FC;border-bottom:1px solid var(--line);}
+.cal-mes-hdr span{padding:8px;font-size:11px;font-weight:700;color:var(--ink-soft);text-align:center;}
+.cal-mes-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-dia{min-height:100px;border:0;border-right:1px solid #F1EEF6;border-bottom:1px solid #F1EEF6;background:#fff;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px;cursor:pointer;font-family:inherit;text-align:left;}
+.cal-dia:hover{background:#FAF7FE;}
+.cal-dia.fuera{background:#FCFBFD;}
+.cal-dia.fuera .cal-num{color:#C9C6D2;}
+.cal-num{font-size:13px;font-weight:800;}
+.cal-dia.hoy .cal-num{background:var(--violet);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.cal-cnt{font-size:10.5px;font-weight:700;color:var(--violet);}
+.cal-cnt em{font-style:normal;color:#B7791F;}
+.cal-venta{font-size:10.5px;font-weight:700;color:#159A61;}
+.cal-mini{font-size:10.5px;padding:1px 5px;border-radius:5px;background:#F4EFFD;color:#4C3A75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.cal-mini.pend{background:#FFF4DE;color:#7A5200;}
+.cal-mini.prep{background:#EAF2FE;color:#1E4FA0;}
+.cal-mini.listo,.cal-mini.hecho{background:#E6F6EE;color:#1D7A46;}
+.cal-mas{font-size:10px;color:var(--ink-soft);}
+@media(max-width:760px){
+  .cal-titulo{font-size:15px;width:100%;margin:6px 0 0;}
+  .cal-nav{flex-wrap:wrap;}
+  .cal-grid{grid-template-columns:48px repeat(var(--cols),minmax(150px,1fr));}
+  .cal-grid.semana{grid-template-columns:48px repeat(7,minmax(112px,1fr));}
+  .cal-dia{min-height:62px;padding:4px;}
+  .cal-mini,.cal-mas,.cal-venta{display:none;}
+  .cal-cnt{font-size:9.5px;}
+}
 .topm,.side-fondo,.side-cerrar{display:none;}
 @media(max-width:860px){
   /* Nada puede ensanchar la página: lo que no cabe se desliza dentro de su propia fila */
@@ -300,6 +403,7 @@ button,input,select,textarea{font-family:inherit;}
   .hdr-actions{width:100%;}
   .sel-negocio{flex:1 1 100%;}
   #btn-ver-tienda{display:none;}
+  .cmp-slot-pc{display:none;}
   /* Filtros de pedidos en una fila deslizable */
   #f-periodo,#f-estado{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
   #f-periodo::-webkit-scrollbar,#f-estado::-webkit-scrollbar{display:none;}
@@ -392,6 +496,7 @@ button,input,select,textarea{font-family:inherit;}
   <header class="topm">
     <button class="topm-btn" onclick="menuMovil(true)" aria-label="Abrir menú"><i class="ti ti-menu-2"></i></button>
     <div class="topm-tit"><span class="topm-logo">Annly<span>.</span></span><span id="topm-seccion">Inicio</span></div>
+    <span class="cmp-slot" id="cmp-slot-m"></span>
     <a class="topm-btn" id="topm-ver" href="#" target="_blank" rel="noopener" aria-label="Ver mi tienda"><i class="ti ti-external-link"></i></a>
   </header>
   <div class="side-fondo" onclick="menuMovil(false)"></div>
@@ -411,12 +516,14 @@ button,input,select,textarea{font-family:inherit;}
   </nav>
 
   <main class="main">
+    <div id="aviso-pago" class="aviso-pago" hidden></div>
     <div class="hdr">
       <div>
         <h1 id="hdr-nombre">Tu tienda</h1>
         <p id="hdr-sub"></p>
       </div>
       <div class="hdr-actions">
+        <span class="cmp-slot cmp-slot-pc" id="cmp-slot"></span>
         <select class="sel-negocio" id="sel-negocio" style="display:none;" onchange="cambiarNegocio(this.value)" aria-label="Negocio"></select>
         <a class="chip-btn" id="btn-ver-tienda" href="#" target="_blank" rel="noopener"><i class="ti ti-external-link"></i> Ver mi tienda</a>
         <button class="chip-btn" onclick="copiarLink(this)"><i class="ti ti-link"></i> <span>Copiar link</span></button>
@@ -438,6 +545,24 @@ button,input,select,textarea{font-family:inherit;}
 
     <!-- Catálogo -->
     <section id="tab-catalogo" class="tabsec" hidden>
+      <div class="sec">
+        <div class="sec-hdr"><div><h2>Promoción destacada</h2><p>Un banner al inicio de tu tienda que destaca un producto (por ejemplo, para el Día de las Madres).</p></div>
+          <label class="switch-lbl"><input type="checkbox" id="pr-activa" onchange="pintarPromoForm()"> <span id="pr-activa-txt">Apagada</span></label></div>
+        <div class="sec-body" id="promo-form" style="padding-top:14px;">
+          <div class="fg"><label class="flbl">Estilo</label><div class="temas-promo" id="pr-temas"></div></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl" for="pr-etiqueta">Etiqueta</label><input class="fi" id="pr-etiqueta" maxlength="30" placeholder="Ej: DÍA DE LAS MADRES"></div>
+            <div class="fg"><label class="flbl" for="pr-festejo">Título</label><input class="fi" id="pr-festejo" maxlength="60" placeholder="Ej: ¡Sorprende a mamá!"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl" for="pr-producto">Producto destacado</label><select class="fi" id="pr-producto"></select></div>
+            <div class="fg"><label class="flbl" for="pr-vigencia">Vigencia (texto)</label><input class="fi" id="pr-vigencia" maxlength="60" placeholder="Ej: Hasta el 31 de mayo"></div>
+          </div>
+          <p class="ayuda" id="pr-ayuda"></p>
+          <p class="msg" id="pr-msg"></p>
+          <button class="btn btn-grad" style="width:auto;" onclick="guardarPromoTienda()"><i class="ti ti-check"></i> Guardar promoción</button>
+        </div>
+      </div>
       <div class="sec">
         <div class="sec-hdr"><div><h2>Categorías</h2><p>Agrupan tus productos en la tienda.</p></div>
           <button class="btn-add" onclick="abrirCategoria()"><i class="ti ti-plus"></i> Nueva categoría</button></div>
@@ -504,7 +629,7 @@ button,input,select,textarea{font-family:inherit;}
         </div>
       </div>
       <div class="sec">
-        <div class="sec-hdr"><div><h2>Logo de la tienda</h2><p>Aparece junto al nombre en tu tienda. Mejor si es cuadrado.</p></div></div>
+        <div class="sec-hdr"><div><h2>Logo de la tienda</h2><p>Es lo primero que ven tus clientes: va grande y en círculo, arriba del nombre de tu tienda.</p></div></div>
         <div class="sec-body" style="padding-top:14px;">
           <div class="foto-box">
             <div id="logo-prev"></div>
@@ -518,15 +643,20 @@ button,input,select,textarea{font-family:inherit;}
         </div>
       </div>
       <div class="sec">
-        <div class="sec-hdr"><div><h2>Foto de portada</h2><p>La imagen grande de la entrada de tu tienda. Si no subes una, se usa la de uno de tus productos.</p></div></div>
+        <div class="sec-hdr"><div><h2>Foto de portada</h2><p>La foto de fondo detrás de tu logo. Si no subes una, se muestra una franja con el color de tu tienda.</p></div></div>
         <div class="sec-body" style="padding-top:14px;">
           <div class="portada-box">
             <div id="portada-prev" class="portada-prev"></div>
             <div>
               <label class="btn-add" style="cursor:pointer;"><i class="ti ti-photo-up"></i> <span id="portada-txt">Subir portada</span><input type="file" id="portada-file" accept="image/*" hidden onchange="subirPortada(this)"></label>
               <button class="btn-del" id="portada-quitar" style="width:auto;margin:0 0 0 8px;" onclick="quitarPortada()">Quitar</button>
-              <p class="ayuda">Mejor vertical (como un retrato): en la tienda se muestra con forma de arco. Se optimiza sola al subirla.</p>
+              <p class="ayuda">Se muestra a todo el ancho, detrás de tu logo. Mejor horizontal. Se optimiza sola al subirla.</p>
             </div>
+          </div>
+          <div class="velo-box" id="velo-box">
+            <label class="flbl" for="d-velo">Tinte con tu color: <b id="d-velo-txt">5%</b></label>
+            <input type="range" id="d-velo" min="0" max="80" step="5" value="5" oninput="previewVelo()" onchange="guardarVelo()">
+            <p class="ayuda" id="d-velo-ayuda"></p>
           </div>
           <p class="msg" id="portada-msg"></p>
         </div>
@@ -595,6 +725,14 @@ button,input,select,textarea{font-family:inherit;}
 
     <!-- Pedidos -->
     <section id="tab-pedidos" class="tabsec" hidden>
+      <div class="cal-modo-bar">
+        <div class="cal-seg" id="ped-modo">
+          <button type="button" data-m="cal" onclick="cambiarModoPed('cal')"><i class="ti ti-calendar-week"></i> Calendario</button>
+          <button type="button" data-m="lista" onclick="cambiarModoPed('lista')"><i class="ti ti-list"></i> Lista</button>
+        </div>
+      </div>
+      <div id="cal-pedidos" hidden></div>
+      <div id="ped-lista-wrap">
       <div class="filtros"><input class="buscar" id="f-buscar" placeholder="Buscar por número, cliente o destinatario" oninput="pintarPedidos()"></div>
       <div class="filtros" id="f-periodo">
         <button class="fchip on" data-p="activos" onclick="filtroPeriodo('activos')">Por atender</button>
@@ -607,6 +745,7 @@ button,input,select,textarea{font-family:inherit;}
       </div>
       <div class="filtros" id="f-estado"></div>
       <div id="lista-pedidos"><p class="vacio-mini">Cargando…</p></div>
+      </div>
     </section>
   </main>
 </div>
@@ -676,9 +815,24 @@ button,input,select,textarea{font-family:inherit;}
       <div class="fg"><label class="flbl" for="prod-costo">Costo estimado ($)</label><input class="fi" id="prod-costo" type="number" step="0.01" min="0" oninput="margenProducto()"></div>
     </div>
     <p class="ayuda" id="prod-margen" style="margin:-6px 0 12px;"></p>
+    <div class="oferta-box">
+      <div class="frow">
+        <div class="fg"><label class="flbl" for="prod-oferta">Precio de oferta ($) <small style="font-weight:500;color:var(--ink-soft);">opcional</small></label><input class="fi" id="prod-oferta" type="number" step="0.01" min="0" placeholder="Ej: 49.00" oninput="margenProducto()"></div>
+        <div class="fg"><label class="flbl" for="prod-oferta-hasta">Válida hasta <small style="font-weight:500;color:var(--ink-soft);">opcional</small></label><input class="fi" id="prod-oferta-hasta" type="date"></div>
+      </div>
+      <p class="ayuda" style="margin:-4px 0 0;">Si la llenas, tu tienda muestra el precio normal tachado, el de oferta y una etiqueta con el descuento. Vacía = sin oferta. Sin fecha, vale hasta que la quites.</p>
+    </div>
     <div class="fg"><label class="flbl">Extras que se pueden agregar</label><div id="prod-extras"></div>
       <p class="ayuda">Deja el precio vacío para usar el del artículo, o escribe uno solo para este producto.</p></div>
-    <label class="check"><input type="checkbox" id="prod-activo" checked> Visible en la tienda</label>
+    <div class="fg"><label class="flbl" for="prod-visib">Dónde aparece</label>
+      <select class="fi" id="prod-visib">
+        <option value="catalogo">En el catálogo (visible para todos)</option>
+        <option value="promo">Solo para promoción (no sale en el catálogo)</option>
+        <option value="oculto">Oculto (no se puede pedir)</option>
+      </select>
+      <p class="ayuda">"Solo para promoción" sirve para productos especiales, por ejemplo uno de temporada: no aparece en el catálogo, pero lo puedes destacar en la promoción y tus clientes lo pueden pedir desde ahí.</p>
+    </div>
+    <input type="checkbox" id="prod-activo" hidden checked>
     <p class="msg" id="prod-msg"></p>
     <button class="btn btn-grad btn-save" id="prod-btn" onclick="guardarProducto()">Guardar producto</button>
     <button class="btn-del" id="prod-borrar" onclick="borrarProducto()">Borrar producto</button>
@@ -776,7 +930,8 @@ button,input,select,textarea{font-family:inherit;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=10"></script>
+<script src="pedidos.js?v=16"></script>
+<script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
 document.getElementById('l-registro').href = ANNLY + '/registro.html';
@@ -799,15 +954,28 @@ async function arrancar(){
   if (estado === 'es-citas'){ document.getElementById('btn-ir-agenda').href = Pedidos.urlPanelAgenda(); mostrar('aviso-citas'); return; }
   if (estado === 'sin-negocio'){ mostrar('aviso-sin-negocio'); return; }
   mostrar('app');
-  await Pedidos.cargarPlan();
   pintarEncabezado();
-  await Pedidos.liberarVencidos();
-  await cargarInicio();
+  // Plan, liberación de vencidos y resumen de Inicio van a la vez (en el celular cada espera se nota)
+  await Promise.all([
+    Pedidos.cargarPlan().then(pintarEncabezado),
+    liberarVencidosAHorrar(),
+    cargarInicio()
+  ]);
+  iniciarCampana();
+}
+
+// Libera pedidos sin pago vencidos, como mucho cada 2 minutos y sin frenar la pantalla
+let ULTIMA_LIBERACION = 0;
+function liberarVencidosAHorrar(){
+  if (Date.now() - ULTIMA_LIBERACION < 120000) return Promise.resolve(0);
+  ULTIMA_LIBERACION = Date.now();
+  return Pedidos.liberarVencidos();
 }
 
 function pintarEncabezado(){
   const n = Pedidos.negocio;
   document.getElementById('hdr-nombre').innerHTML = E(n.nombre) + chipPlan();
+  pintarAvisoPago();
   const lock = document.getElementById('lock-reportes');
   if (lock) lock.hidden = Pedidos.moduloDisponible('PEDIDOS_REPORTES');
   const baseTienda = ((window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.TIENDA_URL) || window.location.origin).replace(/\/$/, '');
@@ -826,6 +994,7 @@ async function cambiarNegocio(id){
   Pedidos.seleccionarNegocio(id);
   await Pedidos.cargarPlan();
   pintarEncabezado();
+  iniciarCampana();
   irTab('inicio');
   await cargarInicio();
 }
@@ -871,15 +1040,211 @@ async function cargarInicio(){
 // ---------- Pestañas ----------
 const CARGA_TAB = { pedidos: cargarPedidos, catalogo: cargarCatalogo, inventario: cargarInventario, entregas: cargarEntregas, config: cargarConfig, plan: cargarMiPlan, reportes: cargarReportes };
 
+// =====================================================================
+// PEDIDOS EN CALENDARIO (Día: Domicilio | Retiro · Semana · Mes)
+// En la computadora abre en calendario; en el celular, en lista. Se recuerda la elección.
+// =====================================================================
+let MODO_PED = (() => { try { return localStorage.getItem('annly_ped_modo') || (window.innerWidth >= 900 ? 'cal' : 'lista'); } catch(e){ return window.innerWidth >= 900 ? 'cal' : 'lista'; } })();
+const CALP = { modo: (() => { try { return localStorage.getItem('annly_calp_modo') || 'dia'; } catch(e){ return 'dia'; } })(), fecha: new Date(), datos: [], clave: '', timer: null };
+const CALP_PX = 60;
+const isoD = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const minP = h => { const [a, b] = String(h || '0:0').split(':').map(Number); return (a || 0) * 60 + (b || 0); };
+const etH = m => { const h = Math.floor(m / 60); return ((h % 12) || 12) + (h >= 12 ? ' p.m.' : ' a.m.'); };
+const etHM = m => { const h = Math.floor(m / 60), mi = m % 60; return ((h % 12) || 12) + ':' + String(mi).padStart(2, '0'); };
+
+function cambiarModoPed(m){ MODO_PED = m; try { localStorage.setItem('annly_ped_modo', m); } catch(e){} cargarPedidos(); }
+function pintarModoPed(){
+  document.querySelectorAll('#ped-modo button').forEach(b => b.classList.toggle('on', b.dataset.m === MODO_PED));
+  document.getElementById('ped-lista-wrap').hidden = MODO_PED === 'cal';
+  document.getElementById('cal-pedidos').hidden = MODO_PED !== 'cal';
+  if (MODO_PED !== 'cal' && CALP.timer){ clearInterval(CALP.timer); CALP.timer = null; }
+}
+function calpModo(m){ CALP.modo = m; try { localStorage.setItem('annly_calp_modo', m); } catch(e){} renderCalPedidos(true); }
+function calpMover(n){
+  const d = new Date(CALP.fecha);
+  if (CALP.modo === 'dia') d.setDate(d.getDate() + n);
+  else if (CALP.modo === 'semana') d.setDate(d.getDate() + 7 * n);
+  else d.setMonth(d.getMonth() + n, 1);
+  CALP.fecha = d; renderCalPedidos(true);
+}
+function calpHoy(){ CALP.fecha = new Date(); renderCalPedidos(true); }
+function calpDia(iso){ CALP.fecha = new Date(iso + 'T00:00:00'); CALP.modo = 'dia'; renderCalPedidos(true); }
+
+// Fechas que muestra la vista actual
+function rangoCalP(){
+  const d = new Date(CALP.fecha); d.setHours(0, 0, 0, 0);
+  if (CALP.modo === 'dia') return { d, dias: [d], desde: isoD(d), hasta: isoD(d) };
+  if (CALP.modo === 'semana'){
+    const lun = new Date(d); lun.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const dias = Array.from({ length: 7 }, (_, i) => { const x = new Date(lun); x.setDate(lun.getDate() + i); return x; });
+    return { d, dias, desde: isoD(dias[0]), hasta: isoD(dias[6]) };
+  }
+  const primero = new Date(d.getFullYear(), d.getMonth(), 1);
+  const ini = new Date(primero); ini.setDate(1 - ((primero.getDay() + 6) % 7));
+  const dias = Array.from({ length: 42 }, (_, i) => { const x = new Date(ini); x.setDate(ini.getDate() + i); return x; });
+  return { d, dias, desde: isoD(dias[0]), hasta: isoD(dias[41]) };
+}
+
+const EST_CAL = { PENDIENTE: 'pend', CONFIRMADO: 'conf', EN_PREPARACION: 'prep', LISTO: 'listo', ENTREGADO: 'hecho' };
+function carrilesP(lista){
+  const ord = lista.slice().sort((a, b) => minP(a.hora_inicio) - minP(b.hora_inicio) || a.numero - b.numero);
+  const fines = [];
+  ord.forEach(p => {
+    const ini = minP(p.hora_inicio);
+    let l = fines.findIndex(f => f <= ini);
+    if (l < 0){ l = fines.length; fines.push(0); }
+    fines[l] = Math.max(ini + 30, minP(p.hora_fin));
+    p._carril = l;
+  });
+  ord.forEach(p => p._carriles = fines.length);
+  return ord;
+}
+function bloqueP(p, ini, conTipo){
+  const a = minP(p.hora_inicio), b = Math.max(a + 30, minP(p.hora_fin));
+  const ancho = 100 / (p._carriles || 1);
+  const saldo = Number(p.saldo_pendiente) > 0;
+  return `<button type="button" class="cal-cita ${EST_CAL[p.estado] || 'conf'}" style="top:${(a - ini) / 60 * CALP_PX}px;height:${Math.max(30, (b - a) / 60 * CALP_PX - 3)}px;left:calc(${ancho * (p._carril || 0)}% + 3px);width:calc(${ancho}% - 6px);" onclick="verPedido('${p.id}')" title="${E(p.product_name || '')} · ${E(p.recipient_name || '')}">
+    <b>${numPed(p.numero)} · ${E(p.product_name || '')}</b>
+    <span>${conTipo ? (p.delivery_type === 'retiro' ? '🛍️ ' : '🚚 ') : ''}Para ${E(p.recipient_name || p.customer_name || '')}${p.zone_name && p.delivery_type !== 'retiro' ? ' · ' + E(p.zone_name) : ''}</span>
+    <span>${etHM(a)}–${etHM(b)} · ${ESTADOS[p.estado] || ''}</span>
+    ${saldo ? `<span class="cal-tag">Saldo ${$(p.saldo_pendiente)}</span>` : ''}
+  </button>`;
+}
+function rangoHorasP(lista){
+  let ini = 8 * 60, fin = 19 * 60;
+  lista.forEach(p => { ini = Math.min(ini, minP(p.hora_inicio)); fin = Math.max(fin, minP(p.hora_fin) || minP(p.hora_inicio) + 60); });
+  return { ini: Math.floor(ini / 60) * 60, fin: Math.ceil(fin / 60) * 60 };
+}
+function reglaP(ini, fin){ let h = ''; for (let m = ini; m < fin; m += 60) h += `<div class="cal-hora" style="height:${CALP_PX}px;"><span>${etH(m)}</span></div>`; return `<div class="cal-regla">${h}</div>`; }
+function lineasP(ini, fin){ let h = ''; for (let m = ini; m < fin; m += 60) h += `<div class="cal-linea" style="height:${CALP_PX}px;"></div>`; return h; }
+function ahoraP(fecha, ini, fin){
+  const hoy = new Date();
+  if (isoD(fecha) !== isoD(hoy)) return '';
+  const m = hoy.getHours() * 60 + hoy.getMinutes();
+  return m < ini || m > fin ? '' : `<div class="cal-ahora" style="top:${(m - ini) / 60 * CALP_PX}px;"></div>`;
+}
+
+async function renderCalPedidos(recargar){
+  const cont = document.getElementById('cal-pedidos');
+  if (!cont) return;
+  const R = rangoCalP();
+  const clave = R.desde + '|' + R.hasta;
+  if (recargar || CALP.clave !== clave){
+    CALP.clave = clave;
+    cont.innerHTML = '<p class="vacio-mini">Cargando…</p>';
+    try { CALP.datos = await Pedidos.pedidosCalendario(R.desde, R.hasta); }
+    catch(e){ cont.innerHTML = `<p class="vacio-mini">${E(e.message)}</p>`; return; }
+    if (CALP.clave !== clave) return;
+    PEDIDOS = []; // las acciones usan el pedido completo que carga el detalle (con pagos y extras)
+  }
+  const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const d = R.d;
+  let titulo;
+  if (CALP.modo === 'dia') titulo = `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}`;
+  else if (CALP.modo === 'semana') titulo = `${R.dias[0].getDate()} ${MESES[R.dias[0].getMonth()].slice(0, 3)} – ${R.dias[6].getDate()} ${MESES[R.dias[6].getMonth()].slice(0, 3)}`;
+  else titulo = MESES[d.getMonth()].charAt(0).toUpperCase() + MESES[d.getMonth()].slice(1) + ' ' + d.getFullYear();
+
+  const barra = `<div class="cal-barra">
+    <div class="cal-nav"><button type="button" class="cal-btn" onclick="calpHoy()">Hoy</button>
+      <button type="button" class="cal-btn ico" onclick="calpMover(-1)" aria-label="Anterior"><i class="ti ti-chevron-left"></i></button>
+      <button type="button" class="cal-btn ico" onclick="calpMover(1)" aria-label="Siguiente"><i class="ti ti-chevron-right"></i></button>
+      <span class="cal-titulo">${titulo}</span></div>
+    <div class="cal-seg">${[['dia','Día'],['semana','Semana'],['mes','Mes']].map(([k, t]) => `<button type="button" class="${CALP.modo === k ? 'on' : ''}" onclick="calpModo('${k}')">${t}</button>`).join('')}</div>
+  </div>
+  <div class="cal-leyenda"><span class="pend"></span>Pago por confirmar <span class="conf"></span>Confirmado <span class="prep"></span>En preparación <span class="listo"></span>Listo <span class="hecho"></span>Entregado</div>`;
+
+  const P = CALP.datos;
+  let cuerpo = '';
+  if (CALP.modo === 'dia'){
+    const del = P.filter(p => p.fecha === R.desde);
+    const { ini, fin } = rangoHorasP(del);
+    const alto = (fin - ini) / 60 * CALP_PX;
+    const cols = [{ k: 'domicilio', t: 'A domicilio', i: 'ti-truck-delivery' }, { k: 'retiro', t: 'Retiro en tienda', i: 'ti-building-store' }];
+    const deCol = k => del.filter(p => (p.delivery_type === 'retiro' ? 'retiro' : 'domicilio') === k);
+    cuerpo = `<div class="cal-scroll"><div class="cal-grid" style="--cols:2;">
+      <div class="cal-esq"></div>
+      ${cols.map(c => `<div class="cal-col-hdr"><span class="cal-ini"><i class="ti ${c.i}"></i></span><b>${c.t}</b><small>${deCol(c.k).length} pedidos</small></div>`).join('')}
+      ${reglaP(ini, fin)}
+      ${cols.map(c => `<div class="cal-col" style="height:${alto}px;">${lineasP(ini, fin)}${carrilesP(deCol(c.k)).map(p => bloqueP(p, ini, false)).join('')}${ahoraP(d, ini, fin)}</div>`).join('')}
+    </div></div>`;
+  }
+  else if (CALP.modo === 'semana'){
+    const { ini, fin } = rangoHorasP(P);
+    const alto = (fin - ini) / 60 * CALP_PX;
+    const hoyIso = isoD(new Date());
+    cuerpo = `<div class="cal-scroll"><div class="cal-grid semana" style="--cols:7;">
+      <div class="cal-esq"></div>
+      ${R.dias.map(x => `<button type="button" class="cal-col-hdr dia${isoD(x) === hoyIso ? ' hoy' : ''}" onclick="calpDia('${isoD(x)}')"><small>${DIAS[x.getDay()].slice(0, 3)}</small><b>${x.getDate()}</b><small>${P.filter(p => p.fecha === isoD(x)).length} pedidos</small></button>`).join('')}
+      ${reglaP(ini, fin)}
+      ${R.dias.map(x => `<div class="cal-col" style="height:${alto}px;">${lineasP(ini, fin)}${carrilesP(P.filter(p => p.fecha === isoD(x))).map(p => bloqueP(p, ini, true)).join('')}${ahoraP(x, ini, fin)}</div>`).join('')}
+    </div></div>`;
+  }
+  else {
+    const hoyIso = isoD(new Date());
+    cuerpo = `<div class="cal-mes"><div class="cal-mes-hdr">${['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(t => `<span>${t}</span>`).join('')}</div>
+      <div class="cal-mes-grid">${R.dias.map(x => {
+        const iso = isoD(x);
+        const del = P.filter(p => p.fecha === iso).sort((a, b) => minP(a.hora_inicio) - minP(b.hora_inicio));
+        const pend = del.filter(p => p.estado === 'PENDIENTE').length;
+        const venta = del.reduce((s, p) => s + Number(p.total || 0), 0);
+        return `<button type="button" class="cal-dia${x.getMonth() !== d.getMonth() ? ' fuera' : ''}${iso === hoyIso ? ' hoy' : ''}" onclick="calpDia('${iso}')">
+          <span class="cal-num">${x.getDate()}</span>
+          ${del.length ? `<span class="cal-cnt">${del.length} pedido${del.length === 1 ? '' : 's'}${pend ? ` · <em>${pend} ⏳</em>` : ''}</span><span class="cal-venta">${$(venta)}</span>` : ''}
+          ${del.slice(0, 3).map(p => `<span class="cal-mini ${EST_CAL[p.estado] || 'conf'}">${etHM(minP(p.hora_inicio))} ${E((p.product_name || '').split(' ').slice(0, 2).join(' '))}</span>`).join('')}
+          ${del.length > 3 ? `<span class="cal-mas">+${del.length - 3} más</span>` : ''}
+        </button>`;
+      }).join('')}</div></div>`;
+  }
+  cont.innerHTML = barra + cuerpo;
+  const sc = cont.querySelector('.cal-scroll'), ah = cont.querySelector('.cal-ahora');
+  if (sc && ah) sc.scrollTop = Math.max(0, ah.offsetTop - 140);
+  if (CALP.timer) clearInterval(CALP.timer);
+  CALP.timer = setInterval(() => {
+    if (MODO_PED === 'cal' && !document.getElementById('cal-pedidos').hidden && CALP.modo !== 'mes') renderCalPedidos(false);
+  }, 60000);
+}
+
+// ---------- Campanita: pedidos nuevos en tiempo real ----------
+function iniciarCampana(){
+  if (!window.AnnlyCampana) return;
+  window.AnnlyCampana.iniciar({
+    cliente: Pedidos.cliente, negocioId: Pedidos.id, tabla: 'orders',
+    montarEn: [document.getElementById('cmp-slot'), document.getElementById('cmp-slot-m')],
+    cargarRecientes: async () => {
+      let r = await Pedidos.cliente.from('orders').select('id, numero, estado, total, product_name, customer_name, fecha, created_at')
+        .eq('business_id', Pedidos.id).order('created_at', { ascending: false }).limit(20);
+      if (r.error) r = await Pedidos.cliente.from('orders').select('id, numero, estado, total, product_name, customer_name, fecha')
+        .eq('business_id', Pedidos.id).order('numero', { ascending: false }).limit(20);
+      return r.data || [];
+    },
+    describir: f => ({
+      titulo: (f.estado === 'PENDIENTE' ? 'Pago por confirmar · ' : 'Nuevo pedido · ') + numPed(f.numero),
+      detalle: [f.product_name, f.customer_name, f.total != null ? $(f.total) : ''].filter(Boolean).join(' · '),
+      urgente: f.estado === 'PENDIENTE',
+      fecha: f.created_at || null
+    }),
+    alAbrir: f => { irTab('pedidos'); verPedido(f.id); },
+    alLlegar: () => {
+      const t = document.querySelector('.tab.on');
+      if (t && t.dataset.tab === 'pedidos') cargarPedidos();
+      cargarInicioSilencioso();
+    }
+  });
+}
+
 // ---------- Plan ----------
 function fechaPlan(iso){
   if (!iso) return '';
-  return new Date(iso + 'T00:00:00').toLocaleDateString('es-PA', { day:'numeric', month:'long', year:'numeric' });
+  // Acepta "2026-10-16" o "2026-10-16T05:00:00+00:00"
+  const d = new Date(String(iso).slice(0, 10) + 'T12:00:00');
+  return isNaN(d) ? '' : d.toLocaleDateString('es-PA', { day:'numeric', month:'long', year:'numeric' });
 }
 function diasPara(iso){
   if (!iso) return null;
   const hoy = new Date(); hoy.setHours(0,0,0,0);
-  return Math.round((new Date(iso + 'T00:00:00') - hoy) / 86400000);
+  const d = new Date(String(iso).slice(0, 10) + 'T00:00:00');
+  return isNaN(d) ? null : Math.round((d - hoy) / 86400000);
 }
 function chipPlan(){
   const p = Pedidos.plan;
@@ -956,8 +1321,95 @@ async function cargarMiPlan(){
     </div>`;
   }).join('');
 
-  cont.innerHTML = planHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '') +
-    `<p class="ayuda" style="margin-top:14px;">Por ahora no se hace ningún cobro en línea: al activar, te contactamos para el pago.</p>`;
+  // Mensualidad: plan + módulos activos, pagada con tarjeta (PagueloFácil)
+  const activos = catalogo.filter(m => Pedidos.modulos.includes(m.code));
+  const total = p.precio + activos.reduce((t, m) => t + m.precio, 0);
+  let pagos = [];
+  try { pagos = await Pedidos.pagosDelNegocio(); } catch(e){}
+  const ultimos = pagos.filter(x => x.estado === 'confirmado').slice(0, 3);
+  // "Pagada" solo si un pago confirmado cubre la fecha; si no, la fecha es solo el vencimiento
+  const hoyIso = new Date().toISOString().slice(0, 10);
+  const pagadoHasta = pagos.filter(x => x.estado === 'confirmado' && x.periodo_hasta && x.periodo_hasta >= hoyIso).map(x => x.periodo_hasta).sort().pop();
+  const mensualidadHtml = `
+    <div class="plan-card">
+      <h2 style="font-size:20px;margin-bottom:4px;">Tu mensualidad</h2>
+      <p class="ayuda" style="margin:0 0 12px;">${pagadoHasta ? 'Tu membresía está pagada hasta el <b>' + fechaPlan(pagadoHasta) + '</b>.'
+        : enPrueba ? 'Estás en tu prueba gratis. Al pagar, tu membresía y tus módulos quedan activos de inmediato.'
+        : (p.vence ? 'Tu membresía vence el <b>' + fechaPlan(p.vence) + '</b>. Paga para mantenerla activa.' : '')}</p>
+      <div class="pago-lista">
+        <div><span>Plan ${E(p.nombre)}</span><b>$${p.precio.toFixed(2)}</b></div>
+        ${activos.map(m => `<div><span>${E(m.nombre)}</span><b>$${m.precio.toFixed(2)}</b></div>`).join('')}
+        <div class="pago-total"><span>Total del mes</span><b>$${total.toFixed(2)}</b></div>
+      </div>
+      <button class="btn btn-grad" id="btn-pagar-mes" style="margin-top:12px;" onclick="pagarMensualidad()"><i class="ti ti-lock"></i> Pagar $${total.toFixed(2)} con tarjeta</button>
+      <p class="ayuda" style="margin-top:8px;">Pago seguro con tarjeta de crédito o débito (PagueloFácil). Se abre en una ventana aparte y, al terminar, tu membresía se actualiza sola aquí.</p>
+      ${ultimos.length ? `<div class="pago-hist"><b>Últimos pagos</b>${ultimos.map(x => `<span><i class="ti ti-circle-check"></i>${E(x.concepto)} · $${Number(x.monto_pagado || x.monto).toFixed(2)}</span>`).join('')}</div>` : ''}
+    </div>`;
+
+  cont.innerHTML = planHtml + mensualidadHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '');
+}
+
+// Aviso arriba del panel cuando la prueba o la membresía están por terminar (o ya vencieron)
+function pintarAvisoPago(){
+  const box = document.getElementById('aviso-pago');
+  if (!box) return;
+  const p = Pedidos.plan;
+  if (!p || !p.vence){ box.hidden = true; return; }
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const dias = Math.round((new Date(String(p.vence).slice(0, 10) + 'T00:00:00') - hoy) / 86400000);
+  const prueba = p.status === 'trial';
+  if (isNaN(dias) || dias > (prueba ? 5 : 3)){ box.hidden = true; return; }
+  const clave = 'annly_aviso_pago_' + Pedidos.id + '_' + String(p.vence).slice(0, 10) + '_' + (dias < 0 ? 'v' : dias);
+  try { if (sessionStorage.getItem(clave)) { box.hidden = true; return; } } catch(e){}
+  const cuando = dias < 0 ? '' : dias === 0 ? 'hoy' : dias === 1 ? 'mañana' : 'en ' + dias + ' días';
+  const titulo = dias < 0 ? (prueba ? 'Tu prueba gratis terminó' : 'Tu membresía venció') : (prueba ? 'Tu prueba gratis termina ' + cuando : 'Tu membresía vence ' + cuando);
+  box.className = 'aviso-pago' + (dias < 0 ? ' vencido' : '');
+  box.innerHTML = `<i class="ti ti-${dias < 0 ? 'alert-triangle' : 'hourglass'}"></i>
+    <div><b>${titulo}</b><span>${dias < 0 ? 'Paga tu membresía para seguir usando Annly sin interrupciones.' : 'Paga con tarjeta en un minuto y sigue usando Annly sin interrupciones.'}</span></div>
+    <button type="button" class="btn btn-grad" style="width:auto;" onclick="pagarDesdeAviso()"><i class="ti ti-credit-card"></i> Pagar ahora</button>
+    <button type="button" class="aviso-x" aria-label="Cerrar" onclick="cerrarAvisoPago('${clave}')">×</button>`;
+  box.hidden = false;
+}
+function cerrarAvisoPago(clave){
+  try { sessionStorage.setItem(clave, '1'); } catch(e){}
+  document.getElementById('aviso-pago').hidden = true;
+}
+function pagarDesdeAviso(){
+  irTab('plan');
+  pagarMensualidad(); // abre la ventana de pago en este mismo clic
+}
+
+// El pago se abre en una ventana aparte; al terminar, pago.html avisa aquí y se cierra sola
+let ESCUCHA_PAGO = false;
+async function pagarMensualidad(){
+  const btn = document.getElementById('btn-pagar-mes') || document.createElement('button');
+  const antes = btn.innerHTML;
+  const w = 520, h = 780;
+  const x = Math.max(0, (window.screenX || 0) + (window.outerWidth - w) / 2), y = Math.max(0, (window.screenY || 0) + (window.outerHeight - h) / 2);
+  const win = window.open('', 'annly_pago', `width=${w},height=${h},left=${x},top=${y}`); // se abre en el clic, si no el navegador la bloquea
+  if (win) { try { win.document.write('<title>Preparando tu pago…</title><p style="font:15px system-ui;text-align:center;margin-top:45vh;color:#6B6680">Preparando tu pago…</p>'); } catch(e){} }
+  btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i> Preparando tu pago…';
+  try {
+    const r = await Pedidos.crearEnlaceMensualidad();
+    if (win && !win.closed){
+      if (!ESCUCHA_PAGO){
+        ESCUCHA_PAGO = true;
+        window.addEventListener('message', ev => {
+          if (ev.origin !== window.location.origin || !ev.data || ev.data.tipo !== 'annly-pago') return;
+          cargarMiPlan();
+          if (ev.data.estado === 'confirmado') setTimeout(() => alert('¡Pago confirmado! Tu membresía quedó activa.'), 300);
+        });
+      }
+      win.location.href = r.url;
+      btn.innerHTML = '<i class="ti ti-external-link"></i> Completa el pago en la ventana que se abrió';
+      const t = setInterval(() => { if (win.closed){ clearInterval(t); cargarMiPlan(); } }, 1000);
+    } else {
+      window.location.href = r.url; // sin ventanas emergentes: se paga en esta misma pestaña
+    }
+  } catch(e){
+    if (win && !win.closed) win.close();
+    alert('No se pudo abrir el pago: ' + (e.message || e)); btn.disabled = false; btn.innerHTML = antes;
+  }
 }
 
 async function terminarPrueba(){
@@ -1219,12 +1671,32 @@ function exportarRep(){
     filas.push(['Producto','Pedidos','Vendido','Costo','Ganancia','Margen %']);
     filasGanancia().forEach(o => filas.push([o.nombre, o.n, n(o.ingreso), n(o.costo), n(o.margen), pct(o.margen, o.ingreso)]));
   }
-  const csv = '\ufeff' + filas.map(f => f.map(q).join(',')).join('\r\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  a.download = `${nombre}-${Pedidos.negocio.slug}-${REP.desde}-a-${REP.hasta}.csv`;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  const archivo = `${nombre}-${Pedidos.negocio.slug}-${REP.desde}-a-${REP.hasta}`;
+  // Excel de verdad (.xlsx); si no carga la librería, CSV
+  const csv = () => {
+    const txt = '\ufeff' + filas.map(f => f.map(q).join(',')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' }));
+    a.download = archivo + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  };
+  const conXlsx = X => {
+    // Los montos van como números para poder sumarlos en Excel
+    const datos = filas.map((f, i) => i === 0 ? f : f.map(v => (typeof v === 'string' && /^-?\d+(\.\d+)?$/.test(v)) ? Number(v) : v));
+    const hoja = X.utils.aoa_to_sheet(datos);
+    hoja['!cols'] = filas[0].map((h, i) => ({ wch: Math.min(32, Math.max(String(h).length + 2, ...filas.map(f => String(f[i] ?? '').length + 1))) }));
+    hoja['!autofilter'] = { ref: hoja['!ref'] };
+    const libro = X.utils.book_new();
+    X.utils.book_append_sheet(libro, hoja, nombre.charAt(0).toUpperCase() + nombre.slice(1));
+    X.utils.writeFile(libro, archivo + '.xlsx');
+  };
+  if (window.XLSX) return conXlsx(window.XLSX);
+  const sc = document.createElement('script');
+  sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  sc.onload = () => { try { conXlsx(window.XLSX); } catch(e){ console.error(e); csv(); } };
+  sc.onerror = csv;
+  document.head.appendChild(sc);
 }
 // Menú del celular (hamburguesa)
 function menuMovil(abrirlo){
@@ -1274,8 +1746,10 @@ function filtroPeriodo(p){
 function filtroEstado(e){ F_ESTADO = F_ESTADO === e ? null : e; pintarPedidos(); }
 
 async function cargarPedidos(){
+  pintarModoPed();
+  if (MODO_PED === 'cal'){ liberarVencidosAHorrar(); return renderCalPedidos(true); }
   document.getElementById('lista-pedidos').innerHTML = '<p class="vacio-mini">Cargando…</p>';
-  await Pedidos.liberarVencidos();
+  liberarVencidosAHorrar();
   const hoy = isoMas(0);
   const f = {
     activos: { estados: ['PENDIENTE','CONFIRMADO','EN_PREPARACION','LISTO'] },
@@ -1523,6 +1997,7 @@ let editCat = null, editProd = null, fotoProd = null;
 async function cargarCatalogo(){
   try { [CATS, PRODS, ARTS] = await Promise.all([Pedidos.listarCategorias(), Pedidos.listarProductos(), Pedidos.listarArticulos()]); }
   catch(e){ document.getElementById('lista-productos').innerHTML = `<p class="vacio-mini">${E(e.message)}</p>`; return; }
+  cargarPromoTienda();
   document.getElementById('lista-categorias').innerHTML = CATS.length ? CATS.map(c => {
     const n = PRODS.filter(p => p.category_id === c.id).length;
     return `<div class="fila"><div class="fila-info"><strong>${E(c.name)}${c.active ? '' : '<span class="chip gris">Oculta</span>'}</strong><span>${n} producto${n === 1 ? '' : 's'}</span></div>
@@ -1535,8 +2010,8 @@ async function cargarCatalogo(){
   document.getElementById('lista-productos').innerHTML = PRODS.length ? grupos.map(g => `<div class="grupo">${E(g.nombre)}</div>` + g.items.map(p => {
     const nx = (p.product_extras || []).length;
     return `<div class="fila">${p.photo_url ? `<img class="miniatura" src="${E(p.photo_url)}" alt="">` : '<div class="miniatura"><i class="ti ti-flower"></i></div>'}
-      <div class="fila-info"><strong>${E(p.name)}${p.active ? '' : '<span class="chip gris">Oculto</span>'}</strong>
-      <span>${$(p.price)} · costo ${$(p.estimated_cost)} · ${nx} extra${nx === 1 ? '' : 's'}</span></div>
+      <div class="fila-info"><strong>${E(p.name)}${p.active ? (p.solo_promo ? '<span class="chip promo">Solo promoción</span>' : '') : '<span class="chip gris">Oculto</span>'}${ofertaVigente(p) ? `<span class="chip oferta">Oferta ${$(p.precio_oferta)}</span>` : ''}</strong>
+      <span>${ofertaVigente(p) ? `<s>${$(p.price)}</s> ${$(p.precio_oferta)}` : $(p.price)} · costo ${$(p.estimated_cost)} · ${nx} extra${nx === 1 ? '' : 's'}${p.precio_oferta && !ofertaVigente(p) ? ' · <span style="color:var(--err);">oferta vencida</span>' : ''}</span></div>
       <div class="fila-acc"><button class="ico" onclick="abrirProducto('${p.id}')" aria-label="Editar"><i class="ti ti-edit"></i></button></div></div>`;
   }).join('')).join('') : '<p class="vacio-mini">Agrega tu primer producto con su foto, precio y extras.</p>';
 }
@@ -1571,7 +2046,10 @@ async function abrirProducto(id){
   document.getElementById('prod-desc').value = editProd ? (editProd.description || '') : '';
   document.getElementById('prod-precio').value = editProd ? editProd.price : '';
   document.getElementById('prod-costo').value = editProd ? editProd.estimated_cost : '';
+  document.getElementById('prod-oferta').value = editProd && editProd.precio_oferta != null ? editProd.precio_oferta : '';
+  document.getElementById('prod-oferta-hasta').value = editProd && editProd.oferta_hasta ? editProd.oferta_hasta : '';
   document.getElementById('prod-activo').checked = editProd ? editProd.active : true;
+  document.getElementById('prod-visib').value = !editProd ? 'catalogo' : (!editProd.active ? 'oculto' : (editProd.solo_promo ? 'promo' : 'catalogo'));
   document.getElementById('prod-cat').innerHTML = '<option value="">Sin categoría</option>' +
     CATS.map(c => `<option value="${c.id}"${editProd && editProd.category_id === c.id ? ' selected' : ''}>${E(c.name)}</option>`).join('');
   const sel = editProd ? (editProd.product_extras || []) : [];
@@ -1601,7 +2079,10 @@ async function subirFotoProducto(input){
 function margenProducto(){
   const p = parseFloat(document.getElementById('prod-precio').value) || 0;
   const c = parseFloat(document.getElementById('prod-costo').value) || 0;
-  document.getElementById('prod-margen').textContent = p > 0 ? `Margen: ${$(p - c)} (${Math.round((p - c) / p * 100)}%)` : '';
+  const o = parseFloat(document.getElementById('prod-oferta').value) || 0;
+  let t = p > 0 ? `Margen: ${$(p - c)} (${Math.round((p - c) / p * 100)}%)` : '';
+  if (o > 0 && p > 0 && o < p) t += ` · En oferta: ${Math.round((1 - o / p) * 100)}% menos, margen ${$(o - c)}`;
+  document.getElementById('prod-margen').textContent = t;
 }
 async function guardarProducto(){
   const extras = [...document.querySelectorAll('.px-chk:checked')].map(c => ({
@@ -1614,11 +2095,61 @@ async function guardarProducto(){
     await Pedidos.guardarProducto({ id: editProd && editProd.id, name: document.getElementById('prod-nombre').value,
       category_id: document.getElementById('prod-cat').value, description: document.getElementById('prod-desc').value,
       photo_url: fotoProd, price: precio, estimated_cost: document.getElementById('prod-costo').value,
-      active: document.getElementById('prod-activo').checked, position: editProd ? editProd.position : PRODS.length, extras });
+      precio_oferta: document.getElementById('prod-oferta').value, oferta_hasta: document.getElementById('prod-oferta-hasta').value,
+      active: document.getElementById('prod-visib').value !== 'oculto', solo_promo: document.getElementById('prod-visib').value === 'promo',
+      position: editProd ? editProd.position : PRODS.length, extras });
     cerrar('ov-prod'); cargarCatalogo();
   } catch(e){ msg('prod-msg', e.message); }
   btn.disabled = false;
 }
+// ¿La oferta del producto está vigente hoy?
+function ofertaVigente(p){
+  const o = Number(p.precio_oferta);
+  if (!(o > 0 && o < Number(p.price))) return false;
+  return !p.oferta_hasta || p.oferta_hasta >= Pedidos.hoyISO();
+}
+
+// ---------- Promoción destacada ----------
+const TEMAS_TIENDA = { fiesta: ['🎉', 'Fiesta'], corazon: ['💝', 'Amor'], regalo: ['🎁', 'Regalo'], flores: ['🌸', 'Flores'] };
+let PROMO_T = null;
+async function cargarPromoTienda(){
+  try { PROMO_T = await Pedidos.promo(); } catch(e){ PROMO_T = null; }
+  const pr = PROMO_T || {};
+  document.getElementById('pr-activa').checked = !!pr.activa;
+  document.getElementById('pr-etiqueta').value = pr.etiqueta || '';
+  document.getElementById('pr-festejo').value = pr.festejo || '';
+  document.getElementById('pr-vigencia').value = pr.vigencia || '';
+  PROMO_T = { ...pr, tema: TEMAS_TIENDA[pr.tema] ? pr.tema : 'fiesta' };
+  const sel = document.getElementById('pr-producto');
+  // Se pueden destacar los del catálogo y los "solo para promoción" (los ocultos no se pueden pedir)
+  sel.innerHTML = '<option value="">Elige un producto…</option>' + PRODS.filter(p => p.active).map(p =>
+    `<option value="${p.id}"${pr.producto_id === p.id ? ' selected' : ''}>${E(p.name)} · ${ofertaVigente(p) ? 'oferta ' + $(p.precio_oferta) : $(p.price)}${p.solo_promo ? ' · solo promoción' : ''}</option>`).join('');
+  sel.onchange = pintarPromoForm;
+  pintarPromoForm();
+}
+function pintarPromoForm(){
+  const on = document.getElementById('pr-activa').checked;
+  document.getElementById('pr-activa-txt').textContent = on ? 'Encendida' : 'Apagada';
+  document.getElementById('promo-form').style.opacity = on ? '1' : '.55';
+  document.getElementById('pr-temas').innerHTML = Object.entries(TEMAS_TIENDA).map(([k, v]) =>
+    `<button type="button" class="tema-op${PROMO_T && PROMO_T.tema === k ? ' on' : ''}" onclick="PROMO_T.tema='${k}';pintarPromoForm()"><span>${v[0]}</span>${v[1]}</button>`).join('');
+  const prod = PRODS.find(p => p.id === document.getElementById('pr-producto').value);
+  document.getElementById('pr-ayuda').innerHTML = !prod ? '' : (ofertaVigente(prod)
+    ? `El banner mostrará <s>${$(prod.price)}</s> <b>${$(prod.precio_oferta)}</b>.`
+    : `Este producto no tiene precio de oferta: el banner mostrará ${$(prod.price)}. Si quieres un descuento, ponle precio de oferta en el producto.`);
+}
+async function guardarPromoTienda(){
+  msg('pr-msg');
+  try {
+    await Pedidos.guardarPromo({
+      activa: document.getElementById('pr-activa').checked, tema: PROMO_T.tema,
+      etiqueta: document.getElementById('pr-etiqueta').value, festejo: document.getElementById('pr-festejo').value,
+      vigencia: document.getElementById('pr-vigencia').value, producto_id: document.getElementById('pr-producto').value || null
+    });
+    alert('Promoción guardada.');
+  } catch(e){ msg('pr-msg', e.message); }
+}
+
 async function borrarProducto(){
   if (!confirm('¿Borrar este producto? Los pedidos que ya lo tienen conservan su nombre y precio.')) return;
   try { await Pedidos.borrarProducto(editProd.id); cerrar('ov-prod'); cargarCatalogo(); } catch(e){ msg('prod-msg', e.message); }
@@ -1811,7 +2342,13 @@ async function quitarLogo(){
 // ---------- Portada ----------
 function pintarPortadaCfg(){
   const url = Pedidos.negocio.portada_url;
-  document.getElementById('portada-prev').innerHTML = url ? `<img src="${E(url)}" alt="Portada">` : '<i class="ti ti-photo"></i>';
+  const v = Number(Pedidos.negocio.portada_velo ?? 5);
+  document.getElementById('d-velo').value = v;
+  document.getElementById('d-velo-ayuda').textContent = url
+    ? '0% = la foto tal cual · 30–40% = queda de fondo en tu tono · 80% = casi solo color. Se guarda al soltar.'
+    : 'Sin foto, el tinte da más o menos color a la franja de tu portada. Se guarda al soltar.';
+  document.getElementById('portada-prev').innerHTML = url ? `<img src="${E(url)}" alt="Portada"><div class="velo" id="velo-prev"></div>` : '<i class="ti ti-photo"></i>';
+  previewVelo();
   document.getElementById('portada-txt').textContent = url ? 'Cambiar portada' : 'Subir portada';
   document.getElementById('portada-quitar').style.display = url ? '' : 'none';
 }
@@ -1822,6 +2359,17 @@ async function subirPortada(input){
   try { await Pedidos.subirPortada(f); pintarPortadaCfg(); msg('portada-msg'); }
   catch(e){ msg('portada-msg', e.message); }
 }
+function previewVelo(){
+  const v = Number(document.getElementById('d-velo').value);
+  document.getElementById('d-velo-txt').textContent = v + '%';
+  const capa = document.getElementById('velo-prev');
+  if (capa){ capa.style.background = Pedidos.negocio.color_primario || '#7C3AED'; capa.style.opacity = v / 100; }
+}
+async function guardarVelo(){
+  try { await Pedidos.guardarVeloPortada(document.getElementById('d-velo').value); msg('portada-msg'); }
+  catch(e){ msg('portada-msg', e.message); }
+}
+
 async function quitarPortada(){
   if (!confirm('¿Quitar la foto de portada? La tienda volverá a usar la foto de un producto.')) return;
   try { await Pedidos.quitarPortada(); pintarPortadaCfg(); } catch(e){ msg('portada-msg', e.message); }
