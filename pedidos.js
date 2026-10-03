@@ -577,7 +577,8 @@ const Pedidos = {
   },
 
   async cargarNegocioPorSlug(slug) {
-    const { data, error } = await sb.from('businesses').select('*').eq('slug', slug).maybeSingle();
+    // Función segura: un solo negocio, por su slug, con las columnas públicas
+    const { data, error } = await sb.rpc('negocio_publico', { p_slug: slug });
     if (error) throw error;
     this.negocio = data || null;
     return this.negocio;
