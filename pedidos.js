@@ -166,10 +166,16 @@ const Pedidos = {
       name: (p.name || '').trim(), category_id: p.category_id || null,
       description: (p.description || '').trim() || null, photo_url: p.photo_url || null,
       price: Number(p.price), estimated_cost: Number(p.estimated_cost || 0),
+      solo_promo: !!p.solo_promo,
+      precio_oferta: p.precio_oferta === '' || p.precio_oferta == null ? null : Number(p.precio_oferta),
+      oferta_hasta: p.oferta_hasta || null,
       active: p.active !== false, position: p.position || 0, updated_at: new Date().toISOString()
     };
     if (!fila.name) throw new Error('Escribe el nombre del producto.');
     if (!(fila.price >= 0) || isNaN(fila.price)) throw new Error('Escribe el precio del producto.');
+    if (fila.precio_oferta != null && !(fila.precio_oferta > 0 && fila.precio_oferta < fila.price))
+      throw new Error('El precio de oferta debe ser mayor que 0 y menor que el precio normal.');
+    if (fila.precio_oferta == null) fila.oferta_hasta = null;
     let id = p.id;
     if (id) await this._q(sb.from('products').update(fila).eq('id', id).eq('business_id', this.id));
     else id = (await this._q(sb.from('products').insert([{ ...fila, business_id: this.id }]).select('id').single())).id;
@@ -351,6 +357,13 @@ const Pedidos = {
     this.negocio.portada_url = url;
     return url;
   },
+  // Cuánto se tiñe la foto de portada con el color de la tienda (0–80 %)
+  async guardarVeloPortada(pct) {
+    const v = Math.min(80, Math.max(0, Math.round(Number(pct) || 0)));
+    const data = await this._q(sb.from('businesses').update({ portada_velo: v }).eq('id', this.id).select('portada_velo'));
+    if (!data || !data.length) throw new Error('No se pudo guardar (sin permisos).');
+    this.negocio.portada_velo = data[0].portada_velo;
+  },
   async quitarPortada() {
     await this._q(sb.from('businesses').update({ portada_url: null }).eq('id', this.id));
     this.negocio.portada_url = null;
@@ -419,6 +432,24 @@ const Pedidos = {
     if (error) throw new Error('No se pudo cancelar: ' + this.mensajeError(error));
     await this.cargarPlan();
     return fecha;
+  },
+
+  // Pago de la mensualidad con PagueloFácil: el servidor calcula el monto y crea un enlace único
+  async crearEnlaceMensualidad() {
+    const { data, error } = await sb.functions.invoke('pf-crear-enlace', {
+      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin }
+    });
+    if (error) {
+      let msg = error.message;
+      try { const j = await error.context.json(); if (j && j.error) msg = j.error; } catch (_) {}
+      throw new Error(msg);
+    }
+    if (!data || !data.url) throw new Error((data && data.error) || 'No se pudo crear el enlace de pago.');
+    return data;
+  },
+  async pagosDelNegocio() {
+    const { data } = await sb.from('pagos_plataforma').select('*').eq('business_id', this.id).order('creado_en', { ascending: false }).limit(10);
+    return data || [];
   },
 
   // Sin pasarela de pago todavía: el dueño termina la prueba con un clic (igual que en Agenda)
@@ -509,6 +540,13 @@ const Pedidos = {
     q = q.order('fecha', { ascending: true }).order('hora_inicio', { ascending: true }).order('numero', { ascending: true }).limit(500);
     return (await this._q(q)) || [];
   },
+  // Calendario: solo lo que se dibuja (sin extras ni pagos), más liviano para el celular
+  async pedidosCalendario(desde, hasta) {
+    return (await this._q(sb.from('orders')
+      .select('id, numero, fecha, hora_inicio, hora_fin, estado, total, product_name, customer_name, recipient_name, delivery_type, zone_name, saldo_pendiente, abono_monto')
+      .eq('business_id', this.id).gte('fecha', desde).lte('fecha', hasta).neq('estado', 'CANCELADO')
+      .order('fecha', { ascending: true }).order('hora_inicio', { ascending: true }).limit(1000))) || [];
+  },
   async detallePedido(id) {
     const [pedido, historial] = await Promise.all([
       this._q(sb.from('orders').select('*, order_extras(*), order_payments(*)').eq('id', id).eq('business_id', this.id).single()),
@@ -539,7 +577,8 @@ const Pedidos = {
   },
 
   async cargarNegocioPorSlug(slug) {
-    const { data, error } = await sb.from('businesses').select('*').eq('slug', slug).maybeSingle();
+    // Función segura: un solo negocio, por su slug, con las columnas públicas
+    const { data, error } = await sb.rpc('negocio_publico', { p_slug: slug });
     if (error) throw error;
     this.negocio = data || null;
     return this.negocio;
@@ -551,6 +590,37 @@ const Pedidos = {
     return data || { categorias: [], productos: [], zonas: [], config: null };
   },
 
+  // Ofertas vigentes de la tienda: { productId: { precio, hasta } }
+  async ofertas() {
+    const { data, error } = await sb.rpc('pedidos_ofertas', { p_business: this.id });
+    if (error) { console.error('Ofertas no disponibles:', error); return {}; }
+    return Object.fromEntries((data || []).map(o => [o.id, { precio: Number(o.precio_oferta), hasta: o.oferta_hasta }]));
+  },
+
+  // Productos "solo para promoción": se pueden pedir, pero no van en el catálogo
+  async soloPromo() {
+    const { data, error } = await sb.rpc('pedidos_solo_promo', { p_business: this.id });
+    if (error) { console.error('Solo promoción no disponible:', error); return new Set(); }
+    return new Set((data || []).map(r => r.id));
+  },
+
+  // Promoción destacada (misma tabla que Agenda: promo_banner)
+  async promo() {
+    const { data } = await sb.from('promo_banner').select('*').eq('business_id', this.id).maybeSingle();
+    return data || null;
+  },
+  async guardarPromo(pr) {
+    const fila = {
+      business_id: this.id, activa: !!pr.activa, tema: pr.tema || 'fiesta',
+      etiqueta: (pr.etiqueta || '').trim() || null, festejo: (pr.festejo || '').trim() || null,
+      vigencia: (pr.vigencia || '').trim() || null, producto_id: pr.producto_id || null,
+      servicio: pr.servicio || null, precio_normal: pr.precio_normal || null, precio_promo: pr.precio_promo || null
+    };
+    if (fila.activa && !fila.producto_id) throw new Error('Elige el producto que quieres destacar.');
+    const { error } = await sb.from('promo_banner').upsert(fila, { onConflict: 'business_id' });
+    if (error) throw new Error('No se pudo guardar la promoción: ' + this.mensajeError(error));
+  },
+
   async franjas(fechaISO) {
     const { data, error } = await sb.rpc('pedidos_franjas', { p_business: this.id, p_fecha: fechaISO });
     if (error) throw error;
@@ -558,14 +628,15 @@ const Pedidos = {
   },
 
   // Todos los precios y validaciones se hacen en la base (pedidos_crear)
-  // p.pagoTipo = 'total' | 'abono'. Con abono se usa la función que lo aplica; si aún no existe (SQL pendiente), se crea normal.
+  // Siempre pasa por la función que aplica en el servidor la oferta vigente y el abono (p.pagoTipo = 'total' | 'abono').
+  // Si aún no existe (SQL pendiente), se crea el pedido normal.
   async crearPedido(p) {
     const datos = { ...p, businessId: this.id };
-    if (p.pagoTipo === 'abono') {
+    {
       const { data, error } = await sb.rpc('pedidos_crear_con_abono', { p: datos });
       if (!error) return data;
       if (!/function|does not exist|schema cache/i.test(error.message || '')) throw new Error(this.mensajeError(error));
-      console.error('pedidos_crear_con_abono no está instalada; se crea el pedido sin abono.', error);
+      console.error('pedidos_crear_con_abono no está instalada; se crea el pedido sin oferta ni abono.', error);
     }
     const { data, error } = await sb.rpc('pedidos_crear', { p: datos });
     if (error) throw new Error(this.mensajeError(error));
@@ -607,4 +678,5 @@ const Pedidos = {
   }
 };
 
+Pedidos.cliente = sb; // lo usa la campanita (tiempo real)
 window.Pedidos = Pedidos;
