@@ -42,7 +42,13 @@ p{font-size:14.5px;line-height:1.55;color:#6B6680;}
   <p class="ayuda" id="ayuda"></p>
 </main>
 <script src="/config.js"></script>
-<script>window.PAGO_CFG = { url: (window.PEDIDOS_CONFIG || {}).SUPABASE_URL, key: (window.PEDIDOS_CONFIG || {}).SUPABASE_KEY };</script>
+<script>
+// Mismo archivo para Agenda y Pedidos: usa el config.js de Pedidos si existe;
+// si no (Agenda), la llave pública de Annly. Nunca poner aquí service_role.
+window.PAGO_CFG = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.SUPABASE_URL)
+  ? { url: window.PEDIDOS_CONFIG.SUPABASE_URL, key: window.PEDIDOS_CONFIG.SUPABASE_KEY }
+  : { url: 'https://hokrimtsyseuqfjjvmxu.supabase.co', key: 'sb_publishable_7JZShvbADW0URka-k_hjBQ_MSE0LM-V' };
+</script>
 <script>
 // Página de resultado del pago de la mensualidad (Agenda y Tiendas).
 // Consulta el estado real del pago, que lo marca el webhook de PagueloFácil.
