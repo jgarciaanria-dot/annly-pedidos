@@ -406,9 +406,16 @@ const Pedidos = {
     return (data || []).map(f => ({ code: f.code, nombre: f.name, descripcion: f.description, precio: Number(f.monthly_price) || 0 }));
   },
 
-  // ¿Se puede USAR el módulo? Solo con la suscripción activa (no en prueba) y el módulo comprado
+  // ¿Se puede USAR el módulo? Con el módulo agregado y la suscripción activa, o en prueba gratis vigente
+  // (para que conozca la funcionalidad). Al vencer la prueba sin pagar, se bloquea.
   moduloDisponible(code) {
-    return !!(this.plan && this.plan.status === 'active' && this.modulos.includes(code));
+    if (!this.plan || !this.modulos.includes(code)) return false;
+    if (this.plan.status === 'active') return true;
+    if (this.plan.status === 'trial') {
+      const fin = String(this.plan.vence || '').slice(0, 10);
+      return !fin || fin >= new Date().toISOString().slice(0, 10);
+    }
+    return false;
   },
 
   async activarModulo(code, nombre, precio) {
@@ -435,28 +442,30 @@ const Pedidos = {
   },
 
   // Pago de la mensualidad con PagueloFácil: el servidor calcula el monto y crea un enlace único
-  async crearEnlaceMensualidad() {
+  async crearEnlaceMensualidad(modulo) {
     const { data, error } = await sb.functions.invoke('pf-crear-enlace', {
-      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin }
+      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin, modulo: modulo || undefined }
     });
     if (error) {
       let msg = error.message;
       try { const j = await error.context.json(); if (j && j.error) msg = j.error; } catch (_) {}
       throw new Error(msg);
     }
+    if (modulo && !/^m[oó]dulo/i.test((data && data.concepto) || '')) throw new Error('El servidor todavía no está actualizado para cobrar módulos. Intenta en unos minutos o escríbenos.');
     if (!data || !data.url) throw new Error((data && data.error) || 'No se pudo crear el enlace de pago.');
     return data;
   },
   // Pago de la mensualidad con Yappy: el servidor calcula el monto y crea la orden en Yappy
-  async crearOrdenYappyMensualidad(aliasYappy) {
+  async crearOrdenYappyMensualidad(aliasYappy, modulo) {
     const { data, error } = await sb.functions.invoke('yappy-crear-orden', {
-      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin, aliasYappy }
+      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin, aliasYappy, modulo: modulo || undefined }
     });
     if (error) {
       let msg = error.message;
       try { const j = await error.context.json(); if (j && j.error) msg = j.error; } catch (_) {}
       throw new Error(msg);
     }
+    if (modulo && !/^m[oó]dulo/i.test((data && data.concepto) || '')) throw new Error('El servidor todavía no está actualizado para cobrar módulos. Intenta en unos minutos o escríbenos.');
     if (!data || !data.body || !data.body.token) throw new Error((data && data.error) || 'No se pudo crear la orden de pago.');
     return data;
   },
