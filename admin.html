@@ -230,6 +230,8 @@ button,input,select,textarea{font-family:inherit;}
 .plan-incluye i{color:var(--violet);font-size:17px;flex-shrink:0;margin-top:1px;}
 .plan-aviso{display:flex;gap:10px;align-items:flex-start;background:#FFF8EA;border:1px solid #F6E2B8;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5;color:#7A5200;margin:12px 0;}
 .plan-aviso i{font-size:18px;margin-top:1px;}
+.pago-yappy{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);}
+.pago-yappy>b{font-size:13.5px;}
 .pago-lista{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
 .pago-lista div{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;font-size:13.5px;border-bottom:1px solid #F3F0F7;}
 .pago-lista div:last-child{border-bottom:0;}
@@ -929,6 +931,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
+<script type="module" src="https://bt-cdn.yappy.cloud/v1/cdn/web-component-btn-yappy.js"></script>
 <script src="config.js"></script>
 <script src="pedidos.js?v=16"></script>
 <script src="campana.js?v=1"></script>
@@ -1343,10 +1346,62 @@ async function cargarMiPlan(){
       </div>
       <button class="btn btn-grad" id="btn-pagar-mes" style="margin-top:12px;" onclick="pagarMensualidad()"><i class="ti ti-lock"></i> Pagar $${total.toFixed(2)} con tarjeta</button>
       <p class="ayuda" style="margin-top:8px;">Pago seguro con tarjeta de crédito o débito (PagueloFácil). Se abre en una ventana aparte y, al terminar, tu membresía se actualiza sola aquí.</p>
+      <div class="pago-yappy">
+        <b>O paga con Yappy</b>
+        <span class="ayuda" style="margin:2px 0 8px;display:block;">Aprueba el cobro en tu app Yappy.</span>
+        <input id="pf-yappy-alias" inputmode="numeric" maxlength="12" placeholder="Tu número Yappy (8 dígitos, sin +507)" autocomplete="tel" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;">
+        <p class="ayuda" id="pf-yappy-msg" style="min-height:14px;margin:6px 0 8px;"></p>
+        <btn-yappy id="pf-btn-yappy" theme="darkBlue" rounded="true"></btn-yappy>
+      </div>
       ${ultimos.length ? `<div class="pago-hist"><b>Últimos pagos</b>${ultimos.map(x => `<span><i class="ti ti-circle-check"></i>${E(x.concepto)} · $${Number(x.monto_pagado || x.monto).toFixed(2)}</span>`).join('')}</div>` : ''}
     </div>`;
 
   cont.innerHTML = planHtml + mensualidadHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '');
+  activarBotonYappy();
+}
+
+// ---------- Pagar con Yappy ----------
+// El botón oficial crea la orden en el servidor (yappy-crear-orden). El navegador NUNCA confirma el pago:
+// lo confirma el aviso IPN de Yappy al servidor; aquí solo se consulta ese estado.
+function activarBotonYappy(){
+  const btn = document.getElementById('pf-btn-yappy');
+  if (!btn) return;
+  const msg = document.getElementById('pf-yappy-msg');
+  const decir = (t, ok) => { if (msg){ msg.style.color = ok ? '#159A61' : '#C2455F'; msg.textContent = t || ''; } };
+  btn.addEventListener('eventClick', async () => {
+    decir('Creando tu orden de pago…', true); msg.style.color = '';
+    try {
+      const r = await Pedidos.crearOrdenYappyMensualidad(document.getElementById('pf-yappy-alias').value);
+      window._yappyPagoId = r.pagoId;
+      decir('');
+      btn.eventPayment({ transactionId: r.body.transactionId, documentName: r.body.documentName, token: r.body.token });
+    } catch(e){
+      console.error(e);
+      decir(e.message || 'No se pudo crear la orden de pago.');
+      btn.isButtonLoading = false;
+    }
+  });
+  btn.addEventListener('eventSuccess', () => { esperarConfirmacionYappy(); });
+  btn.addEventListener('eventError', () => {
+    decir('El pago no se completó. Puedes intentarlo de nuevo.');
+    btn.isButtonLoading = false;
+  });
+}
+async function esperarConfirmacionYappy(){
+  const msg = document.getElementById('pf-yappy-msg');
+  if (msg){ msg.style.color = '#159A61'; msg.textContent = 'Pago recibido. Confirmando tu membresía…'; }
+  const id = window._yappyPagoId;
+  for (let i = 0; i < 60 && id; i++){
+    try {
+      const { data } = await sb.rpc('estado_pago_plataforma', { p_id: id });
+      const p = Array.isArray(data) ? data[0] : data;
+      if (p && p.estado === 'confirmado'){ cargarMiPlan(); setTimeout(() => alert('¡Pago confirmado! Tu membresía quedó activa.'), 300); return; }
+      if (p && p.estado === 'rechazado'){ if (msg){ msg.style.color = '#C2455F'; msg.textContent = 'El pago no se completó.'; } return; }
+    } catch(e){ console.error(e); }
+    await new Promise(r => setTimeout(r, 3000));
+  }
+  if (msg){ msg.style.color = ''; msg.textContent = 'Tu pago está en proceso. Si se completó, tu plan se activará solo en unos minutos.'; }
+  cargarMiPlan();
 }
 
 // Aviso arriba del panel cuando la prueba o la membresía están por terminar (o ya vencieron)
