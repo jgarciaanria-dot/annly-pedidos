@@ -406,9 +406,16 @@ const Pedidos = {
     return (data || []).map(f => ({ code: f.code, nombre: f.name, descripcion: f.description, precio: Number(f.monthly_price) || 0 }));
   },
 
-  // ¿Se puede USAR el módulo? Solo con la suscripción activa (no en prueba) y el módulo comprado
+  // ¿Se puede USAR el módulo? Con el módulo agregado y la suscripción activa, o en prueba gratis vigente
+  // (para que conozca la funcionalidad). Al vencer la prueba sin pagar, se bloquea.
   moduloDisponible(code) {
-    return !!(this.plan && this.plan.status === 'active' && this.modulos.includes(code));
+    if (!this.plan || !this.modulos.includes(code)) return false;
+    if (this.plan.status === 'active') return true;
+    if (this.plan.status === 'trial') {
+      const fin = String(this.plan.vence || '').slice(0, 10);
+      return !fin || fin >= new Date().toISOString().slice(0, 10);
+    }
+    return false;
   },
 
   async activarModulo(code, nombre, precio) {

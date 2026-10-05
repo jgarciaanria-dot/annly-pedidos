@@ -1305,7 +1305,7 @@ async function cargarMiPlan(){
         <li><i class="ti ti-check"></i>Nombre, logo, portada y colores de tu tienda</li>
       </ul>
       ${enPrueba ? `
-        <div class="plan-aviso"><i class="ti ti-hourglass"></i><div>Estás en tu <b>prueba gratis</b>${p.vence ? ' hasta el <b>' + fechaPlan(p.vence) + '</b>' + (d != null && d >= 0 ? ' (' + d + (d === 1 ? ' día' : ' días') + ')' : '') : ''}. Los módulos que compres se activan cuando termines la prueba.</div></div>
+        <div class="plan-aviso"><i class="ti ti-hourglass"></i><div>Estás en tu <b>prueba gratis</b>${p.vence ? ' hasta el <b>' + fechaPlan(p.vence) + '</b>' + (d != null && d >= 0 ? ' (' + d + (d === 1 ? ' día' : ' días') + ')' : '') : ''}. Los módulos que agregues los puedes usar durante la prueba; al terminar, paga tu mensualidad para conservarlos.</div></div>
         <button class="btn btn-grad" style="width:auto;" onclick="terminarPrueba()"><i class="ti ti-rocket"></i> Terminar mi prueba y activar mi plan</button>
         <p class="msg" id="plan-msg"></p>` : `<p class="ayuda" style="margin-top:10px;"><i class="ti ti-circle-check" style="color:#1D7A46;"></i> Plan activo.</p>`}
     </div>`;
@@ -1317,7 +1317,7 @@ async function cargarMiPlan(){
     let acciones;
     if (!activo) acciones = `<button class="btn btn-grad" style="width:auto;" onclick="activarModulo('${m.code}')"><i class="ti ti-plus"></i> Agregar a mi plan</button>`;
     else if (det.cancela_el) acciones = `<span class="mod-estado" style="background:#FFF4DE;color:#9A6200;">Activo hasta el ${fechaPlan(det.cancela_el)}</span>`;
-    else acciones = `<span class="mod-estado">${enPrueba ? 'Se activa al terminar la prueba' : 'Activo'}</span>
+    else acciones = `<span class="mod-estado">${enPrueba ? 'Activo en tu prueba' : 'Activo'}</span>
       <button class="chip-btn" onclick="cancelarModulo('${m.code}')"><i class="ti ti-x"></i> Cancelar</button>`;
     return `<div class="mod-card${activo ? ' on' : ''}">
       <div class="mod-ico"><i class="ti ${m.code === 'PEDIDOS_REPORTES' ? 'ti-chart-bar' : 'ti-puzzle'}"></i></div>
@@ -1557,7 +1557,7 @@ async function activarModulo(code){
   // Fuera de la prueba gratis, el módulo se paga al agregarlo (tarjeta o Yappy) y se activa al confirmarse
   if (!(Pedidos.plan && Pedidos.plan.status === 'trial')){ abrirPagoModulo(m); return; }
   if (!confirm(`¿Agregar "${m.nombre}" por $${m.precio.toFixed(0)}/mes?`)) return;
-  try { await Pedidos.activarModulo(m.code, m.nombre, m.precio); await cargarMiPlan(); }
+  try { await Pedidos.activarModulo(m.code, m.nombre, m.precio); await cargarMiPlan(); pintarEncabezado(); }
   catch(e){ alert(e.message); }
 }
 async function cancelarModulo(code){
@@ -1574,7 +1574,7 @@ async function cargarReportes(){
     const p = Pedidos.plan;
     const comprado = Pedidos.modulos.includes('PEDIDOS_REPORTES');
     const nota = comprado && p && p.status === 'trial'
-      ? 'Ya lo agregaste a tu plan: se activa cuando termines tu prueba gratis.'
+      ? 'Tu prueba terminó: paga tu mensualidad para volver a usar este módulo.'
       : 'Agrégalo a tu plan por <b>$8/mes</b> y conoce de verdad cómo va tu tienda.';
     cont.innerHTML = `<div class="vitrina">
       <div class="vitrina-ico"><i class="ti ti-chart-bar"></i></div>
