@@ -435,9 +435,9 @@ const Pedidos = {
   },
 
   // Pago de la mensualidad con PagueloFácil: el servidor calcula el monto y crea un enlace único
-  async crearEnlaceMensualidad() {
+  async crearEnlaceMensualidad(modulo) {
     const { data, error } = await sb.functions.invoke('pf-crear-enlace', {
-      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin }
+      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin, modulo: modulo || undefined }
     });
     if (error) {
       let msg = error.message;
@@ -448,9 +448,9 @@ const Pedidos = {
     return data;
   },
   // Pago de la mensualidad con Yappy: el servidor calcula el monto y crea la orden en Yappy
-  async crearOrdenYappyMensualidad(aliasYappy) {
+  async crearOrdenYappyMensualidad(aliasYappy, modulo) {
     const { data, error } = await sb.functions.invoke('yappy-crear-orden', {
-      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin, aliasYappy }
+      body: { negocioId: this.id, origen: 'pedidos', volverA: window.location.origin, aliasYappy, modulo: modulo || undefined }
     });
     if (error) {
       let msg = error.message;
