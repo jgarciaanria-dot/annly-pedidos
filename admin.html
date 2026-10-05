@@ -1556,7 +1556,7 @@ async function activarModulo(code){
   if (!m) return;
   // Fuera de la prueba gratis, el módulo se paga al agregarlo (tarjeta o Yappy) y se activa al confirmarse
   if (!(Pedidos.plan && Pedidos.plan.status === 'trial')){ abrirPagoModulo(m); return; }
-  if (!confirm(`¿Agregar "${m.nombre}" por $${m.precio.toFixed(0)}/mes?`)) return;
+  if (!confirm(`¿Agregar "${m.nombre}"? Durante tu prueba gratis lo usas sin costo; al terminar, se suma a tu mensualidad ($${m.precio.toFixed(0)}/mes).`)) return;
   try { await Pedidos.activarModulo(m.code, m.nombre, m.precio); await cargarMiPlan(); pintarEncabezado(); }
   catch(e){ alert(e.message); }
 }
