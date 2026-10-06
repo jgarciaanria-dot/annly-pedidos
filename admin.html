@@ -1598,9 +1598,11 @@ async function cargarReportes(){
   if (!Pedidos.moduloDisponible('PEDIDOS_REPORTES')){
     const p = Pedidos.plan;
     const comprado = Pedidos.modulos.includes('PEDIDOS_REPORTES');
+    let precioRep = 6;
+    try { const cat = await Pedidos.catalogoModulos(); const m = cat.find(x => x.code === 'PEDIDOS_REPORTES'); if (m && m.precio) precioRep = m.precio; } catch(e){}
     const nota = comprado && p && p.status === 'trial'
       ? 'Tu prueba terminó: paga tu mensualidad para volver a usar este módulo.'
-      : 'Agrégalo a tu plan por <b>$8/mes</b> y conoce de verdad cómo va tu tienda.';
+      : 'Agrégalo a tu plan por <b>$' + precioRep.toFixed(0) + '/mes</b> y conoce de verdad cómo va tu tienda.';
     cont.innerHTML = `<div class="vitrina">
       <div class="vitrina-ico"><i class="ti ti-chart-bar"></i></div>
       <h2>Ventas e Inventario</h2>
