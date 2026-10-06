@@ -468,6 +468,44 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
   .acc-row > *{flex:1 1 140px;}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+
+/* Pago de la membresía en tarjetas separadas */
+.pf-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch;margin-bottom:14px}
+.pf-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;min-width:0}
+.pf-ico{width:42px;height:42px;border-radius:12px;background:#F4EAFF;color:#7424d4;display:grid;place-items:center;font-size:21px;margin-bottom:12px}
+.pf-ico.yappy{background:#E3F0FF;color:#1676D8}
+.pf-card h3{margin:0 0 4px;font-size:16px}
+.pf-desc{font-size:12.5px;line-height:1.5;color:var(--ink-soft);margin:0 0 14px}
+.pf-monto{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;line-height:1;margin:0 0 14px}
+.pf-monto small{font-family:inherit;font-size:12.5px;font-weight:500;color:var(--ink-soft);margin-left:6px}
+.pf-card .pf-pagar{width:100%;height:46px;border-radius:999px;margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700}
+.pf-card btn-yappy{display:block;width:100%;max-width:100%;margin-top:auto}
+@media(max-width:1100px){.pf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pf-grid>.pf-card:first-child{grid-column:1/-1}}
+@media(max-width:700px){.pf-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Programa de clientes */
+.club-card{display:flex;align-items:flex-start;gap:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:14px}
+.club-ico{width:46px;height:46px;border-radius:14px;background:var(--lilac);color:var(--violet);display:grid;place-items:center;font-size:23px;flex:none}
+.club-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.club-txt b{font-size:14.5px}.club-txt span{font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
+.club-txt small{font-size:11.5px;color:var(--violet);font-weight:600}
+.club-sw{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 12px;border-radius:12px;background:#F7F3FB;font-size:13px;font-weight:600}
+.tg{position:relative;width:40px;height:23px;flex-shrink:0}.tg input{opacity:0;width:0;height:0;position:absolute}
+.tg-track{position:absolute;inset:0;border-radius:999px;background:#DDD9E3;cursor:pointer;transition:background .2s}
+.tg input:checked+.tg-track{background:#42A978}
+.tg-thumb{position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);pointer-events:none}
+.tg input:checked~.tg-thumb{transform:translateX(17px)}
+.club-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.club-filtros button{font:600 12px 'DM Sans',sans-serif;border:1.5px solid var(--line);background:#fff;color:var(--ink);padding:7px 13px;border-radius:999px;cursor:pointer}
+.club-filtros button.on{background:var(--lilac);border-color:var(--violet);color:var(--violet)}
+.club-filtros .club-csv{margin-left:auto;display:inline-flex;gap:6px;align-items:center}
+.cli-fila{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #F3F0F7}
+.cli-av{width:38px;height:38px;border-radius:50%;background:var(--lilac);color:var(--violet);display:grid;place-items:center;font-weight:700;flex:none}
+.cli-info{flex:1;min-width:0}.cli-info b{display:block;font-size:14px}.cli-info span{display:block;font-size:12px;color:var(--ink-soft)}
+.club-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.club-tag{display:inline-flex;gap:4px;align-items:center;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--lilac);color:var(--violet)}
+.club-tag.cumple{background:#FDE8EF;color:#B4476B}
+@media(max-width:700px){.club-card{flex-wrap:wrap}.club-filtros .club-csv{margin-left:0}}
 </style>
 </head>
 <body>
@@ -518,6 +556,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
     <button class="tab" data-tab="catalogo" onclick="irTab('catalogo')"><i class="ti ti-flower"></i>Catálogo</button>
     <button class="tab" data-tab="inventario" onclick="irTab('inventario')"><i class="ti ti-packages"></i>Inventario</button>
     <button class="tab" data-tab="entregas" onclick="irTab('entregas')"><i class="ti ti-truck-delivery"></i>Entregas y horarios</button>
+    <button class="tab" data-tab="clientes" onclick="irTab('clientes')"><i class="ti ti-users"></i>Clientes<i class="ti ti-lock tab-lock" id="lock-clientes" hidden></i></button>
     <button class="tab" data-tab="reportes" onclick="irTab('reportes')"><i class="ti ti-chart-bar"></i>Reportes<i class="ti ti-lock tab-lock" id="lock-reportes" hidden></i></button>
     <button class="tab" data-tab="config" onclick="irTab('config')"><i class="ti ti-settings"></i>Configuración</button>
     <button class="tab" data-tab="plan" onclick="irTab('plan')"><i class="ti ti-sparkles"></i>Mi plan</button>
@@ -617,6 +656,10 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
           <button class="btn-add" onclick="abrirFecha()"><i class="ti ti-plus"></i> Bloquear fecha</button></div>
         <div class="sec-body" id="lista-fechas"></div>
       </div>
+    </section>
+
+    <section id="tab-clientes" class="tabsec" hidden>
+      <div id="cli-contenido"></div>
     </section>
 
     <!-- Configuración -->
@@ -941,7 +984,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
 <script type="module" src="https://bt-cdn.yappy.cloud/v1/cdn/web-component-btn-yappy.js"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=17"></script>
+<script src="pedidos.js?v=18"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -994,6 +1037,8 @@ function pintarEncabezado(){
   });
   const lock = document.getElementById('lock-reportes');
   if (lock) lock.hidden = Pedidos.moduloDisponible('PEDIDOS_REPORTES');
+  const lockCli = document.getElementById('lock-clientes');
+  if (lockCli) lockCli.hidden = Pedidos.moduloDisponible('PEDIDOS_CLIENTES');
   const baseTienda = ((window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.TIENDA_URL) || window.location.origin).replace(/\/$/, '');
   document.getElementById('hdr-sub').textContent = baseTienda.replace(/^https?:\/\//, '') + '/' + n.slug;
   const verM = document.getElementById('topm-ver');
@@ -1054,7 +1099,7 @@ async function cargarInicio(){
 }
 
 // ---------- Pestañas ----------
-const CARGA_TAB = { pedidos: cargarPedidos, catalogo: cargarCatalogo, inventario: cargarInventario, entregas: cargarEntregas, config: cargarConfig, plan: cargarMiPlan, reportes: cargarReportes };
+const CARGA_TAB = { pedidos: cargarPedidos, catalogo: cargarCatalogo, inventario: cargarInventario, entregas: cargarEntregas, config: cargarConfig, plan: cargarMiPlan, reportes: cargarReportes, clientes: cargarClientes };
 
 // =====================================================================
 // PEDIDOS EN CALENDARIO (Día: Domicilio | Retiro · Semana · Mes)
@@ -1351,27 +1396,35 @@ async function cargarMiPlan(){
       <h2 style="font-size:20px;margin-bottom:4px;"><i class="ti ti-heart-handshake"></i> Plan de cortesía</h2>
       <p class="ayuda" style="margin:0;">Esta cuenta tiene un acuerdo comercial con Annly: el plan está activo, sin pagos pendientes y sin fecha de vencimiento.</p>
     </div>` : `
-    <div class="plan-card">
-      <h2 style="font-size:20px;margin-bottom:4px;">Tu mensualidad</h2>
-      <p class="ayuda" style="margin:0 0 12px;">${pagadoHasta ? 'Tu membresía está pagada hasta el <b>' + fechaPlan(pagadoHasta) + '</b>.'
-        : enPrueba ? 'Estás en tu prueba gratis. Al pagar, tu membresía y tus módulos quedan activos de inmediato.'
-        : (p.vence ? 'Tu membresía vence el <b>' + fechaPlan(p.vence) + '</b>. Paga para mantenerla activa.' : '')}</p>
-      <div class="pago-lista">
-        <div><span>Plan ${E(p.nombre)}</span><b>$${p.precio.toFixed(2)}</b></div>
-        ${activos.map(m => `<div><span>${E(m.nombre)}</span><b>$${m.precio.toFixed(2)}</b></div>`).join('')}
-        <div class="pago-total"><span>Total del mes</span><b>$${total.toFixed(2)}</b></div>
+    <div class="pf-grid">
+      <div class="pf-card">
+        <h2 style="font-size:18px;margin-bottom:4px;"><i class="ti ti-receipt" style="color:var(--purple,#7424d4);"></i> Tu mensualidad</h2>
+        <p class="ayuda" style="margin:0 0 12px;">${pagadoHasta ? 'Tu membresía está pagada hasta el <b>' + fechaPlan(pagadoHasta) + '</b>.'
+          : enPrueba ? 'Estás en tu prueba gratis. Al pagar, tu membresía y tus módulos quedan activos de inmediato.'
+          : (p.vence ? 'Tu membresía vence el <b>' + fechaPlan(p.vence) + '</b>. Paga para mantenerla activa.' : '')}</p>
+        <div class="pago-lista">
+          <div><span>Plan ${E(p.nombre)}</span><b>$${p.precio.toFixed(2)}</b></div>
+          ${activos.map(m => `<div><span>${E(m.nombre)}</span><b>$${m.precio.toFixed(2)}</b></div>`).join('')}
+          <div class="pago-total"><span>Total del mes</span><b>$${total.toFixed(2)}</b></div>
+        </div>
       </div>
-      <button class="btn btn-grad" id="btn-pagar-mes" style="margin-top:12px;" onclick="pagarMensualidad()"><i class="ti ti-lock"></i> Pagar $${total.toFixed(2)} con tarjeta</button>
-      <p class="ayuda" style="margin-top:8px;">Pago seguro con tarjeta de crédito o débito (PagueloFácil). Se abre en una ventana aparte y, al terminar, tu membresía se actualiza sola aquí.</p>
-      <div class="pago-yappy">
-        <b>O paga con Yappy</b>
-        <span class="ayuda" style="margin:2px 0 8px;display:block;">Aprueba el cobro en tu app Yappy.</span>
-        <input id="pf-yappy-alias" inputmode="numeric" maxlength="12" placeholder="Tu número Yappy (8 dígitos, sin +507)" autocomplete="tel" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;">
+      <div class="pf-card">
+        <div class="pf-ico"><i class="ti ti-credit-card"></i></div>
+        <h3>Paga con tarjeta</h3>
+        <p class="pf-desc">Tarjeta de crédito o débito, con pago seguro de PagueloFácil. Se abre en una ventana aparte y, al terminar, tu membresía se actualiza sola aquí.</p>
+        <div class="pf-monto">$${total.toFixed(2)}<small>al mes</small></div>
+        <button class="btn btn-grad pf-pagar" id="btn-pagar-mes" onclick="pagarMensualidad()"><i class="ti ti-credit-card"></i> Pagar $${total.toFixed(2)} con tarjeta</button>
+      </div>
+      <div class="pf-card" id="pf-yappy">
+        <div class="pf-ico yappy"><i class="ti ti-device-mobile"></i></div>
+        <h3>Paga con Yappy</h3>
+        <p class="pf-desc">Escribe tu número y aprueba el cobro en tu app Yappy.</p>
+        <input id="pf-yappy-alias" inputmode="numeric" maxlength="12" placeholder="Tu número Yappy (8 dígitos)" autocomplete="tel" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;">
         <p class="ayuda" id="pf-yappy-msg" style="min-height:14px;margin:6px 0 8px;"></p>
         <btn-yappy id="pf-btn-yappy" theme="darkBlue" rounded="true"></btn-yappy>
       </div>
-      ${ultimos.length ? `<div class="pago-hist"><b>Últimos pagos</b>${ultimos.map(x => `<span><i class="ti ti-circle-check"></i>${E(x.concepto)} · $${Number(x.monto_pagado || x.monto).toFixed(2)}</span>`).join('')}</div>` : ''}
-    </div>`;
+    </div>
+    ${ultimos.length ? `<div class="plan-card" style="margin-top:12px;"><div class="pago-hist" style="margin-top:0;"><b>Últimos pagos</b>${ultimos.map(x => `<span><i class="ti ti-circle-check"></i>${E(x.concepto)} · $${Number(x.monto_pagado || x.monto).toFixed(2)}</span>`).join('')}</div></div>` : ''}`;
 
   cont.innerHTML = planHtml + mensualidadHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '');
   activarBotonYappy();
@@ -1454,7 +1507,7 @@ function abrirModalPago(o){
     <div class="pago-yappy">
       <b>O paga con Yappy</b>
       <span class="ayuda" style="margin:2px 0 8px;display:block;">Aprueba el cobro en tu app Yappy.</span>
-      <input id="pm-yappy-alias" inputmode="numeric" maxlength="12" placeholder="Tu número Yappy (8 dígitos, sin +507)" autocomplete="tel" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;">
+      <input id="pm-yappy-alias" inputmode="numeric" maxlength="12" placeholder="Tu número Yappy (8 dígitos)" autocomplete="tel" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;">
       <p class="ayuda" id="pm-yappy-msg" style="min-height:14px;margin:6px 0 8px;"></p>
       <btn-yappy id="pm-btn-yappy" theme="darkBlue" rounded="true"></btn-yappy>
     </div>
@@ -1591,6 +1644,108 @@ async function cancelarModulo(code){
   catch(e){ alert(e.message); }
 }
 
+// ---------- Clientes (módulo Programa de clientes) ----------
+const MESES_CLUB = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+let CLIENTES = [], FILTRO_CLI = 'todos', BUSCA_CLI = '';
+const mesActualPanama = () => new Date(Date.now() - 5 * 3600000).getUTCMonth() + 1;
+const textoCumple = c => c.cumple_dia && c.cumple_mes ? c.cumple_dia + ' de ' + MESES_CLUB[c.cumple_mes - 1].toLowerCase() : '';
+
+async function cargarClientes(){
+  const cont = document.getElementById('cli-contenido');
+  if (!Pedidos.plan) await Pedidos.cargarPlan();
+  if (!Pedidos.moduloDisponible('PEDIDOS_CLIENTES')){
+    const comprado = Pedidos.modulos.includes('PEDIDOS_CLIENTES');
+    let m = null;
+    try { m = (await Pedidos.catalogoModulos()).find(x => x.code === 'PEDIDOS_CLIENTES'); } catch(e){}
+    const precio = m && m.precio ? m.precio : 6;
+    cont.innerHTML = `<div class="vitrina">
+      <div class="vitrina-ico"><i class="ti ti-heart-handshake"></i></div>
+      <h2>Programa de clientes</h2>
+      <p>Deja un botón en tu tienda para que tus compradores se inscriban y reciban descuentos, regalos y promociones. Armas tu base de clientes con su cumpleaños y su permiso para contactarlos.</p>
+      <p class="ayuda">${comprado && Pedidos.plan && Pedidos.plan.status === 'trial' ? 'Tu prueba terminó: paga tu mensualidad para volver a usar este módulo.' : 'Agrégalo a tu plan por <b>$' + precio.toFixed(0) + '/mes</b>.'}</p>
+      ${comprado ? '' : `<button class="btn btn-grad" style="width:auto;" onclick="activarModulo('PEDIDOS_CLIENTES')"><i class="ti ti-plus"></i> Agregar a mi plan</button>`}
+    </div>`;
+    return;
+  }
+  cont.innerHTML = '<p class="ayuda">Cargando…</p>';
+  try { CLIENTES = await Pedidos.listarClientes(); } catch(e){ console.error(e); CLIENTES = []; }
+  pintarClientes();
+}
+
+function pintarClientes(){
+  const cont = document.getElementById('cli-contenido');
+  const on = !!(Pedidos.negocio && Pedidos.negocio.inscripcion_clientes);
+  const inscritos = CLIENTES.filter(c => c.acepta_promos).length;
+  const mes = mesActualPanama();
+  const cumples = CLIENTES.filter(c => c.cumple_mes === mes).length;
+  const q = BUSCA_CLI.toLowerCase();
+  const lista = CLIENTES.filter(c => {
+    if (FILTRO_CLI === 'inscritos' && !c.acepta_promos) return false;
+    if (FILTRO_CLI === 'cumple' && c.cumple_mes !== mes) return false;
+    return !q || (c.nombre || '').toLowerCase().includes(q) || (c.telefono || '').includes(q);
+  });
+  cont.innerHTML = `
+    <div class="club-card">
+      <div class="club-ico"><i class="ti ti-heart-handshake"></i></div>
+      <div class="club-txt"><b>Programa de clientes</b>
+        <span>Muestra en tu tienda el botón <b>"Recibe descuentos y regalos"</b>. Quienes se inscriben quedan en esta lista, con su cumpleaños y su permiso para recibir promociones.</span>
+        <small>${inscritos} inscrito${inscritos === 1 ? '' : 's'} · ${cumples} cumpleaños este mes</small>
+        <div class="club-sw"><label class="tg"><input type="checkbox" id="club-toggle" ${on ? 'checked' : ''} onchange="toggleClub(this.checked)"><span class="tg-track"></span><span class="tg-thumb"></span></label><span id="club-sw-txt">${on ? 'Botón activado en tu tienda' : 'Activar el botón en mi tienda'}</span></div>
+        <small id="club-msg" style="min-height:14px;"></small>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-body" style="padding:16px;">
+      <input class="fi" id="cli-buscar" placeholder="Buscar por nombre o teléfono…" value="${E(BUSCA_CLI)}" oninput="BUSCA_CLI=this.value;pintarClientes();document.getElementById('cli-buscar').focus()" style="margin-bottom:10px;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;">
+      <div class="club-filtros">
+        <button type="button" class="${FILTRO_CLI === 'todos' ? 'on' : ''}" onclick="setFiltroCli('todos')">Todos</button>
+        <button type="button" class="${FILTRO_CLI === 'inscritos' ? 'on' : ''}" onclick="setFiltroCli('inscritos')">Inscritos</button>
+        <button type="button" class="${FILTRO_CLI === 'cumple' ? 'on' : ''}" onclick="setFiltroCli('cumple')">Cumpleaños del mes</button>
+        <button type="button" class="club-csv" onclick="exportarInscritosCSV()"><i class="ti ti-download"></i> Descargar inscritos</button>
+      </div>
+      ${lista.length ? lista.map(c => {
+        const cum = textoCumple(c);
+        return `<div class="cli-fila">
+          <div class="cli-av">${E((c.nombre || '?').trim().charAt(0).toUpperCase())}</div>
+          <div class="cli-info"><b>${E(c.nombre)}</b>
+            <span>${E(c.telefono || '')}${c.email ? ' · ' + E(c.email) : ''}</span>
+            ${(c.acepta_promos || cum) ? `<div class="club-tags">${c.acepta_promos ? '<span class="club-tag"><i class="ti ti-heart"></i> Inscrito</span>' : ''}${cum ? '<span class="club-tag cumple"><i class="ti ti-cake"></i> ' + cum + '</span>' : ''}</div>` : ''}
+          </div>
+          <button class="chip-btn" onclick="eliminarClienteUI('${c.id}')" title="Eliminar"><i class="ti ti-trash"></i></button>
+        </div>`;
+      }).join('') : '<p class="ayuda" style="text-align:center;padding:1rem 0;">No hay clientes para mostrar.</p>'}
+    </div></div>`;
+}
+function setFiltroCli(f){ FILTRO_CLI = f; pintarClientes(); }
+async function toggleClub(v){
+  const msg = document.getElementById('club-msg');
+  try {
+    await Pedidos.activarInscripcion(v);
+    if (msg){ msg.style.color = '#159A61'; msg.textContent = v ? 'Listo: el botón ya aparece en tu tienda.' : 'Listo: el botón se quitó de tu tienda.'; }
+    const sw = document.getElementById('club-sw-txt'); if (sw) sw.textContent = v ? 'Botón activado en tu tienda' : 'Activar el botón en mi tienda';
+  } catch(e){
+    console.error(e);
+    const t = document.getElementById('club-toggle'); if (t) t.checked = !v;
+    if (msg){ msg.style.color = '#C2455F'; msg.textContent = 'No se pudo guardar. Intenta de nuevo.'; }
+  }
+}
+async function eliminarClienteUI(id){
+  if (!confirm('¿Eliminar este cliente de la lista?')) return;
+  try { await Pedidos.eliminarCliente(id); CLIENTES = CLIENTES.filter(c => c.id !== id); pintarClientes(); }
+  catch(e){ console.error(e); alert('No se pudo eliminar. Intenta de nuevo.'); }
+}
+function exportarInscritosCSV(){
+  const lista = CLIENTES.filter(c => c.acepta_promos);
+  if (!lista.length){ alert('Todavía no tienes clientes inscritos.'); return; }
+  const q = t => '"' + String(t == null ? '' : t).replace(/"/g, '""') + '"';
+  const filas = [['Nombre','Teléfono','Correo','Cumpleaños'].map(q).join(',')]
+    .concat(lista.map(c => [c.nombre, c.telefono, c.email || '', textoCumple(c)].map(q).join(',')));
+  const blob = new Blob(['\ufeff' + filas.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'clientes-inscritos.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
 // ---------- Reportes (módulo Ventas e Inventario) ----------
 async function cargarReportes(){
   const cont = document.getElementById('rep-contenido');
@@ -1598,9 +1753,11 @@ async function cargarReportes(){
   if (!Pedidos.moduloDisponible('PEDIDOS_REPORTES')){
     const p = Pedidos.plan;
     const comprado = Pedidos.modulos.includes('PEDIDOS_REPORTES');
+    let precioRep = 6;
+    try { const cat = await Pedidos.catalogoModulos(); const m = cat.find(x => x.code === 'PEDIDOS_REPORTES'); if (m && m.precio) precioRep = m.precio; } catch(e){}
     const nota = comprado && p && p.status === 'trial'
       ? 'Tu prueba terminó: paga tu mensualidad para volver a usar este módulo.'
-      : 'Agrégalo a tu plan por <b>$8/mes</b> y conoce de verdad cómo va tu tienda.';
+      : 'Agrégalo a tu plan por <b>$' + precioRep.toFixed(0) + '/mes</b> y conoce de verdad cómo va tu tienda.';
     cont.innerHTML = `<div class="vitrina">
       <div class="vitrina-ico"><i class="ti ti-chart-bar"></i></div>
       <h2>Ventas e Inventario</h2>

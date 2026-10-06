@@ -619,6 +619,40 @@ const Pedidos = {
     return data || [];
   },
 
+  // -------------------------------------------------------
+  // PROGRAMA DE CLIENTES (módulo PEDIDOS_CLIENTES)
+  // -------------------------------------------------------
+  async listarClientes() {
+    const { data, error } = await sb.from('clients').select('*').eq('business_id', this.id).order('nombre');
+    if (error) throw error;
+    return data || [];
+  },
+  async eliminarCliente(id) {
+    const { error } = await sb.from('clients').delete().eq('id', id).eq('business_id', this.id);
+    if (error) throw error;
+  },
+  // Interruptor: mostrar u ocultar el botón de inscripción en la tienda pública
+  async activarInscripcion(v) {
+    const { error } = await sb.from('businesses').update({ inscripcion_clientes: !!v }).eq('id', this.id);
+    if (error) throw error;
+    if (this.negocio) this.negocio.inscripcion_clientes = !!v;
+  },
+  // Tienda pública: ¿se muestra el botón para inscribirse?
+  async inscripcionClientesActiva() {
+    if (!this.id) return false;
+    const { data, error } = await sb.rpc('inscripcion_clientes_activa', { p_business: this.id });
+    if (error) { console.warn('Inscripción de clientes:', error.message); return false; }
+    return data === true;
+  },
+  async inscribirCliente(d) {
+    const { data, error } = await sb.rpc('inscribir_cliente', {
+      p_business: this.id, p_nombre: d.nombre, p_telefono: d.telefono, p_correo: d.correo || null,
+      p_cumple_dia: d.cumpleDia || null, p_cumple_mes: d.cumpleMes || null, p_acepta: !!d.acepta
+    });
+    if (error) throw error;
+    return data;
+  },
+
   // Sin pasarela de pago todavía: el dueño termina la prueba con un clic (igual que en Agenda)
   async activarSuscripcion() {
     if (!this.plan) throw new Error('Tu tienda no tiene plan todavía.');
