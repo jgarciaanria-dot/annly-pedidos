@@ -230,6 +230,16 @@ button,input,select,textarea{font-family:inherit;}
 .plan-incluye i{color:var(--violet);font-size:17px;flex-shrink:0;margin-top:1px;}
 .plan-aviso{display:flex;gap:10px;align-items:flex-start;background:#FFF8EA;border:1px solid #F6E2B8;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5;color:#7A5200;margin:12px 0;}
 .plan-aviso i{font-size:18px;margin-top:1px;}
+.pago-yappy{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);}
+.pago-yappy>b{font-size:13.5px;}
+.pm-ov{position:fixed;inset:0;background:rgba(26,22,37,.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+.pm-box{position:relative;background:#fff;border-radius:20px;width:100%;max-width:420px;max-height:92vh;overflow-y:auto;padding:24px 22px 22px;}
+.pm-box h3{margin:0 24px 4px 0;font-size:17px;}
+.pm-x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:26px;line-height:1;cursor:pointer;color:var(--ink-soft,#77738A);}
+.pm-precio{font-size:26px;font-weight:800;margin:0 0 8px;}
+.pm-precio small{font-size:13px;font-weight:600;color:var(--ink-soft,#77738A);}
+/* Mientras el recuadro de pago de Yappy está abierto, el menú y el encabezado quedan por debajo */
+.yappy-abierto .side,.yappy-abierto .topm{z-index:0 !important;}
 .pago-lista{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
 .pago-lista div{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;font-size:13.5px;border-bottom:1px solid #F3F0F7;}
 .pago-lista div:last-child{border-bottom:0;}
@@ -929,8 +939,9 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
+<script type="module" src="https://bt-cdn.yappy.cloud/v1/cdn/web-component-btn-yappy.js"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=16"></script>
+<script src="pedidos.js?v=17"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -976,6 +987,11 @@ function pintarEncabezado(){
   const n = Pedidos.negocio;
   document.getElementById('hdr-nombre').innerHTML = E(n.nombre) + chipPlan();
   pintarAvisoPago();
+  // Aviso con contador (48 h de gracia) o cuenta suspendida (solo vista); "Mi plan" y el pago siguen abiertos
+  annlyAplicarEstadoCuenta(Pedidos.plan && Pedidos.plan.vence, {
+    irAPagar: () => irTab('plan'),
+    permitidos: '#tab-plan, .side, .topm, .side-fondo'
+  });
   const lock = document.getElementById('lock-reportes');
   if (lock) lock.hidden = Pedidos.moduloDisponible('PEDIDOS_REPORTES');
   const baseTienda = ((window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.TIENDA_URL) || window.location.origin).replace(/\/$/, '');
@@ -1296,7 +1312,7 @@ async function cargarMiPlan(){
         <li><i class="ti ti-check"></i>Nombre, logo, portada y colores de tu tienda</li>
       </ul>
       ${enPrueba ? `
-        <div class="plan-aviso"><i class="ti ti-hourglass"></i><div>Estás en tu <b>prueba gratis</b>${p.vence ? ' hasta el <b>' + fechaPlan(p.vence) + '</b>' + (d != null && d >= 0 ? ' (' + d + (d === 1 ? ' día' : ' días') + ')' : '') : ''}. Los módulos que compres se activan cuando termines la prueba.</div></div>
+        <div class="plan-aviso"><i class="ti ti-hourglass"></i><div>Estás en tu <b>prueba gratis</b>${p.vence ? ' hasta el <b>' + fechaPlan(p.vence) + '</b>' + (d != null && d >= 0 ? ' (' + d + (d === 1 ? ' día' : ' días') + ')' : '') : ''}. Los módulos que agregues los puedes usar durante la prueba; al terminar, paga tu mensualidad para conservarlos.</div></div>
         <button class="btn btn-grad" style="width:auto;" onclick="terminarPrueba()"><i class="ti ti-rocket"></i> Terminar mi prueba y activar mi plan</button>
         <p class="msg" id="plan-msg"></p>` : `<p class="ayuda" style="margin-top:10px;"><i class="ti ti-circle-check" style="color:#1D7A46;"></i> Plan activo.</p>`}
     </div>`;
@@ -1308,7 +1324,7 @@ async function cargarMiPlan(){
     let acciones;
     if (!activo) acciones = `<button class="btn btn-grad" style="width:auto;" onclick="activarModulo('${m.code}')"><i class="ti ti-plus"></i> Agregar a mi plan</button>`;
     else if (det.cancela_el) acciones = `<span class="mod-estado" style="background:#FFF4DE;color:#9A6200;">Activo hasta el ${fechaPlan(det.cancela_el)}</span>`;
-    else acciones = `<span class="mod-estado">${enPrueba ? 'Se activa al terminar la prueba' : 'Activo'}</span>
+    else acciones = `<span class="mod-estado">${enPrueba ? 'Activo en tu prueba' : 'Activo'}</span>
       <button class="chip-btn" onclick="cancelarModulo('${m.code}')"><i class="ti ti-x"></i> Cancelar</button>`;
     return `<div class="mod-card${activo ? ' on' : ''}">
       <div class="mod-ico"><i class="ti ${m.code === 'PEDIDOS_REPORTES' ? 'ti-chart-bar' : 'ti-puzzle'}"></i></div>
@@ -1330,7 +1346,11 @@ async function cargarMiPlan(){
   // "Pagada" solo si un pago confirmado cubre la fecha; si no, la fecha es solo el vencimiento
   const hoyIso = new Date().toISOString().slice(0, 10);
   const pagadoHasta = pagos.filter(x => x.estado === 'confirmado' && x.periodo_hasta && x.periodo_hasta >= hoyIso).map(x => x.periodo_hasta).sort().pop();
-  const mensualidadHtml = `
+  const mensualidadHtml = annlyEsCortesia(p.vence) ? `
+    <div class="plan-card">
+      <h2 style="font-size:20px;margin-bottom:4px;"><i class="ti ti-heart-handshake"></i> Plan de cortesía</h2>
+      <p class="ayuda" style="margin:0;">Esta cuenta tiene un acuerdo comercial con Annly: el plan está activo, sin pagos pendientes y sin fecha de vencimiento.</p>
+    </div>` : `
     <div class="plan-card">
       <h2 style="font-size:20px;margin-bottom:4px;">Tu mensualidad</h2>
       <p class="ayuda" style="margin:0 0 12px;">${pagadoHasta ? 'Tu membresía está pagada hasta el <b>' + fechaPlan(pagadoHasta) + '</b>.'
@@ -1343,10 +1363,143 @@ async function cargarMiPlan(){
       </div>
       <button class="btn btn-grad" id="btn-pagar-mes" style="margin-top:12px;" onclick="pagarMensualidad()"><i class="ti ti-lock"></i> Pagar $${total.toFixed(2)} con tarjeta</button>
       <p class="ayuda" style="margin-top:8px;">Pago seguro con tarjeta de crédito o débito (PagueloFácil). Se abre en una ventana aparte y, al terminar, tu membresía se actualiza sola aquí.</p>
+      <div class="pago-yappy">
+        <b>O paga con Yappy</b>
+        <span class="ayuda" style="margin:2px 0 8px;display:block;">Aprueba el cobro en tu app Yappy.</span>
+        <input id="pf-yappy-alias" inputmode="numeric" maxlength="12" placeholder="Tu número Yappy (8 dígitos, sin +507)" autocomplete="tel" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;">
+        <p class="ayuda" id="pf-yappy-msg" style="min-height:14px;margin:6px 0 8px;"></p>
+        <btn-yappy id="pf-btn-yappy" theme="darkBlue" rounded="true"></btn-yappy>
+      </div>
       ${ultimos.length ? `<div class="pago-hist"><b>Últimos pagos</b>${ultimos.map(x => `<span><i class="ti ti-circle-check"></i>${E(x.concepto)} · $${Number(x.monto_pagado || x.monto).toFixed(2)}</span>`).join('')}</div>` : ''}
     </div>`;
 
   cont.innerHTML = planHtml + mensualidadHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '');
+  activarBotonYappy();
+}
+
+// ---------- Pagar con Yappy ----------
+// El botón oficial crea la orden en el servidor (yappy-crear-orden). El navegador NUNCA confirma el pago:
+// lo confirma el aviso IPN de Yappy al servidor; aquí solo se consulta ese estado.
+function activarBotonYappy(){
+  conectarBotonYappy(document.getElementById('pf-btn-yappy'), { aliasId: 'pf-yappy-alias', msgId: 'pf-yappy-msg' });
+}
+function yappyCerrado(){ clearTimeout(window._yappyT); document.body.classList.remove('yappy-abierto'); }
+// Conecta un botón btn-yappy con yappy-crear-orden. `o.modulo` (opcional): código del módulo que se paga.
+function conectarBotonYappy(btn, o){
+  if (!btn) return;
+  const msg = document.getElementById(o.msgId);
+  const decir = (t, ok) => { if (msg){ msg.style.color = ok ? '#159A61' : '#C2455F'; msg.textContent = t || ''; } };
+  btn.addEventListener('eventClick', async () => {
+    document.body.classList.add('yappy-abierto'); // el recuadro de Yappy debe quedar por encima del menú
+    clearTimeout(window._yappyT); window._yappyT = setTimeout(yappyCerrado, 6 * 60 * 1000);
+    decir('Creando tu orden de pago…', true); if (msg) msg.style.color = '';
+    try {
+      const r = await Pedidos.crearOrdenYappyMensualidad(document.getElementById(o.aliasId).value, o.modulo);
+      window._yappyPagoId = r.pagoId;
+      decir('');
+      btn.eventPayment({ transactionId: r.body.transactionId, documentName: r.body.documentName, token: r.body.token });
+    } catch(e){
+      console.error(e);
+      yappyCerrado();
+      decir(e.message || 'No se pudo crear la orden de pago.');
+      btn.isButtonLoading = false;
+    }
+  });
+  btn.addEventListener('eventSuccess', () => { yappyCerrado(); esperarConfirmacionYappy(o); });
+  btn.addEventListener('eventError', () => {
+    yappyCerrado();
+    decir('El pago no se completó. Puedes intentarlo de nuevo.');
+    btn.isButtonLoading = false;
+  });
+}
+async function esperarConfirmacionYappy(o){
+  const msg = document.getElementById(o.msgId);
+  if (msg){ msg.style.color = '#159A61'; msg.textContent = o.modulo ? 'Pago recibido. Activando tu módulo…' : 'Pago recibido. Confirmando tu membresía…'; }
+  const id = window._yappyPagoId;
+  for (let i = 0; i < 60 && id; i++){
+    try {
+      const { data } = await sb.rpc('estado_pago_plataforma', { p_id: id });
+      const p = Array.isArray(data) ? data[0] : data;
+      if (p && p.estado === 'confirmado'){
+        cerrarPagoModulo(); cargarMiPlan();
+        setTimeout(() => alert(o.modulo ? '¡Pago confirmado! Tu módulo quedó activo.' : '¡Pago confirmado! Tu membresía quedó activa.'), 300);
+        return;
+      }
+      if (p && p.estado === 'rechazado'){ if (msg){ msg.style.color = '#C2455F'; msg.textContent = 'El pago no se completó.'; } return; }
+    } catch(e){ console.error(e); }
+    await new Promise(r => setTimeout(r, 3000));
+  }
+  if (msg){ msg.style.color = ''; msg.textContent = o.modulo ? 'Tu pago está en proceso. Si se completó, tu módulo se activará solo en unos minutos.' : 'Tu pago está en proceso. Si se completó, tu plan se activará solo en unos minutos.'; }
+  cargarMiPlan();
+}
+
+// ---------- Agregar un módulo: se paga completo (tarjeta o Yappy) y queda activo al confirmarse el pago ----------
+// En prueba gratis se activa sin cobro (ver activarModulo).
+function abrirPagoModulo(m){
+  abrirModalPago({ titulo: 'Agregar ' + m.nombre, monto: m.precio, modulo: m.code,
+    nota: 'Pagas ahora y el módulo queda activo en cuanto se confirme el pago. Desde el próximo mes se suma a tu mensualidad.' });
+}
+function abrirModalPago(o){
+  cerrarPagoModulo();
+  const precio = '$' + o.monto.toFixed(2);
+  const ov = document.createElement('div');
+  ov.className = 'pm-ov'; ov.id = 'pm-ov';
+  ov.addEventListener('click', e => { if (e.target === ov) cerrarPagoModulo(); });
+  ov.innerHTML = `<div class="pm-box" role="dialog" aria-modal="true">
+    <button type="button" class="pm-x" aria-label="Cerrar" onclick="cerrarPagoModulo()">×</button>
+    <h3>${E(o.titulo)}</h3>
+    <p class="pm-precio">${precio}<small> /mes</small></p>
+    <p class="ayuda" style="margin:0 0 12px;">${E(o.nota)}</p>
+    <button class="btn btn-grad" id="pm-btn-tarjeta" onclick="pagarModuloTarjeta('${o.modulo || ''}')"><i class="ti ti-lock"></i> Pagar ${precio} con tarjeta</button>
+    <div class="pago-yappy">
+      <b>O paga con Yappy</b>
+      <span class="ayuda" style="margin:2px 0 8px;display:block;">Aprueba el cobro en tu app Yappy.</span>
+      <input id="pm-yappy-alias" inputmode="numeric" maxlength="12" placeholder="Tu número Yappy (8 dígitos, sin +507)" autocomplete="tel" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;">
+      <p class="ayuda" id="pm-yappy-msg" style="min-height:14px;margin:6px 0 8px;"></p>
+      <btn-yappy id="pm-btn-yappy" theme="darkBlue" rounded="true"></btn-yappy>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  conectarBotonYappy(document.getElementById('pm-btn-yappy'), { aliasId: 'pm-yappy-alias', msgId: 'pm-yappy-msg', modulo: o.modulo || undefined });
+}
+function cerrarPagoModulo(){
+  const ov = document.getElementById('pm-ov');
+  if (ov) ov.remove();
+}
+async function pagarModuloTarjeta(code){
+  const btn = document.getElementById('pm-btn-tarjeta');
+  const antes = btn ? btn.innerHTML : '';
+  const w = 520, h = 780;
+  const x = Math.max(0, (window.screenX || 0) + (window.outerWidth - w) / 2), y = Math.max(0, (window.screenY || 0) + (window.outerHeight - h) / 2);
+  const win = window.open('', 'annly_pago', `width=${w},height=${h},left=${x},top=${y}`); // se abre en el clic, si no el navegador la bloquea
+  if (win) { try { win.document.write('<title>Preparando tu pago…</title><p style="font:15px system-ui;text-align:center;margin-top:45vh;color:#6B6680">Preparando tu pago…</p>'); } catch(e){} }
+  if (btn){ btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i> Preparando tu pago…'; }
+  try {
+    const r = await Pedidos.crearEnlaceMensualidad(code || undefined);
+    if (win && !win.closed){
+      escucharPagoPlan();
+      win.location.href = r.url;
+      if (btn) btn.innerHTML = '<i class="ti ti-external-link"></i> Completa el pago en la ventana que se abrió';
+      const t = setInterval(() => { if (win.closed){ clearInterval(t); if (btn){ btn.disabled = false; btn.innerHTML = antes; } cargarMiPlan(); } }, 1000);
+    } else {
+      window.location.href = r.url; // sin ventanas emergentes: se paga en esta misma pestaña
+    }
+  } catch(e){
+    if (win && !win.closed) win.close();
+    alert('No se pudo abrir el pago: ' + (e.message || e));
+    if (btn){ btn.disabled = false; btn.innerHTML = antes; }
+  }
+}
+// Aviso de pago.html (ventana aparte) al terminar
+function escucharPagoPlan(){
+  if (ESCUCHA_PAGO) return;
+  ESCUCHA_PAGO = true;
+  window.addEventListener('message', ev => {
+    if (ev.origin !== window.location.origin || !ev.data || ev.data.tipo !== 'annly-pago') return;
+    cerrarPagoModulo();
+    cargarMiPlan();
+    if (ev.data.estado === 'confirmado') setTimeout(() => alert('¡Pago confirmado! Ya quedó activo.'), 300);
+  });
 }
 
 // Aviso arriba del panel cuando la prueba o la membresía están por terminar (o ya vencieron)
@@ -1412,17 +1565,24 @@ async function pagarMensualidad(){
   }
 }
 
+// Terminar la prueba: ya no se activa gratis; se paga la mensualidad (tarjeta o Yappy) y el plan queda activo al confirmarse
 async function terminarPrueba(){
-  if (!confirm('¿Terminar tu prueba gratis y activar tu plan ahora?')) return;
-  try { await Pedidos.activarSuscripcion(); await cargarMiPlan(); }
-  catch(e){ msg('plan-msg', e.message); }
+  try {
+    const cat = await Pedidos.catalogoModulos();
+    const total = Pedidos.plan.precio + cat.filter(m => Pedidos.modulos.includes(m.code)).reduce((t, m) => t + m.precio, 0);
+    abrirModalPago({ titulo: 'Activar mi plan ahora', monto: total, modulo: null,
+      nota: 'Pagas tu mensualidad ahora y tu plan queda activo en cuanto se confirme el pago, con tus módulos.' });
+  } catch(e){ msg('plan-msg', e.message); }
 }
 async function activarModulo(code){
   const cat = await Pedidos.catalogoModulos();
   const m = cat.find(x => x.code === code);
   if (!m) return;
-  if (!confirm(`¿Agregar "${m.nombre}" por $${m.precio.toFixed(0)}/mes?`)) return;
-  try { await Pedidos.activarModulo(m.code, m.nombre, m.precio); await cargarMiPlan(); }
+  // Fuera de la prueba gratis, el módulo se paga al agregarlo (tarjeta o Yappy) y se activa al confirmarse
+  // (En prueba gratis y en cuentas de cortesía se activa directo, sin cobro)
+  if (!(Pedidos.plan && Pedidos.plan.status === 'trial') && !annlyEsCortesia(Pedidos.plan && Pedidos.plan.vence)){ abrirPagoModulo(m); return; }
+  if (!confirm(`¿Agregar "${m.nombre}"? Durante tu prueba gratis lo usas sin costo; al terminar, se suma a tu mensualidad ($${m.precio.toFixed(0)}/mes).`)) return;
+  try { await Pedidos.activarModulo(m.code, m.nombre, m.precio); await cargarMiPlan(); pintarEncabezado(); }
   catch(e){ alert(e.message); }
 }
 async function cancelarModulo(code){
@@ -1439,7 +1599,7 @@ async function cargarReportes(){
     const p = Pedidos.plan;
     const comprado = Pedidos.modulos.includes('PEDIDOS_REPORTES');
     const nota = comprado && p && p.status === 'trial'
-      ? 'Ya lo agregaste a tu plan: se activa cuando termines tu prueba gratis.'
+      ? 'Tu prueba terminó: paga tu mensualidad para volver a usar este módulo.'
       : 'Agrégalo a tu plan por <b>$8/mes</b> y conoce de verdad cómo va tu tienda.';
     cont.innerHTML = `<div class="vitrina">
       <div class="vitrina-ico"><i class="ti ti-chart-bar"></i></div>
