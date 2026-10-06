@@ -11,12 +11,12 @@ const sb = window.supabase.createClient(PCFG.SUPABASE_URL, PCFG.SUPABASE_KEY);
 // ESTADO DE LA CUENTA POR PAGO
 // Al vencer el plan (o la prueba): 48 horas de gracia con contador en pantalla; pasadas esas horas la
 // cuenta queda SUSPENDIDA (el panel en solo vista y el sitio público sin reservas ni pedidos).
-// Quien ya estaba vencido antes de ANNLY_MORA_DESDE cuenta sus 48 horas desde esa fecha.
+// (ANNLY_MORA_DESDE: tope inferior de la regla; hoy sin efecto práctico. Subirlo daría gracia extra a los ya vencidos.)
 // ⚠ La regla debe ser la misma que la función SQL negocio_suspendido() (supabase/sql/negocio_suspendido.sql).
 // Es un bloqueo de la aplicación (no de la base de datos): ver docs/etapa-2-pendientes.md.
 // =========================================================
 const ANNLY_GRACIA_HORAS = 48;
-const ANNLY_MORA_DESDE = Date.parse('2026-10-07T00:00:00-05:00'); // inicio de esta regla (hora de Panamá)
+const ANNLY_MORA_DESDE = Date.parse('2026-01-01T00:00:00-05:00'); // inicio de la regla (hora de Panamá)
 const ANNLY_MSG_SUSPENDIDA = 'Tu cuenta está suspendida. Para seguir utilizando las funciones, por favor realiza tu pago.';
 
 // periodoHasta: fecha de fin del periodo pagado o de la prueba (current_period_end)
