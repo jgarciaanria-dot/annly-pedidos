@@ -1420,17 +1420,21 @@ async function esperarConfirmacionYappy(o){
 // ---------- Agregar un módulo: se paga completo (tarjeta o Yappy) y queda activo al confirmarse el pago ----------
 // En prueba gratis se activa sin cobro (ver activarModulo).
 function abrirPagoModulo(m){
+  abrirModalPago({ titulo: 'Agregar ' + m.nombre, monto: m.precio, modulo: m.code,
+    nota: 'Pagas ahora y el módulo queda activo en cuanto se confirme el pago. Desde el próximo mes se suma a tu mensualidad.' });
+}
+function abrirModalPago(o){
   cerrarPagoModulo();
-  const precio = '$' + m.precio.toFixed(2);
+  const precio = '$' + o.monto.toFixed(2);
   const ov = document.createElement('div');
   ov.className = 'pm-ov'; ov.id = 'pm-ov';
   ov.addEventListener('click', e => { if (e.target === ov) cerrarPagoModulo(); });
   ov.innerHTML = `<div class="pm-box" role="dialog" aria-modal="true">
     <button type="button" class="pm-x" aria-label="Cerrar" onclick="cerrarPagoModulo()">×</button>
-    <h3>Agregar ${E(m.nombre)}</h3>
+    <h3>${E(o.titulo)}</h3>
     <p class="pm-precio">${precio}<small> /mes</small></p>
-    <p class="ayuda" style="margin:0 0 12px;">Pagas ahora y el módulo queda activo en cuanto se confirme el pago. Desde el próximo mes se suma a tu mensualidad.</p>
-    <button class="btn btn-grad" id="pm-btn-tarjeta" onclick="pagarModuloTarjeta('${m.code}')"><i class="ti ti-lock"></i> Pagar ${precio} con tarjeta</button>
+    <p class="ayuda" style="margin:0 0 12px;">${E(o.nota)}</p>
+    <button class="btn btn-grad" id="pm-btn-tarjeta" onclick="pagarModuloTarjeta('${o.modulo || ''}')"><i class="ti ti-lock"></i> Pagar ${precio} con tarjeta</button>
     <div class="pago-yappy">
       <b>O paga con Yappy</b>
       <span class="ayuda" style="margin:2px 0 8px;display:block;">Aprueba el cobro en tu app Yappy.</span>
@@ -1440,7 +1444,7 @@ function abrirPagoModulo(m){
     </div>
   </div>`;
   document.body.appendChild(ov);
-  conectarBotonYappy(document.getElementById('pm-btn-yappy'), { aliasId: 'pm-yappy-alias', msgId: 'pm-yappy-msg', modulo: m.code });
+  conectarBotonYappy(document.getElementById('pm-btn-yappy'), { aliasId: 'pm-yappy-alias', msgId: 'pm-yappy-msg', modulo: o.modulo || undefined });
 }
 function cerrarPagoModulo(){
   const ov = document.getElementById('pm-ov');
@@ -1455,7 +1459,7 @@ async function pagarModuloTarjeta(code){
   if (win) { try { win.document.write('<title>Preparando tu pago…</title><p style="font:15px system-ui;text-align:center;margin-top:45vh;color:#6B6680">Preparando tu pago…</p>'); } catch(e){} }
   if (btn){ btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader-2"></i> Preparando tu pago…'; }
   try {
-    const r = await Pedidos.crearEnlaceMensualidad(code);
+    const r = await Pedidos.crearEnlaceMensualidad(code || undefined);
     if (win && !win.closed){
       escucharPagoPlan();
       win.location.href = r.url;
@@ -1545,10 +1549,14 @@ async function pagarMensualidad(){
   }
 }
 
+// Terminar la prueba: ya no se activa gratis; se paga la mensualidad (tarjeta o Yappy) y el plan queda activo al confirmarse
 async function terminarPrueba(){
-  if (!confirm('¿Terminar tu prueba gratis y activar tu plan ahora?')) return;
-  try { await Pedidos.activarSuscripcion(); await cargarMiPlan(); }
-  catch(e){ msg('plan-msg', e.message); }
+  try {
+    const cat = await Pedidos.catalogoModulos();
+    const total = Pedidos.plan.precio + cat.filter(m => Pedidos.modulos.includes(m.code)).reduce((t, m) => t + m.precio, 0);
+    abrirModalPago({ titulo: 'Activar mi plan ahora', monto: total, modulo: null,
+      nota: 'Pagas tu mensualidad ahora y tu plan queda activo en cuanto se confirme el pago, con tus módulos.' });
+  } catch(e){ msg('plan-msg', e.message); }
 }
 async function activarModulo(code){
   const cat = await Pedidos.catalogoModulos();
