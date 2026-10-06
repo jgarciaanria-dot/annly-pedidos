@@ -214,6 +214,15 @@ header{background:#fff;}
 .estado{text-align:center;padding:70px 20px;color:var(--ink-soft);font-size:14px;line-height:1.6;}
 .estado h2{font-family:'DM Sans',sans-serif;color:var(--ink);font-size:18px;margin-bottom:6px;}
 
+/* Inscripción de clientes */
+.club-card{display:flex;align-items:center;gap:14px;width:100%;margin:2px 0 16px;padding:14px 16px;border:1.5px solid color-mix(in srgb,var(--p) 25%,#fff);border-radius:18px;background:color-mix(in srgb,var(--p) 7%,#fff);cursor:pointer;text-align:left;font-family:inherit;color:var(--ink);}
+.club-card[hidden]{display:none;}
+.club-ico{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:22px;color:var(--p);background:#fff;flex:none;}
+.club-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.club-txt b{font-size:15px;}.club-txt small{font-size:12.5px;color:var(--ink-soft);}
+.club-flecha{color:var(--p);font-size:18px;}
+.club-check{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.5;margin:10px 0;cursor:pointer;}
+.club-check input{margin-top:3px;flex-shrink:0;accent-color:var(--p);}
 /* Detalle del producto */
 .ov{position:fixed;inset:0;background:rgba(25,20,35,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;}
 .ov.on{display:flex;}
@@ -717,6 +726,11 @@ footer{animation:aparecer .6s ease both;}
 
 <main class="wrap">
   <div class="promo" id="t-promo" hidden></div>
+  <button type="button" class="club-card" id="club-link" onclick="abrirInscripcion()" hidden>
+    <span class="club-ico"><i class="ti ti-heart-handshake" aria-hidden="true"></i></span>
+    <span class="club-txt"><b>Recibe descuentos y regalos</b><small>Inscríbete y entérate de promociones</small></span>
+    <i class="ti ti-arrow-right club-flecha" aria-hidden="true"></i>
+  </button>
   <div class="cat-titulo" id="catalogo">
     <h2>Nuestro catálogo</h2>
     <p>Elige tu favorito y hazlo especial con un extra</p>
@@ -758,6 +772,13 @@ footer{animation:aparecer .6s ease both;}
   <i class="destello" style="--x:45%;--y:34%;--delay:.42s;"></i>
 </div>
 
+<!-- Inscripción de clientes -->
+<div class="ov" id="ov-club" onclick="if(event.target===this)cerrarInscripcion()">
+  <div class="hoja" role="dialog" aria-modal="true" aria-label="Inscríbete">
+    <div class="hoja-body" id="club-body"></div>
+  </div>
+</div>
+
 <!-- Producto y pedido (pasos) -->
 <div class="ov" id="ov-prod" onclick="if(event.target===this)cerrarProducto()">
   <div class="hoja" role="dialog" aria-modal="true" aria-label="Tu pedido">
@@ -768,7 +789,7 @@ footer{animation:aparecer .6s ease both;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=17"></script>
+<script src="/pedidos.js?v=18"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -799,12 +820,14 @@ async function arrancar(){
   try {
     if (await Pedidos.negocioSuspendido()){
       annlyModoVista('Por el momento esta tienda no está recibiendo pedidos.');
-      ['irPaso', 'enviarPedido'].forEach(nombre => {
+      ['irPaso', 'enviarPedido', 'abrirInscripcion', 'enviarInscripcion'].forEach(nombre => {
         const f = window[nombre];
         if (typeof f === 'function') window[nombre] = function(){ alert('Por el momento esta tienda no está recibiendo pedidos.'); };
       });
     }
   } catch(e){ console.warn(e); }
+  // Inscripción de clientes (módulo Programa de clientes, si la tienda lo activó)
+  Pedidos.inscripcionClientesActiva().then(activa => { const c = document.getElementById('club-link'); if (activa && c) c.hidden = false; }).catch(() => {});
   // Catálogo, ofertas y promoción se piden a la vez (antes iban uno tras otro)
   let of = {}, promo = null, soloPromo = new Set();
   try {
@@ -1168,6 +1191,61 @@ function paso4(){
     <p class="err" id="p-err"></p>
     <button class="btn-pedir" onclick="validarDatos()">Ir al pago</button>`;
 }
+// ---------- Inscripción de clientes ----------
+function abrirInscripcion(){
+  const nombreNegocio = (Pedidos.negocio && Pedidos.negocio.nombre) || 'esta tienda';
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('club-body').innerHTML = `
+    <div class="hoja-top"><h3>Inscríbete</h3><button class="cerrar" onclick="cerrarInscripcion()" aria-label="Cerrar">×</button></div>
+    <p class="hoja-desc">¿Te gustaría recibir <b>descuentos, regalos y promociones</b>? Déjanos tus datos y ${E(nombreNegocio)} te tendrá en cuenta.</p>
+    <div class="fg"><label class="flbl" for="insc-nombre">Tu nombre</label><input class="fi" id="insc-nombre" maxlength="80" autocomplete="name"></div>
+    <div class="fg"><label class="flbl" for="insc-telefono">Tu WhatsApp</label><input class="fi" id="insc-telefono" inputmode="tel" maxlength="20" autocomplete="tel" placeholder="6000-0000"></div>
+    <div class="fg"><label class="flbl" for="insc-correo">Tu correo (opcional)</label><input class="fi" id="insc-correo" type="email" maxlength="120" autocomplete="email" placeholder="tu@correo.com"></div>
+    <div class="fg"><label class="flbl">Tu cumpleaños (opcional, para sorprenderte)</label>
+      <div style="display:flex;gap:8px;">
+        <select class="fi" id="insc-dia" style="flex:1;"><option value="">Día</option>${Array.from({length:31},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}</select>
+        <select class="fi" id="insc-mes" style="flex:2;"><option value="">Mes</option>${meses.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('')}</select>
+      </div></div>
+    <input id="insc-web" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;" aria-hidden="true">
+    <label class="club-check"><input type="checkbox" id="insc-acepta"><span>Acepto que ${E(nombreNegocio)} me contacte con promociones y beneficios. Puedo pedir que me quiten cuando quiera.</span></label>
+    <p class="err" id="insc-msg"></p>
+    <button class="btn-pedir" id="btnInscripcion" onclick="enviarInscripcion()">Inscribirme</button>`;
+  document.getElementById('ov-club').classList.add('on');
+}
+function cerrarInscripcion(){ document.getElementById('ov-club').classList.remove('on'); }
+async function enviarInscripcion(){
+  const msg = document.getElementById('insc-msg'), btn = document.getElementById('btnInscripcion');
+  const v = id => ((document.getElementById(id) || {}).value || '').trim();
+  if (v('insc-web')) return; // trampa para programas automáticos
+  const nombre = v('insc-nombre'), telefono = v('insc-telefono'), correo = v('insc-correo');
+  const dia = parseInt(v('insc-dia'), 10) || null, mes = parseInt(v('insc-mes'), 10) || null;
+  if (nombre.length < 2){ msg.textContent = 'Escribe tu nombre.'; return; }
+  if (telefono.replace(/\D/g, '').length < 7){ msg.textContent = 'Escribe tu número de WhatsApp.'; return; }
+  if (correo && !/^\S+@\S+\.\S+$/.test(correo)){ msg.textContent = 'Revisa tu correo.'; return; }
+  if ((dia && !mes) || (!dia && mes)){ msg.textContent = 'Elige el día y el mes de tu cumpleaños, o deja los dos vacíos.'; return; }
+  if (!document.getElementById('insc-acepta').checked){ msg.textContent = 'Marca la casilla para poder inscribirte.'; return; }
+  msg.textContent = ''; btn.disabled = true; btn.textContent = 'Enviando...';
+  try {
+    const r = await Pedidos.inscribirCliente({ nombre, telefono, correo, cumpleDia: dia, cumpleMes: mes, acepta: true });
+    if (!r || !r.ok){
+      const errores = { cumple: 'Revisa la fecha de tu cumpleaños.', correo: 'Revisa tu correo.', telefono: 'Revisa tu número de WhatsApp.', nombre: 'Escribe tu nombre.', no_disponible: 'Por ahora no está disponible la inscripción.' };
+      msg.textContent = errores[r && r.error] || 'No se pudo completar la inscripción. Intenta de nuevo.';
+      btn.disabled = false; btn.textContent = 'Inscribirme'; return;
+    }
+    document.getElementById('club-body').innerHTML = `
+      <div style="text-align:center;padding:1.2rem .5rem 1rem;">
+        <div style="width:54px;height:54px;border-radius:50%;background:color-mix(in srgb,var(--p) 14%,#fff);color:var(--p);display:grid;place-items:center;font-size:26px;margin:0 auto 14px;"><i class="ti ti-check"></i></div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:6px;">¡Listo, ya estás inscrito(a)!</div>
+        <p class="hoja-desc" style="margin:0 0 6px;">Gracias por unirte. Pronto sabrás de nuestras promociones y sorpresas.</p>
+        <button class="btn-pedir" onclick="cerrarInscripcion()">Cerrar</button>
+      </div>`;
+  } catch(e){
+    console.error(e);
+    msg.textContent = 'No se pudo completar la inscripción. Intenta de nuevo.';
+    btn.disabled = false; btn.textContent = 'Inscribirme';
+  }
+}
+
 function leerDatos(){
   const v = id => (document.getElementById(id) || {}).value || '';
   PED.cliente = { nombre: v('c-nom').trim(), telefono: v('c-tel').trim(), correo: v('c-mail').trim() };
