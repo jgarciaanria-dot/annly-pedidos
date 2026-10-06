@@ -941,7 +941,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module" src="https://bt-cdn.yappy.cloud/v1/cdn/web-component-btn-yappy.js"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=16"></script>
+<script src="pedidos.js?v=17"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -987,6 +987,11 @@ function pintarEncabezado(){
   const n = Pedidos.negocio;
   document.getElementById('hdr-nombre').innerHTML = E(n.nombre) + chipPlan();
   pintarAvisoPago();
+  // Aviso con contador (48 h de gracia) o cuenta suspendida (solo vista); "Mi plan" y el pago siguen abiertos
+  annlyAplicarEstadoCuenta(Pedidos.plan && Pedidos.plan.vence, {
+    irAPagar: () => irTab('plan'),
+    permitidos: '#tab-plan, .side, .topm, .side-fondo'
+  });
   const lock = document.getElementById('lock-reportes');
   if (lock) lock.hidden = Pedidos.moduloDisponible('PEDIDOS_REPORTES');
   const baseTienda = ((window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.TIENDA_URL) || window.location.origin).replace(/\/$/, '');

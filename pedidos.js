@@ -7,6 +7,146 @@
 const PCFG = window.PEDIDOS_CONFIG || {};
 const sb = window.supabase.createClient(PCFG.SUPABASE_URL, PCFG.SUPABASE_KEY);
 
+// =========================================================
+// ESTADO DE LA CUENTA POR PAGO
+// Al vencer el plan (o la prueba): 48 horas de gracia con contador en pantalla; pasadas esas horas la
+// cuenta queda SUSPENDIDA (el panel en solo vista y el sitio público sin reservas ni pedidos).
+// (ANNLY_MORA_DESDE: tope inferior de la regla; hoy sin efecto práctico. Subirlo daría gracia extra a los ya vencidos.)
+// ⚠ La regla debe ser la misma que la función SQL negocio_suspendido() (supabase/sql/negocio_suspendido.sql).
+// Es un bloqueo de la aplicación (no de la base de datos): ver docs/etapa-2-pendientes.md.
+// =========================================================
+const ANNLY_GRACIA_HORAS = 48;
+const ANNLY_MORA_DESDE = Date.parse('2026-01-01T00:00:00-05:00'); // inicio de la regla (hora de Panamá)
+const ANNLY_MSG_SUSPENDIDA = 'Tu cuenta está suspendida. Para seguir utilizando las funciones, por favor realiza tu pago.';
+
+// periodoHasta: fecha de fin del periodo pagado o de la prueba (current_period_end)
+function annlyEstadoCuenta(periodoHasta) {
+  const fin = String(periodoHasta || '').slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fin)) return { fase: 'ok' };
+  const vence = Date.parse(fin + 'T00:00:00-05:00') + 86400000; // vence al terminar el día de fin (hora de Panamá)
+  const ahora = Date.now();
+  if (ahora < vence) return { fase: 'ok' };
+  const suspendeEn = Math.max(vence, ANNLY_MORA_DESDE) + ANNLY_GRACIA_HORAS * 3600000;
+  return ahora < suspendeEn ? { fase: 'gracia', suspendeEn } : { fase: 'suspendida' };
+}
+
+// Con la cuenta suspendida, toda escritura a la base (insert/update/upsert/delete) devuelve un error en vez de guardarse
+function annlyBloqueado() {
+  const res = { data: null, count: null, status: 403, statusText: 'Forbidden', error: { code: 'CUENTA_SUSPENDIDA', message: ANNLY_MSG_SUSPENDIDA } };
+  const p = new Proxy(function () {}, {
+    get(_, k) {
+      if (k === 'then') return (ok, ko) => Promise.resolve(res).then(ok, ko);
+      if (k === 'catch') return (f) => Promise.resolve(res).catch(f);
+      if (k === 'finally') return (f) => Promise.resolve(res).finally(f);
+      return () => p;
+    },
+    apply() { return p; }
+  });
+  return p;
+}
+function annlyGuardarEscrituras(client, tablasLibres) {
+  const from = client.from.bind(client);
+  client.from = function (tabla) {
+    const q = from(tabla);
+    if (!window.ANNLY_SUSPENDIDA || (tablasLibres || []).includes(tabla)) return q;
+    return new Proxy(q, {
+      get(t, k) {
+        if (k === 'insert' || k === 'update' || k === 'upsert' || k === 'delete') return () => annlyBloqueado();
+        const v = t[k];
+        return typeof v === 'function' ? v.bind(t) : v;
+      }
+    });
+  };
+}
+
+function annlyEstilosCuenta() {
+  if (document.getElementById('cuenta-estilos')) return;
+  const st = document.createElement('style');
+  st.id = 'cuenta-estilos';
+  st.textContent = `
+.cuenta-banner{position:fixed;left:0;right:0;bottom:0;z-index:900;display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 16px;font:600 14px/1.35 'DM Sans',system-ui,sans-serif;flex-wrap:wrap;text-align:center;box-shadow:0 -6px 24px rgba(0,0,0,.18);}
+.cuenta-banner.gracia{background:#FFF4DE;color:#7A5200;border-top:1px solid #F6E2B8;}
+.cuenta-banner.suspendida{background:#7A1F2B;color:#fff;}
+.cuenta-banner button{border:0;border-radius:10px;padding:9px 16px;font:800 13.5px 'DM Sans',system-ui,sans-serif;cursor:pointer;background:#7C3AED;color:#fff;}
+.cuenta-banner .cb-timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:16px;}
+body.cuenta-aviso{padding-bottom:70px;}
+.cuenta-toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:950;max-width:92vw;background:#1A1625;color:#fff;padding:12px 16px;border-radius:12px;font:600 13.5px/1.4 'DM Sans',system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3);}
+#cuenta-vista{position:sticky;top:0;z-index:3000;background:#7A1F2B;color:#fff;text-align:center;padding:10px 14px;font:700 14px/1.4 system-ui,sans-serif;}
+body.negocio-suspendido .btn-pedir,
+body.negocio-suspendido .btn-main[onclick*="openCal"],
+body.negocio-suspendido .btn-main[onclick*="Certificado"],
+body.negocio-suspendido [onclick*="abrirModalComprarCertificado"]{display:none !important;}`;
+  document.head.appendChild(st);
+}
+function annlyToastSuspension() {
+  document.querySelectorAll('.cuenta-toast').forEach(e => e.remove());
+  const t = document.createElement('div');
+  t.className = 'cuenta-toast'; t.textContent = ANNLY_MSG_SUSPENDIDA;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4500);
+}
+
+// Panel del negocio: pinta el aviso (contador en gracia, o suspendida) y, ya suspendida, deja la pantalla en solo vista.
+// o.irAPagar: abre "Mi plan"; o.permitidos: selector CSS de lo que sigue funcionando (menú, "Mi plan", pago).
+function annlyAplicarEstadoCuenta(periodoHasta, o) {
+  clearInterval(window._cuentaT);
+  annlyEstilosCuenta();
+  const est = window.ANNLY_PLATFORM_ADMIN ? { fase: 'ok' } : annlyEstadoCuenta(periodoHasta);
+  window.ANNLY_SUSPENDIDA = est.fase === 'suspendida';
+  document.body.classList.toggle('cuenta-suspendida', window.ANNLY_SUSPENDIDA);
+  let bar = document.getElementById('cuenta-banner');
+  if (est.fase === 'ok') {
+    if (bar) bar.remove();
+    document.body.classList.remove('cuenta-aviso');
+    return est;
+  }
+  if (!bar) { bar = document.createElement('div'); bar.id = 'cuenta-banner'; document.body.appendChild(bar); }
+  document.body.classList.add('cuenta-aviso');
+  bar.className = 'cuenta-banner ' + est.fase;
+  if (est.fase === 'gracia') {
+    bar.innerHTML = `<span>⏳ <b>Tu plan venció.</b> Tu cuenta se suspende en <span class="cb-timer"></span>. Paga ahora para evitarlo.</span><button type="button">Pagar ahora</button>`;
+    const timer = bar.querySelector('.cb-timer');
+    const tick = () => {
+      const ms = est.suspendeEn - Date.now();
+      if (ms <= 0) { annlyAplicarEstadoCuenta(periodoHasta, o); return; } // pasó la gracia: se suspende
+      const s = Math.floor(ms / 1000);
+      timer.textContent = [Math.floor(s / 3600), Math.floor(s % 3600 / 60), s % 60].map(n => String(n).padStart(2, '0')).join(':');
+    };
+    tick();
+    window._cuentaT = setInterval(tick, 1000);
+  } else {
+    bar.innerHTML = `<span>🔒 <b>${ANNLY_MSG_SUSPENDIDA}</b></span><button type="button">Pagar ahora</button>`;
+  }
+  const btn = bar.querySelector('button');
+  if (btn) btn.onclick = () => { if (o && o.irAPagar) o.irAPagar(); };
+  if (!window._cuentaClickGuard) {
+    window._cuentaClickGuard = true;
+    document.addEventListener('click', ev => {
+      if (!window.ANNLY_SUSPENDIDA) return;
+      const t = ev.target && ev.target.closest && ev.target.closest('button, a, [onclick], select, label, input[type=checkbox], input[type=radio]');
+      if (!t) return;
+      const ok = (window._cuentaPermitidos || '') + ', #cuenta-banner, .pm-ov, btn-yappy, [class*="yappy" i], [id*="yappy" i]';
+      if (t.closest(ok)) return;
+      ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation();
+      annlyToastSuspension();
+    }, true);
+  }
+  window._cuentaPermitidos = (o && o.permitidos) || '';
+  return est;
+}
+
+// Sitio público: aviso arriba y sin reservas/pedidos
+function annlyModoVista(texto) {
+  annlyEstilosCuenta();
+  window.ANNLY_VISTA = true;
+  document.body.classList.add('negocio-suspendido');
+  if (document.getElementById('cuenta-vista')) return;
+  const d = document.createElement('div');
+  d.id = 'cuenta-vista'; d.textContent = texto;
+  document.body.prepend(d);
+}
+annlyGuardarEscrituras(sb, ['pagos_plataforma']);
+
 const Pedidos = {
   negocio: null,        // negocio activo (fila de businesses)
   negocios: [],         // Platform Admin: todos los negocios de pedidos
@@ -604,6 +744,14 @@ const Pedidos = {
     if (error) throw error;
     this.negocio = data || null;
     return this.negocio;
+  },
+
+  // ¿La cuenta de la tienda está suspendida por falta de pago? (tienda pública: solo vista, sin pedidos)
+  async negocioSuspendido() {
+    if (!this.negocio || !this.negocio.id) return false;
+    const { data, error } = await sb.rpc('negocio_suspendido', { p_negocio: this.negocio.id });
+    if (error) { console.warn('negocio_suspendido:', error.message); return false; } // si falla, no se bloquea
+    return data === true;
   },
 
   async catalogo() {

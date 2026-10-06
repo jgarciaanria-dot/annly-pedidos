@@ -768,7 +768,7 @@ footer{animation:aparecer .6s ease both;}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=16"></script>
+<script src="/pedidos.js?v=17"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -795,6 +795,16 @@ async function arrancar(){
     return;
   }
   pintarNegocio(n);
+  // Cuenta suspendida por falta de pago: la tienda queda en solo vista (sin pedidos)
+  try {
+    if (await Pedidos.negocioSuspendido()){
+      annlyModoVista('Por el momento esta tienda no está recibiendo pedidos.');
+      ['irPaso', 'enviarPedido'].forEach(nombre => {
+        const f = window[nombre];
+        if (typeof f === 'function') window[nombre] = function(){ alert('Por el momento esta tienda no está recibiendo pedidos.'); };
+      });
+    }
+  } catch(e){ console.warn(e); }
   // Catálogo, ofertas y promoción se piden a la vez (antes iban uno tras otro)
   let of = {}, promo = null, soloPromo = new Set();
   try {
