@@ -19,6 +19,11 @@ const ANNLY_GRACIA_HORAS = 48;
 const ANNLY_MORA_DESDE = Date.parse('2026-01-01T00:00:00-05:00'); // inicio de la regla (hora de Panamá)
 const ANNLY_MSG_SUSPENDIDA = 'Tu cuenta está suspendida. Para seguir utilizando las funciones, por favor realiza tu pago.';
 
+// Cuenta de cortesía / acuerdo comercial: sin vencimiento (fecha de fin 2099-12-31)
+function annlyEsCortesia(periodoHasta) {
+  return String(periodoHasta || '').slice(0, 10) >= '2099-01-01';
+}
+
 // periodoHasta: fecha de fin del periodo pagado o de la prueba (current_period_end)
 function annlyEstadoCuenta(periodoHasta) {
   const fin = String(periodoHasta || '').slice(0, 10);
