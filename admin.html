@@ -238,6 +238,8 @@ button,input,select,textarea{font-family:inherit;}
 .pm-x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:26px;line-height:1;cursor:pointer;color:var(--ink-soft,#77738A);}
 .pm-precio{font-size:26px;font-weight:800;margin:0 0 8px;}
 .pm-precio small{font-size:13px;font-weight:600;color:var(--ink-soft,#77738A);}
+/* Mientras el recuadro de pago de Yappy está abierto, el menú y el encabezado quedan por debajo */
+.yappy-abierto .side,.yappy-abierto .topm{z-index:0 !important;}
 .pago-lista{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
 .pago-lista div{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;font-size:13.5px;border-bottom:1px solid #F3F0F7;}
 .pago-lista div:last-child{border-bottom:0;}
@@ -1372,12 +1374,15 @@ async function cargarMiPlan(){
 function activarBotonYappy(){
   conectarBotonYappy(document.getElementById('pf-btn-yappy'), { aliasId: 'pf-yappy-alias', msgId: 'pf-yappy-msg' });
 }
+function yappyCerrado(){ clearTimeout(window._yappyT); document.body.classList.remove('yappy-abierto'); }
 // Conecta un botón btn-yappy con yappy-crear-orden. `o.modulo` (opcional): código del módulo que se paga.
 function conectarBotonYappy(btn, o){
   if (!btn) return;
   const msg = document.getElementById(o.msgId);
   const decir = (t, ok) => { if (msg){ msg.style.color = ok ? '#159A61' : '#C2455F'; msg.textContent = t || ''; } };
   btn.addEventListener('eventClick', async () => {
+    document.body.classList.add('yappy-abierto'); // el recuadro de Yappy debe quedar por encima del menú
+    clearTimeout(window._yappyT); window._yappyT = setTimeout(yappyCerrado, 6 * 60 * 1000);
     decir('Creando tu orden de pago…', true); if (msg) msg.style.color = '';
     try {
       const r = await Pedidos.crearOrdenYappyMensualidad(document.getElementById(o.aliasId).value, o.modulo);
@@ -1386,12 +1391,14 @@ function conectarBotonYappy(btn, o){
       btn.eventPayment({ transactionId: r.body.transactionId, documentName: r.body.documentName, token: r.body.token });
     } catch(e){
       console.error(e);
+      yappyCerrado();
       decir(e.message || 'No se pudo crear la orden de pago.');
       btn.isButtonLoading = false;
     }
   });
-  btn.addEventListener('eventSuccess', () => { esperarConfirmacionYappy(o); });
+  btn.addEventListener('eventSuccess', () => { yappyCerrado(); esperarConfirmacionYappy(o); });
   btn.addEventListener('eventError', () => {
+    yappyCerrado();
     decir('El pago no se completó. Puedes intentarlo de nuevo.');
     btn.isButtonLoading = false;
   });
