@@ -661,16 +661,24 @@ const Pedidos = {
     await this.cargarPlan();
   },
 
-  // Paleta de colores de la tienda (las mismas 8 del registro de Annly)
+  // Paleta de colores de la tienda (las mismas del registro de Annly)
   PALETAS: [
-    { nombre: 'Violeta',         primario: '#7C3AED', secundario: '#EC4899' },
-    { nombre: 'Ámbar Urbano',    primario: '#F77F00', secundario: '#1D1D1D' },
-    { nombre: 'Esmeralda',       primario: '#0F766E', secundario: '#84CC16' },
-    { nombre: 'Coral',           primario: '#E85D4F', secundario: '#F4A261' },
+    { nombre: 'Violeta', primario: '#7C3AED', secundario: '#EC4899' },
+    { nombre: 'Ámbar Urbano', primario: '#F77F00', secundario: '#1D1D1D' },
+    { nombre: 'Esmeralda', primario: '#0F766E', secundario: '#84CC16' },
+    { nombre: 'Coral', primario: '#E85D4F', secundario: '#F4A261' },
     { nombre: 'Marino Elegante', primario: '#1E3A5F', secundario: '#C9A96E' },
-    { nombre: 'Carbón & Oro',    primario: '#2D2D2D', secundario: '#C9A96E' },
-    { nombre: 'Rosa Cuarzo',     primario: '#D88C9A', secundario: '#6B3F4D' },
-    { nombre: 'Lavanda Suave',   primario: '#B39DDB', secundario: '#5E3A87' }
+    { nombre: 'Rosa Cuarzo', primario: '#D88C9A', secundario: '#6B3F4D' },
+    { nombre: 'Lavanda Suave', primario: '#B39DDB', secundario: '#5E3A87' },
+    { nombre: 'Orquídea', primario: '#B83280', secundario: '#6B2150' },
+    { nombre: 'Salvia', primario: '#5E8B7E', secundario: '#2F4F47' },
+    { nombre: 'Peonía', primario: '#E0587A', secundario: '#8E2F4F' },
+    { nombre: 'Frambuesa', primario: '#C2185B', secundario: '#7B1040' },
+    { nombre: 'Mandarina', primario: '#E67E22', secundario: '#8A4B0F' },
+    { nombre: 'Océano', primario: '#06B6D4', secundario: '#075985' },
+    { nombre: 'Eléctrico', primario: '#3B5BDB', secundario: '#1B2A6B' },
+    { nombre: 'Cielo', primario: '#0EA5E9', secundario: '#0C4A6E' },
+    { nombre: 'Celeste', primario: '#7DB9E8', secundario: '#2F5D8A' }
   ],
   async guardarPaleta(primario, secundario) {
     const hex = /^#[0-9a-fA-F]{6}$/;
