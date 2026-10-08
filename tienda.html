@@ -1461,7 +1461,11 @@ async function esperarConfirmacionYappy(){
   let estado = 'pendiente';
   while (Date.now() < fin){
     estado = await Pedidos.estadoOrdenYappy(PED.yappyOrderId);
-    if (estado === 'ejecutado' || ['rechazado', 'cancelado', 'expirado'].includes(estado)) break;
+    if (estado === 'ejecutado' || estado === 'revisar' || ['rechazado', 'cancelado', 'expirado'].includes(estado)) break;
+    if (Date.now() - (fin - 150000) > 25000){
+      const sub = document.querySelector('#p-body .paso-sub');
+      if (sub) sub.textContent = 'Está tardando más de lo normal. Si ya aprobaste el pago en Yappy, no lo repitas: tu pedido se confirmará solo.';
+    }
     await new Promise(r => setTimeout(r, 2500));
   }
   if (estado === 'ejecutado'){ PED.pagadoYappy = true; }
@@ -1469,7 +1473,7 @@ async function esperarConfirmacionYappy(){
     PED.yappyOrderId = null; irPaso(5);
     const e = document.getElementById('p-yappy-msg'); if (e) e.textContent = 'Yappy no aprobó el pago. Puedes intentar de nuevo.';
     return;
-  } else { PED.pagoEnRevision = true; }
+  } else { PED.pagoEnRevision = true; }   // 'revisar' o sin respuesta a tiempo: el negocio valida el pago
   PED.resultado = PED.pedidoYappy;
   irPaso(6);
 }
