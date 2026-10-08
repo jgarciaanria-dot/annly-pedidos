@@ -1461,15 +1461,19 @@ async function esperarConfirmacionYappy(){
   let estado = 'pendiente';
   while (Date.now() < fin){
     estado = await Pedidos.estadoOrdenYappy(PED.yappyOrderId);
-    if (estado === 'ejecutado' || ['rechazado', 'cancelado', 'expirado'].includes(estado)) break;
-    await new Promise(r => setTimeout(r, 2500));
+    if (estado === 'ejecutado' || estado === 'revisar' || ['rechazado', 'cancelado', 'expirado'].includes(estado)) break;
+    if (Date.now() - (fin - 150000) > 25000){
+      const sub = document.querySelector('#p-body .paso-sub');
+      if (sub) sub.textContent = 'Está tardando más de lo normal. Si ya aprobaste el pago en Yappy, no lo repitas: tu pedido se confirmará solo.';
+    }
+    await new Promise(r => setTimeout(r, (Date.now() - (fin - 150000)) < 20000 ? 1200 : 2500));
   }
   if (estado === 'ejecutado'){ PED.pagadoYappy = true; }
   else if (['rechazado', 'cancelado', 'expirado'].includes(estado)){
     PED.yappyOrderId = null; irPaso(5);
     const e = document.getElementById('p-yappy-msg'); if (e) e.textContent = 'Yappy no aprobó el pago. Puedes intentar de nuevo.';
     return;
-  } else { PED.pagoEnRevision = true; }
+  } else { PED.pagoEnRevision = true; }   // 'revisar' o sin respuesta a tiempo: el negocio valida el pago
   PED.resultado = PED.pedidoYappy;
   irPaso(6);
 }
@@ -1503,7 +1507,7 @@ function paso6(){
       <div><span>Entrega</span><span>${PED.entrega === 'retiro' ? 'Retiro en tienda' : 'A domicilio'}</span></div>
       <div><span>Para</span><span>${E(PED.destinatario.nombre)}</span></div>
       <div class="tot"><span>Total</span><span>${Pedidos.dinero(r.total)}${r.envioPorConfirmar ? ' + envío' : ''}</span></div>
-      ${r.abono ? `<div><span>Abono enviado</span><span>${Pedidos.dinero(r.abono)}</span></div>
+      ${r.abono ? `<div><span>${PED.pagadoYappy ? 'Abono pagado' : 'Abono enviado'}</span><span>${Pedidos.dinero(r.abono)}</span></div>
       <div><span>Pagas al recibir</span><span><b>${Pedidos.dinero(r.saldo)}</b></span></div>` : ''}
     </div>
     ${r.pocaAnticipacion ? '<div class="aviso">Pediste con poca anticipación: el negocio te confirmará si llega a tiempo.</div>' : ''}
