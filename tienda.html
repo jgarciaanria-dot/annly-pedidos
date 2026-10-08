@@ -353,7 +353,7 @@ footer .wrap{position:relative;z-index:1;max-width:680px;}
 .prod{overflow:hidden;}
 .ov.on{animation:aparecer .25s ease;}
 .ov.on .hoja{animation:hojaSube .35s cubic-bezier(.2,.8,.2,1);}
-#p-body > *:not(.pasos){animation:pasoEntra .3s ease both;}
+#p-body > *:not(.pasos){animation:pasoEntra .3s ease backwards;}
 .pasos span{transition:background .35s ease;}
 .dia,.fr,.opc,.extra{transition:border-color .2s,background .2s,transform .15s;}
 .dia:active,.fr:active,.opc:active,.extra:active{transform:scale(.97);}
@@ -1047,7 +1047,7 @@ function abrirProducto(id){
   pintarPaso();
   document.getElementById('ov-prod').classList.add('on');
 }
-function cerrarProducto(){ document.getElementById('ov-prod').classList.remove('on'); document.getElementById('celebracion')?.classList.remove('on'); }
+function cerrarProducto(){ if (PED._aislado) return; document.getElementById('ov-prod').classList.remove('on'); document.getElementById('celebracion')?.classList.remove('on'); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarProducto(); });
 
 // ---- Montos (solo para mostrar; el total real lo calcula la base al crear el pedido) ----
@@ -1064,7 +1064,7 @@ function barraPasos(){
   return `<div class="pasos" aria-hidden="true">${Array.from({ length: PASOS }, (_, i) => `<span class="${i < PED.paso ? 'on' : ''}"></span>`).join('')}</div>`;
 }
 function botonVolver(){ return PED.paso > 1 ? `<button class="volver" onclick="irPaso(${PED.paso - 1})"><i class="ti ti-chevron-left"></i> Volver</button>` : ''; }
-function irPaso(n){ PED.paso = n; pintarPaso(); document.querySelector('.hoja').scrollTop = 0; if(n === 6) setTimeout(lanzarCelebracion, 120); }
+function irPaso(n){ restaurarYappy(); PED.paso = n; pintarPaso(); document.querySelector('#ov-prod .hoja').scrollTop = 0; if(n === 6) setTimeout(lanzarCelebracion, 120); }
 
 function pintarPaso(){
   document.getElementById('p-foto').style.display = PED.paso === 1 ? '' : 'none';
@@ -1379,6 +1379,39 @@ async function enviarPedido(){
 }
 
 // ---- Pago automático con Yappy Comercial ----
+// Mientras la ventana de Yappy está abierta, el resto del pedido se oculta para que no se encime ni se desordene.
+// Siempre queda un botón "Volver al pedido" por si el cliente cierra la ventana de Yappy sin pagar.
+function aislarYappy(btn){
+  const ov = document.getElementById('ov-prod'), hoja = ov && ov.querySelector('.hoja');
+  if (!hoja || !ov || PED._aislado) return;
+  PED._aislado = [];
+  let nodo = btn;
+  while (nodo && nodo !== hoja){
+    const padre = nodo.parentElement;
+    if (!padre) break;
+    [...padre.children].forEach(h => { if (h !== nodo) PED._aislado.push([h, h.style.visibility, null]); });
+    PED._aislado.push([padre, null, padre.style.cssText]);
+    nodo = padre;
+  }
+  PED._aislado.forEach(([el, vis, css]) => {
+    if (vis !== null) el.style.visibility = 'hidden';
+    else { el.style.background = 'transparent'; el.style.borderColor = 'transparent'; el.style.boxShadow = 'none'; }
+  });
+  hoja.style.overflow = 'visible';
+  const v = document.createElement('button');
+  v.id = 'yappy-volver'; v.type = 'button'; v.textContent = '← Volver a mi pedido';
+  v.style.cssText = 'position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;border:0;border-radius:999px;padding:10px 18px;font:700 13px DM Sans,sans-serif;background:#fff;color:#1F1B2B;box-shadow:0 6px 20px rgba(0,0,0,.28);cursor:pointer;';
+  v.onclick = () => { restaurarYappy(); const m = document.getElementById('p-yappy-msg'); if (m) m.textContent = ''; };
+  ov.appendChild(v);
+  clearTimeout(PED._aisladoT); PED._aisladoT = setTimeout(restaurarYappy, 6 * 60 * 1000);
+}
+function restaurarYappy(){
+  if (!PED._aislado) return;
+  PED._aislado.forEach(([el, vis, css]) => { if (vis !== null) el.style.visibility = vis; else el.style.cssText = css; });
+  const hoja = document.querySelector('#ov-prod .hoja'); if (hoja) hoja.style.overflow = '';
+  PED._aislado = null; clearTimeout(PED._aisladoT);
+  const v = document.getElementById('yappy-volver'); if (v) v.remove();
+}
 // El pedido se crea al tocar el botón (queda pendiente) y SOLO se confirma cuando Yappy avisa al servidor.
 function conectarYappyPedido(){
   const btn = document.getElementById('p-btn-yappy');
@@ -1408,15 +1441,17 @@ function conectarYappyPedido(){
       if (!r || !r.ok){ msg((r && r.error) || 'No se pudo crear la orden de pago. Intenta de nuevo.'); btn.isButtonLoading = false; return; }
       PED.yappyOrderId = r.orderId;
       msg('', true);
+      aislarYappy(btn);
       btn.eventPayment({ transactionId: r.transactionId, documentName: r.documentName, token: r.token });
     } catch(e){
+      restaurarYappy();
       msg(e.message || 'No se pudo preparar el pago.');
       btn.isButtonLoading = false;
       if (/franja|preparar/i.test(e.message || '')){ PED.franja = null; setTimeout(() => irPaso(2), 1800); }
     }
   });
-  btn.addEventListener('eventSuccess', () => esperarConfirmacionYappy());
-  btn.addEventListener('eventError', () => msg('El pago no se completó. Puedes intentar de nuevo.'));
+  btn.addEventListener('eventSuccess', () => { restaurarYappy(); esperarConfirmacionYappy(); });
+  btn.addEventListener('eventError', () => { restaurarYappy(); msg('El pago no se completó. Puedes intentar de nuevo.'); });
 }
 // Espera a que el servidor confirme el pago (Yappy avisa y el pedido pasa a CONFIRMADO)
 async function esperarConfirmacionYappy(){
