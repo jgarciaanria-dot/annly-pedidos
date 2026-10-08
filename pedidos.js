@@ -459,6 +459,27 @@ const Pedidos = {
     Object.assign(this.negocio, data[0]);
   },
 
+  // ---- Yappy Comercial (botón de pago real) ----
+  // El Secret se guarda pero NUNCA se vuelve a leer en el navegador: solo se sabe si ya hay uno (tieneSecret).
+  async credencialesYappy() {
+    const { data, error } = await sb.rpc('yappy_credenciales_estado', { p_business: this.id });
+    if (error) throw new Error(error.message);
+    return data || null;
+  },
+  // secret vacío = se conserva el que ya estaba guardado
+  async guardarCredencialesYappy({ merchantId, secret, dominio, activo }) {
+    const { error } = await sb.rpc('yappy_guardar', {
+      p_business: this.id, p_merchant: merchantId, p_secret: secret || null, p_dominio: dominio, p_activo: activo !== false
+    });
+    if (error) throw new Error(error.message);
+    this.negocio.tiene_yappy_comercial = activo !== false;
+  },
+  async eliminarCredencialesYappy() {
+    const { error } = await sb.rpc('yappy_eliminar', { p_business: this.id });
+    if (error) throw new Error(error.message);
+    this.negocio.tiene_yappy_comercial = false;
+  },
+
   // Nombre de la tienda (por si se escribió mal al registrarse). El link (slug) NO cambia,
   // para no romper los links que el negocio ya compartió.
   async guardarNombre(nombre) {
