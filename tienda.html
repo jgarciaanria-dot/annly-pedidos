@@ -1466,7 +1466,7 @@ async function esperarConfirmacionYappy(){
       const sub = document.querySelector('#p-body .paso-sub');
       if (sub) sub.textContent = 'Está tardando más de lo normal. Si ya aprobaste el pago en Yappy, no lo repitas: tu pedido se confirmará solo.';
     }
-    await new Promise(r => setTimeout(r, 2500));
+    await new Promise(r => setTimeout(r, (Date.now() - (fin - 150000)) < 20000 ? 1200 : 2500));
   }
   if (estado === 'ejecutado'){ PED.pagadoYappy = true; }
   else if (['rechazado', 'cancelado', 'expirado'].includes(estado)){
