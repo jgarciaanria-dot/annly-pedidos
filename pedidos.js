@@ -678,7 +678,8 @@ const Pedidos = {
     { nombre: 'Océano', primario: '#06B6D4', secundario: '#075985' },
     { nombre: 'Eléctrico', primario: '#3B5BDB', secundario: '#1B2A6B' },
     { nombre: 'Cielo', primario: '#0EA5E9', secundario: '#0C4A6E' },
-    { nombre: 'Celeste', primario: '#7DB9E8', secundario: '#2F5D8A' }
+    { nombre: 'Celeste', primario: '#7DB9E8', secundario: '#2F5D8A' },
+    { nombre: 'Neutral', primario: '#6F6A64', secundario: '#34312E' }
   ],
   async guardarPaleta(primario, secundario) {
     const hex = /^#[0-9a-fA-F]{6}$/;
