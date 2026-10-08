@@ -788,8 +788,9 @@ footer{animation:aparecer .6s ease both;}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
+<script type="module" src="https://bt-cdn.yappy.cloud/v1/cdn/web-component-btn-yappy.js"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=21"></script>
+<script src="/pedidos.js?v=22"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -1070,6 +1071,7 @@ function pintarPaso(){
   const cuerpo = { 1: paso1, 2: paso2, 3: paso3, 4: paso4, 5: paso5, 6: paso6 }[PED.paso]();
   document.getElementById('p-body').innerHTML = (PED.paso <= PASOS ? barraPasos() : '') + cuerpo;
   if (PED.paso === 2 && PED.fecha) cargarFranjas();
+  if (PED.paso === 5 && PED.metodo === 'yappy_real') conectarYappyPedido();
 }
 
 // ---- 1. Producto y extras ----
@@ -1268,6 +1270,7 @@ function validarDatos(){
 function mediosPago(){
   const n = Pedidos.negocio || {};
   const m = [];
+  if (n.tiene_yappy_comercial) m.push('yappy_real');   // botón oficial de Yappy (módulo Pagos en línea)
   if (n.yappy_numero) m.push('yappy');
   if (n.banco_nombre && n.banco_numero_cuenta && n.banco_titular) m.push('transferencia');
   return m;
@@ -1303,7 +1306,14 @@ function paso5(){
   ];
   const opcion = (val, tit, txt) => `<label class="opc${PED.metodo === val ? ' on' : ''}"><input type="radio" name="metodo" ${PED.metodo === val ? 'checked' : ''} onchange="elegirMetodo('${val}')"><div><strong>${tit}</strong><span>${txt}</span></div></label>`;
   let detalle = '';
-  if (PED.metodo === 'yappy'){
+  if (PED.metodo === 'yappy_real'){
+    const aliasIni = PED.alias != null ? PED.alias : String((PED.cliente && PED.cliente.telefono) || '').replace(/\D/g, '').replace(/^507(?=\d{8}$)/, '');
+    detalle = `<div class="yappy" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <span class="nota" style="text-align:left;margin:0;">Escribe tu número de Yappy y toca el botón: aprobarás ${Pedidos.dinero(aPagar)} en tu app.</span>
+        <input class="fi" id="p-alias" inputmode="numeric" maxlength="12" autocomplete="tel" value="${E(aliasIni)}" placeholder="Tu número Yappy (8 dígitos, sin +507)">
+        <btn-yappy id="p-btn-yappy" theme="darkBlue" rounded="true"></btn-yappy>
+        <p class="err" id="p-yappy-msg" style="margin:0;"></p></div>`;
+  } else if (PED.metodo === 'yappy'){
     detalle = `<div class="yappy"><div><span class="nota" style="display:block;text-align:left;margin:0;">Envía ${Pedidos.dinero(aPagar)} al número</span><b>${E(n.yappy_numero)}</b></div>
         <button class="copiar" onclick="copiarDato(this, '${String(n.yappy_numero).replace(/\D/g, '')}')">Copiar</button></div>`;
   } else if (PED.metodo === 'transferencia'){
@@ -1322,14 +1332,15 @@ function paso5(){
       <label class="opc${PED.pagoTipo === 'total' ? ' on' : ''}"><input type="radio" name="pagotipo" ${PED.pagoTipo === 'total' ? 'checked' : ''} onchange="elegirPagoTipo('total')"><div><strong>Pagar todo · ${Pedidos.dinero(m.total)}</strong><span>Tu pedido queda pagado.</span></div></label>
       <label class="opc${PED.pagoTipo === 'abono' ? ' on' : ''}"><input type="radio" name="pagotipo" ${PED.pagoTipo === 'abono' ? 'checked' : ''} onchange="elegirPagoTipo('abono')"><div><strong>Dejar un abono · ${Pedidos.dinero(abono)}</strong><span>Pagas los ${Pedidos.dinero(m.total - abono)} restantes al recibir tu pedido.</span></div></label>` : ''}
     ${medios.length ? `<div class="sub">¿Cómo pagas${abono ? ' ' + Pedidos.dinero(aPagar) : ''}?</div>
-      ${medios.includes('yappy') ? opcion('yappy', 'Yappy', 'Pago inmediato desde tu app.') : ''}
+      ${medios.includes('yappy_real') ? opcion('yappy_real', 'Yappy · pago automático', 'Aprueba el pago en tu app y tu pedido se confirma solo.') : ''}
+      ${medios.includes('yappy') ? opcion('yappy', medios.includes('yappy_real') ? 'Yappy · enviar al número' : 'Yappy', 'Pago inmediato desde tu app.') : ''}
       ${medios.includes('transferencia') ? opcion('transferencia', 'Transferencia bancaria', E(n.banco_nombre)) : ''}
       ${detalle}
-      <div class="fg"><label class="flbl" for="p-comp">${PED.metodo === 'transferencia' ? 'Número de referencia de la transferencia' : 'Número de comprobante de Yappy'}</label><input class="fi" id="p-comp" maxlength="60" value="${E(PED.comprobante)}" placeholder="${PED.metodo === 'transferencia' ? 'Lo encuentras en tu banca en línea' : 'Lo encuentras en el detalle del pago'}"></div>`
+      ${PED.metodo === 'yappy_real' ? '' : `<div class="fg"><label class="flbl" for="p-comp">${PED.metodo === 'transferencia' ? 'Número de referencia de la transferencia' : 'Número de comprobante de Yappy'}</label><input class="fi" id="p-comp" maxlength="60" value="${E(PED.comprobante)}" placeholder="${PED.metodo === 'transferencia' ? 'Lo encuentras en tu banca en línea' : 'Lo encuentras en el detalle del pago'}"></div>`}`
     : '<div class="aviso info">Este negocio coordinará el pago contigo por WhatsApp al confirmar tu pedido.</div>'}
     <p class="err" id="p-err"></p>
-    <button class="btn-pedir" id="p-enviar" onclick="enviarPedido()">Enviar pedido</button>
-    <p class="nota">Tu pedido queda reservado y el negocio confirma el pago.</p>`;
+    ${PED.metodo === 'yappy_real' ? '' : '<button class="btn-pedir" id="p-enviar" onclick="enviarPedido()">Enviar pedido</button>'}
+    <p class="nota">${PED.metodo === 'yappy_real' ? 'Tu pedido se confirma solo cuando Yappy aprueba el pago.' : 'Tu pedido queda reservado y el negocio confirma el pago.'}</p>`;
 }
 function elegirMetodo(v){
   const comp = document.getElementById('p-comp');
@@ -1367,6 +1378,67 @@ async function enviarPedido(){
   }
 }
 
+// ---- Pago automático con Yappy Comercial ----
+// El pedido se crea al tocar el botón (queda pendiente) y SOLO se confirma cuando Yappy avisa al servidor.
+function conectarYappyPedido(){
+  const btn = document.getElementById('p-btn-yappy');
+  if (!btn || btn.dataset.listo) return;
+  btn.dataset.listo = '1';
+  const msg = (t, ok) => { const e = document.getElementById('p-yappy-msg'); if (e){ e.style.color = ok ? '#5a5a66' : ''; e.textContent = t || ''; } };
+  const alias = () => String((document.getElementById('p-alias') || {}).value || '').replace(/\D/g, '').replace(/^507(?=\d{8}$)/, '');
+  btn.addEventListener('eventClick', async () => {
+    const a = alias(); PED.alias = a;
+    if (a.length < 7){ msg('Escribe tu número de Yappy (8 dígitos, sin +507).'); btn.isButtonLoading = false; return; }
+    msg('Preparando tu pago…', true);
+    try {
+      if (!PED.pedidoYappy){
+        PED.pedidoYappy = await Pedidos.crearPedido({
+          productId: PED.prod.id,
+          extras: extrasElegidos().map(x => ({ itemId: x.id, qty: 1 })),
+          fecha: PED.fecha, slotId: PED.franja.id, entrega: PED.entrega,
+          zonaId: PED.entrega === 'domicilio' && !PED.fueraZona ? PED.zonaId : null,
+          direccion: PED.entrega === 'domicilio' ? PED.direccion : null,
+          referencia: PED.entrega === 'domicilio' ? PED.referencia : null,
+          cliente: PED.cliente, destinatario: PED.destinatario, dedicatoria: PED.dedicatoria,
+          pago: { metodo: 'yappy', comprobante: null },
+          pagoTipo: PED.pagoTipo === 'abono' ? 'abono' : 'total'
+        });
+      }
+      const r = await Pedidos.crearOrdenYappyPedido(PED.pedidoYappy.id, a);
+      if (!r || !r.ok){ msg((r && r.error) || 'No se pudo crear la orden de pago. Intenta de nuevo.'); btn.isButtonLoading = false; return; }
+      PED.yappyOrderId = r.orderId;
+      msg('', true);
+      btn.eventPayment({ transactionId: r.transactionId, documentName: r.documentName, token: r.token });
+    } catch(e){
+      msg(e.message || 'No se pudo preparar el pago.');
+      btn.isButtonLoading = false;
+      if (/franja|preparar/i.test(e.message || '')){ PED.franja = null; setTimeout(() => irPaso(2), 1800); }
+    }
+  });
+  btn.addEventListener('eventSuccess', () => esperarConfirmacionYappy());
+  btn.addEventListener('eventError', () => msg('El pago no se completó. Puedes intentar de nuevo.'));
+}
+// Espera a que el servidor confirme el pago (Yappy avisa y el pedido pasa a CONFIRMADO)
+async function esperarConfirmacionYappy(){
+  const cuerpo = document.getElementById('p-body');
+  if (cuerpo) cuerpo.innerHTML = '<div class="listo"><h3>Confirmando tu pago…</h3><p class="paso-sub">No cierres esta ventana, solo tarda unos segundos.</p></div>';
+  const fin = Date.now() + 150000;
+  let estado = 'pendiente';
+  while (Date.now() < fin){
+    estado = await Pedidos.estadoOrdenYappy(PED.yappyOrderId);
+    if (estado === 'ejecutado' || ['rechazado', 'cancelado', 'expirado'].includes(estado)) break;
+    await new Promise(r => setTimeout(r, 2500));
+  }
+  if (estado === 'ejecutado'){ PED.pagadoYappy = true; }
+  else if (['rechazado', 'cancelado', 'expirado'].includes(estado)){
+    PED.yappyOrderId = null; irPaso(5);
+    const e = document.getElementById('p-yappy-msg'); if (e) e.textContent = 'Yappy no aprobó el pago. Puedes intentar de nuevo.';
+    return;
+  } else { PED.pagoEnRevision = true; }
+  PED.resultado = PED.pedidoYappy;
+  irPaso(6);
+}
+
 // ---- 6. Listo ----
 function lanzarCelebracion(){
   const el = document.getElementById('celebracion');
@@ -1384,9 +1456,11 @@ function paso6(){
   const wa = String(n.whatsapp || '').replace(/\D/g, '');
   const texto = encodeURIComponent(`Hola, acabo de hacer el pedido ${numero} (${PED.prod.nombre}) para el ${fechaLarga(PED.fecha)}. A nombre de ${PED.cliente.nombre}.`);
   return `<div class="listo"><div class="check-wrap"><i class="ti ti-check"></i></div>
-    <h3>¡Pedido recibido!</h3>
+    <h3>${PED.pagadoYappy ? '¡Pago aprobado!' : '¡Pedido recibido!'}</h3>
     <div class="num">${numero}</div>
-    <p class="paso-sub">${E(n.nombre || '')} revisará tu pago y te confirmará por WhatsApp.</p></div>
+    <p class="paso-sub">${PED.pagadoYappy ? 'Tu pedido quedó confirmado. ' + E(n.nombre || '') + ' te escribirá por WhatsApp si necesita algo más.'
+      : PED.pagoEnRevision ? 'Estamos esperando la confirmación de Yappy. Si te cobraron, tu pedido se confirmará solo; si tienes dudas, escríbele a ' + E(n.nombre || 'la tienda') + '.'
+      : E(n.nombre || '') + ' revisará tu pago y te confirmará por WhatsApp.'}</p></div>
     <div class="resumen">
       <div><span>Producto</span><span>${E(PED.prod.nombre)}</span></div>
       <div><span>Fecha</span><span>${fechaLarga(PED.fecha)}</span></div>

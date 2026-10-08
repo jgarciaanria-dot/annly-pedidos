@@ -776,7 +776,11 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
       </div>
       <div class="sec" id="yc-sec">
         <div class="sec-hdr"><div><h2>Yappy Comercial (botón de pago real)</h2><p>Para que tus clientes paguen con el botón oficial de Yappy y el pedido se confirme solo.</p></div></div>
-        <div class="sec-body" style="padding-top:14px;">
+        <div class="sec-body" id="yc-bloqueado" style="padding-top:14px;display:none;">
+          <p class="ayuda" style="margin-top:0;" id="yc-bloq-txt"></p>
+          <button class="btn btn-grad" id="yc-agregar" style="width:auto;display:none;" onclick="activarModulo('PEDIDOS_PAGOS')"><i class="ti ti-plus"></i> Agregar a mi plan</button>
+        </div>
+        <div class="sec-body" id="yc-activo-bloque" style="padding-top:14px;">
           <p class="ayuda" style="margin-top:0;">Si ya tienes cuenta de Yappy Comercial (Banco General), configúrala aquí. Sin esto, tu tienda sigue usando tu número de Yappy de arriba con confirmación manual.</p>
           <div class="frow">
             <div class="fg"><label class="flbl" for="yc-merchant">Merchant ID</label><input class="fi" id="yc-merchant" autocomplete="off" placeholder="78fb770f-055f-43c1-8529-a2bef7cbf5cd"></div>
@@ -1003,7 +1007,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
 <script type="module" src="https://bt-cdn.yappy.cloud/v1/cdn/web-component-btn-yappy.js"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=21"></script>
+<script src="pedidos.js?v=22"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -1391,7 +1395,7 @@ async function cargarMiPlan(){
     else acciones = `<span class="mod-estado">${enPrueba ? 'Activo en tu prueba' : 'Activo'}</span>
       <button class="chip-btn" onclick="cancelarModulo('${m.code}')"><i class="ti ti-x"></i> Cancelar</button>`;
     return `<div class="mod-card${activo ? ' on' : ''}">
-      <div class="mod-ico"><i class="ti ${m.code === 'PEDIDOS_REPORTES' ? 'ti-chart-bar' : 'ti-puzzle'}"></i></div>
+      <div class="mod-ico"><i class="ti ${m.code === 'PEDIDOS_REPORTES' ? 'ti-chart-bar' : m.code === 'PEDIDOS_PAGOS' ? 'ti-credit-card' : 'ti-puzzle'}"></i></div>
       <div class="mod-body">
         <h3>${E(m.nombre)}</h3>
         <p>${E(m.descripcion || '')}</p>
@@ -2802,6 +2806,21 @@ async function guardarDatos(){
 let YC_TIENE_SECRET = false;
 async function cargarYappyComercial(){
   msg('yc-msg');
+  if (!Pedidos.plan) { try { await Pedidos.cargarPlan(); } catch(e){} }
+  const disponible = Pedidos.moduloDisponible('PEDIDOS_PAGOS');
+  document.getElementById('yc-activo-bloque').style.display = disponible ? '' : 'none';
+  document.getElementById('yc-bloqueado').style.display = disponible ? 'none' : '';
+  if (!disponible){
+    const comprado = Pedidos.modulos.includes('PEDIDOS_PAGOS');
+    let m = null;
+    try { m = (await Pedidos.catalogoModulos()).find(x => x.code === 'PEDIDOS_PAGOS'); } catch(e){}
+    document.getElementById('yc-bloq-txt').innerHTML = comprado
+      ? 'Tu prueba terminó: paga tu mensualidad para volver a usar los pagos en línea.'
+      : (m ? '<b>Pagos en línea</b> es un módulo adicional: cobra con Yappy Comercial y tus pedidos se confirman solos. Agrégalo a tu plan por <b>$' + (m.precio || 5).toFixed(0) + '/mes</b>.'
+           : '<b>Pagos en línea</b> (Yappy Comercial y pasarelas de pago) estará disponible muy pronto como módulo adicional.');
+    document.getElementById('yc-agregar').style.display = (!comprado && m) ? 'inline-flex' : 'none';
+    return;
+  }
   document.getElementById('yc-secret').value = '';
   try {
     const c = await Pedidos.credencialesYappy();
@@ -2814,6 +2833,7 @@ async function cargarYappyComercial(){
   } catch(e){ msg('yc-msg', 'No se pudieron cargar las credenciales de Yappy.'); }
 }
 async function guardarYappyComercial(){
+  if (!Pedidos.moduloDisponible('PEDIDOS_PAGOS')){ msg('yc-msg', 'Agrega el módulo Pagos en línea a tu plan para usar Yappy Comercial.'); return; }
   const merchantId = document.getElementById('yc-merchant').value.trim();
   const dominio = document.getElementById('yc-dominio').value.trim();
   const secret = document.getElementById('yc-secret').value.trim();

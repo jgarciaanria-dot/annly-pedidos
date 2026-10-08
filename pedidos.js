@@ -882,6 +882,25 @@ const Pedidos = {
     return data;
   },
 
+  // Pago automático con Yappy Comercial (el monto lo calcula el servidor a partir del pedido)
+  async crearOrdenYappyPedido(orderId, aliasYappy) {
+    try {
+      const resp = await fetch(`${PCFG.SUPABASE_URL}/functions/v1/yappy-pedido`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: PCFG.SUPABASE_KEY },
+        body: JSON.stringify({ orderId, aliasYappy })
+      });
+      return await resp.json();
+    } catch (e) { return { ok: false, error: 'Error de conexión al crear la orden de pago.' }; }
+  },
+  async estadoOrdenYappy(yappyOrderId) {
+    try {
+      const resp = await fetch(`${PCFG.SUPABASE_URL}/functions/v1/swift-function?orderId=${encodeURIComponent(yappyOrderId)}`, { headers: { apikey: PCFG.SUPABASE_KEY } });
+      const r = await resp.json();
+      return r.ok ? r.estado : 'error';
+    } catch (e) { return 'error'; }
+  },
+
   // Panel: cobra el saldo de un pedido con abono
   async registrarSaldo(id, metodo, comprobante) {
     const { error } = await sb.rpc('pedidos_registrar_saldo', { p_order: id, p_metodo: metodo, p_comprobante: comprobante || null });
