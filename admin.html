@@ -774,6 +774,25 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
           <button class="btn btn-grad" style="width:auto;" onclick="guardarDatos()"><i class="ti ti-check"></i> Guardar datos</button>
         </div>
       </div>
+      <div class="sec" id="yc-sec">
+        <div class="sec-hdr"><div><h2>Yappy Comercial (botón de pago real)</h2><p>Para que tus clientes paguen con el botón oficial de Yappy y el pedido se confirme solo.</p></div></div>
+        <div class="sec-body" style="padding-top:14px;">
+          <p class="ayuda" style="margin-top:0;">Si ya tienes cuenta de Yappy Comercial (Banco General), configúrala aquí. Sin esto, tu tienda sigue usando tu número de Yappy de arriba con confirmación manual.</p>
+          <div class="frow">
+            <div class="fg"><label class="flbl" for="yc-merchant">Merchant ID</label><input class="fi" id="yc-merchant" autocomplete="off" placeholder="78fb770f-055f-43c1-8529-a2bef7cbf5cd"></div>
+            <div class="fg"><label class="flbl" for="yc-dominio">Dominio registrado en Yappy</label><input class="fi" id="yc-dominio" autocomplete="off" placeholder="tienda.tudominio.com"></div>
+          </div>
+          <div class="fg"><label class="flbl" for="yc-secret">Secret (te lo da Yappy al aprobar tu comercio)</label><input class="fi" id="yc-secret" type="password" autocomplete="new-password" placeholder="•••••••••••••">
+            <p class="ayuda" id="yc-secret-ayuda">Una vez guardado, no se vuelve a mostrar.</p></div>
+          <label style="display:flex;align-items:center;gap:10px;font-size:13px;margin:6px 0 12px;cursor:pointer;"><input type="checkbox" id="yc-activo" checked> Botón real de Yappy activo</label>
+          <p class="ayuda" style="margin-top:-4px;">Apagarlo vuelve al flujo manual de inmediato y conserva tus credenciales.</p>
+          <p class="msg" id="yc-msg"></p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-grad" style="width:auto;" onclick="guardarYappyComercial()"><i class="ti ti-check"></i> Guardar credenciales Yappy</button>
+            <button class="btn btn-line" id="yc-quitar" style="width:auto;display:none;" onclick="quitarYappyComercial()">Quitar</button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Pedidos -->
@@ -984,7 +1003,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
 <script type="module" src="https://bt-cdn.yappy.cloud/v1/cdn/web-component-btn-yappy.js"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=20"></script>
+<script src="pedidos.js?v=21"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -2751,6 +2770,7 @@ async function cargarConfig(){
   document.getElementById('d-tag').value = n.tagline || '';
   document.getElementById('d-avisos').value = CFG.correo_avisos || '';
   msg('c-msg'); msg('d-msg');
+  cargarYappyComercial();
 }
 async function guardarTiempos(){
   const v = id => parseInt(document.getElementById(id).value, 10);
@@ -2776,6 +2796,43 @@ async function guardarDatos(){
       direccion: document.getElementById('d-dir').value, instagram: document.getElementById('d-ig').value, tagline: document.getElementById('d-tag').value });
     msg('d-msg', ''); alert('Datos guardados.');
   } catch(e){ msg('d-msg', e.message); }
+}
+
+// ---------- Yappy Comercial ----------
+let YC_TIENE_SECRET = false;
+async function cargarYappyComercial(){
+  msg('yc-msg');
+  document.getElementById('yc-secret').value = '';
+  try {
+    const c = await Pedidos.credencialesYappy();
+    YC_TIENE_SECRET = !!(c && c.tieneSecret);
+    document.getElementById('yc-merchant').value = c ? (c.merchantId || '') : '';
+    document.getElementById('yc-dominio').value = c ? (c.dominioRegistrado || '') : '';
+    document.getElementById('yc-activo').checked = c ? c.activo !== false : true;
+    document.getElementById('yc-secret').placeholder = YC_TIENE_SECRET ? 'Ya configurado — deja en blanco para no cambiarlo' : '•••••••••••••';
+    document.getElementById('yc-quitar').style.display = c ? 'inline-flex' : 'none';
+  } catch(e){ msg('yc-msg', 'No se pudieron cargar las credenciales de Yappy.'); }
+}
+async function guardarYappyComercial(){
+  const merchantId = document.getElementById('yc-merchant').value.trim();
+  const dominio = document.getElementById('yc-dominio').value.trim();
+  const secret = document.getElementById('yc-secret').value.trim();
+  const activo = document.getElementById('yc-activo').checked;
+  // Apagar siempre se puede; encender exige los datos completos
+  if (activo && (!merchantId || !dominio)){ msg('yc-msg', 'Completa el Merchant ID y el dominio registrado.'); return; }
+  if (activo && !secret && !YC_TIENE_SECRET){ msg('yc-msg', 'Ingresa el Secret la primera vez que configures Yappy.'); return; }
+  msg('yc-msg', 'Guardando...');
+  try {
+    await Pedidos.guardarCredencialesYappy({ merchantId, secret, dominio, activo });
+    await cargarYappyComercial();
+    msg('yc-msg', '');
+    alert(activo ? '¡Credenciales de Yappy guardadas!' : 'Botón real desactivado: volviste al flujo manual.');
+  } catch(e){ msg('yc-msg', 'No se pudo guardar: ' + e.message); }
+}
+async function quitarYappyComercial(){
+  if (!confirm('¿Quitar las credenciales de Yappy Comercial? Tu tienda volverá al pago manual.')) return;
+  try { await Pedidos.eliminarCredencialesYappy(); await cargarYappyComercial(); }
+  catch(e){ msg('yc-msg', 'No se pudo quitar: ' + e.message); }
 }
 
 async function guardarNombreTienda(){
