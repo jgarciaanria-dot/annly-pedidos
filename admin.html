@@ -250,6 +250,10 @@ button,input,select,textarea{font-family:inherit;}
 .mod-card{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px;}
 .mod-card.on{border-color:var(--violet);box-shadow:0 0 0 3px var(--lilac);}
 .mod-ico{width:46px;height:46px;border-radius:14px;background:var(--lilac);color:var(--violet);display:grid;place-items:center;font-size:22px;flex-shrink:0;}
+.mods-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:stretch;}
+.mods-grid .mod-card{flex-direction:column;gap:12px;}
+.mods-grid .mod-acc{margin-top:auto;padding-top:12px;}
+.mods-grid .mod-body{display:flex;flex-direction:column;width:100%;}
 .mod-body{flex:1;min-width:0;}
 .mod-body h3{font-size:16px;margin-bottom:4px;}
 .mod-body p{font-size:13px;color:var(--ink-soft);line-height:1.5;}
@@ -1450,7 +1454,7 @@ async function cargarMiPlan(){
     </div>
     ${ultimos.length ? `<div class="plan-card" style="margin-top:12px;"><div class="pago-hist" style="margin-top:0;"><b>Últimos pagos</b>${ultimos.map(x => `<span><i class="ti ti-circle-check"></i>${E(x.concepto)} · $${Number(x.monto_pagado || x.monto).toFixed(2)}</span>`).join('')}</div></div>` : ''}`;
 
-  cont.innerHTML = planHtml + mensualidadHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3>${modsHtml}` : '');
+  cont.innerHTML = planHtml + mensualidadHtml + (modsHtml ? `<h3 style="font-size:15px;margin:18px 0 10px;">Módulos</h3><div class="mods-grid">${modsHtml}</div>` : '');
   activarBotonYappy();
 }
 
