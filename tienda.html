@@ -1507,7 +1507,7 @@ function paso6(){
       <div><span>Entrega</span><span>${PED.entrega === 'retiro' ? 'Retiro en tienda' : 'A domicilio'}</span></div>
       <div><span>Para</span><span>${E(PED.destinatario.nombre)}</span></div>
       <div class="tot"><span>Total</span><span>${Pedidos.dinero(r.total)}${r.envioPorConfirmar ? ' + envío' : ''}</span></div>
-      ${r.abono ? `<div><span>Abono enviado</span><span>${Pedidos.dinero(r.abono)}</span></div>
+      ${r.abono ? `<div><span>${PED.pagadoYappy ? 'Abono pagado' : 'Abono enviado'}</span><span>${Pedidos.dinero(r.abono)}</span></div>
       <div><span>Pagas al recibir</span><span><b>${Pedidos.dinero(r.saldo)}</b></span></div>` : ''}
     </div>
     ${r.pocaAnticipacion ? '<div class="aviso">Pediste con poca anticipación: el negocio te confirmará si llega a tiempo.</div>' : ''}
