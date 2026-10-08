@@ -984,7 +984,7 @@ button.cal-col-hdr{border-top:0;border-right:0;cursor:pointer;}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
 <script type="module" src="https://bt-cdn.yappy.cloud/v1/cdn/web-component-btn-yappy.js"></script>
 <script src="config.js"></script>
-<script src="pedidos.js?v=18"></script>
+<script src="pedidos.js?v=20"></script>
 <script src="campana.js?v=1"></script>
 <script>
 const ANNLY = (window.PEDIDOS_CONFIG && window.PEDIDOS_CONFIG.ANNLY_URL) || 'https://annly.app';
@@ -2696,8 +2696,14 @@ async function quitarPortada(){
 let PALETA_SEL = 0;
 function pintarPaletas(){
   const n = Pedidos.negocio;
-  const idx = Pedidos.PALETAS.findIndex(p => (p.primario || '').toLowerCase() === String(n.color_primario || '').toLowerCase()
+  // Si la tienda tiene una paleta que ya no está en la lista, se conserva como "Tu paleta actual"
+  for (let k = Pedidos.PALETAS.length - 1; k >= 0; k--) if (Pedidos.PALETAS[k].actual) Pedidos.PALETAS.splice(k, 1);
+  let idx = Pedidos.PALETAS.findIndex(p => (p.primario || '').toLowerCase() === String(n.color_primario || '').toLowerCase()
     && (p.secundario || '').toLowerCase() === String(n.color_secundario || '').toLowerCase());
+  if (idx < 0 && /^#[0-9a-f]{6}$/i.test(n.color_primario || '')){
+    Pedidos.PALETAS.unshift({ nombre: 'Tu paleta actual', primario: n.color_primario, secundario: n.color_secundario || n.color_primario, actual: true });
+    idx = 0;
+  }
   PALETA_SEL = idx >= 0 ? idx : 0;
   dibujarPaletas();
 }
