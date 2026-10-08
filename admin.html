@@ -1385,7 +1385,8 @@ async function cargarMiPlan(){
         <p class="msg" id="plan-msg"></p>` : `<p class="ayuda" style="margin-top:10px;"><i class="ti ti-circle-check" style="color:#1D7A46;"></i> Plan activo.</p>`}
     </div>`;
 
-  const modsHtml = catalogo.map(m => {
+  // Primero los módulos que ya paga (activos), después los disponibles para agregar
+  const modsHtml = catalogo.slice().sort((x, y) => (Pedidos.detalleModulo(y.code) ? 1 : 0) - (Pedidos.detalleModulo(x.code) ? 1 : 0)).map(m => {
     const det = Pedidos.detalleModulo(m.code);
     const activo = !!det;
     const incluye = m.code === 'PEDIDOS_REPORTES' ? `<ul class="plan-incluye">${REPORTES_INCLUYE.map(x => `<li><i class="ti ${x[0]}"></i>${x[1]}</li>`).join('')}</ul>` : '';
