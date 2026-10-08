@@ -228,7 +228,7 @@ header{background:#fff;}
 .ov.on{display:flex;}
 .hoja{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;}
 @media(min-width:640px){.ov{align-items:center;}.hoja{border-radius:22px;}}
-.hoja-foto{width:100%;height:min(250px,26vh);aspect-ratio:auto;object-fit:cover;object-position:center;background:linear-gradient(160deg,color-mix(in srgb,var(--p) 14%,#fff),color-mix(in srgb,var(--s) 14%,#fff));display:grid;place-items:center;color:var(--p);font-size:40px;}
+.hoja-foto{width:100%;height:clamp(200px,34vh,320px);aspect-ratio:auto;object-fit:contain;object-position:center;background:linear-gradient(160deg,color-mix(in srgb,var(--p) 14%,#fff),color-mix(in srgb,var(--s) 14%,#fff));display:grid;place-items:center;color:var(--p);font-size:40px;}
 .hoja-body{padding:18px 20px 22px;}
 .hoja-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
 .hoja h3{font-family:'DM Sans',sans-serif;font-size:20px;}
@@ -353,7 +353,7 @@ footer .wrap{position:relative;z-index:1;max-width:680px;}
 .prod{overflow:hidden;}
 .ov.on{animation:aparecer .25s ease;}
 .ov.on .hoja{animation:hojaSube .35s cubic-bezier(.2,.8,.2,1);}
-#p-body > *:not(.pasos){animation:pasoEntra .3s ease both;}
+#p-body > *:not(.pasos){animation:pasoEntra .3s ease backwards;}
 .pasos span{transition:background .35s ease;}
 .dia,.fr,.opc,.extra{transition:border-color .2s,background .2s,transform .15s;}
 .dia:active,.fr:active,.opc:active,.extra:active{transform:scale(.97);}
@@ -788,8 +788,9 @@ footer{animation:aparecer .6s ease both;}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
+<script type="module" src="https://bt-cdn.yappy.cloud/v1/cdn/web-component-btn-yappy.js"></script>
 <script src="/config.js"></script>
-<script src="/pedidos.js?v=20"></script>
+<script src="/pedidos.js?v=22"></script>
 <script>
 let CAT = { categorias: [], productos: [], zonas: [] };
 let CAT_SEL = null;
@@ -1046,7 +1047,7 @@ function abrirProducto(id){
   pintarPaso();
   document.getElementById('ov-prod').classList.add('on');
 }
-function cerrarProducto(){ document.getElementById('ov-prod').classList.remove('on'); document.getElementById('celebracion')?.classList.remove('on'); }
+function cerrarProducto(){ if (PED._aislado) return; document.getElementById('ov-prod').classList.remove('on'); document.getElementById('celebracion')?.classList.remove('on'); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarProducto(); });
 
 // ---- Montos (solo para mostrar; el total real lo calcula la base al crear el pedido) ----
@@ -1063,13 +1064,14 @@ function barraPasos(){
   return `<div class="pasos" aria-hidden="true">${Array.from({ length: PASOS }, (_, i) => `<span class="${i < PED.paso ? 'on' : ''}"></span>`).join('')}</div>`;
 }
 function botonVolver(){ return PED.paso > 1 ? `<button class="volver" onclick="irPaso(${PED.paso - 1})"><i class="ti ti-chevron-left"></i> Volver</button>` : ''; }
-function irPaso(n){ PED.paso = n; pintarPaso(); document.querySelector('.hoja').scrollTop = 0; if(n === 6) setTimeout(lanzarCelebracion, 120); }
+function irPaso(n){ restaurarYappy(); PED.paso = n; pintarPaso(); document.querySelector('#ov-prod .hoja').scrollTop = 0; if(n === 6) setTimeout(lanzarCelebracion, 120); }
 
 function pintarPaso(){
   document.getElementById('p-foto').style.display = PED.paso === 1 ? '' : 'none';
   const cuerpo = { 1: paso1, 2: paso2, 3: paso3, 4: paso4, 5: paso5, 6: paso6 }[PED.paso]();
   document.getElementById('p-body').innerHTML = (PED.paso <= PASOS ? barraPasos() : '') + cuerpo;
   if (PED.paso === 2 && PED.fecha) cargarFranjas();
+  if (PED.paso === 5 && PED.metodo === 'yappy_real') conectarYappyPedido();
 }
 
 // ---- 1. Producto y extras ----
@@ -1268,6 +1270,7 @@ function validarDatos(){
 function mediosPago(){
   const n = Pedidos.negocio || {};
   const m = [];
+  if (n.tiene_yappy_comercial) m.push('yappy_real');   // botón oficial de Yappy (módulo Pagos en línea)
   if (n.yappy_numero) m.push('yappy');
   if (n.banco_nombre && n.banco_numero_cuenta && n.banco_titular) m.push('transferencia');
   return m;
@@ -1303,7 +1306,14 @@ function paso5(){
   ];
   const opcion = (val, tit, txt) => `<label class="opc${PED.metodo === val ? ' on' : ''}"><input type="radio" name="metodo" ${PED.metodo === val ? 'checked' : ''} onchange="elegirMetodo('${val}')"><div><strong>${tit}</strong><span>${txt}</span></div></label>`;
   let detalle = '';
-  if (PED.metodo === 'yappy'){
+  if (PED.metodo === 'yappy_real'){
+    const aliasIni = PED.alias != null ? PED.alias : String((PED.cliente && PED.cliente.telefono) || '').replace(/\D/g, '').replace(/^507(?=\d{8}$)/, '');
+    detalle = `<div class="yappy" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <span class="nota" style="text-align:left;margin:0;">Escribe tu número de Yappy y toca el botón: aprobarás ${Pedidos.dinero(aPagar)} en tu app.</span>
+        <input class="fi" id="p-alias" inputmode="numeric" maxlength="12" autocomplete="tel" value="${E(aliasIni)}" placeholder="Tu número Yappy (8 dígitos, sin +507)">
+        <btn-yappy id="p-btn-yappy" theme="darkBlue" rounded="true"></btn-yappy>
+        <p class="err" id="p-yappy-msg" style="margin:0;"></p></div>`;
+  } else if (PED.metodo === 'yappy'){
     detalle = `<div class="yappy"><div><span class="nota" style="display:block;text-align:left;margin:0;">Envía ${Pedidos.dinero(aPagar)} al número</span><b>${E(n.yappy_numero)}</b></div>
         <button class="copiar" onclick="copiarDato(this, '${String(n.yappy_numero).replace(/\D/g, '')}')">Copiar</button></div>`;
   } else if (PED.metodo === 'transferencia'){
@@ -1322,14 +1332,15 @@ function paso5(){
       <label class="opc${PED.pagoTipo === 'total' ? ' on' : ''}"><input type="radio" name="pagotipo" ${PED.pagoTipo === 'total' ? 'checked' : ''} onchange="elegirPagoTipo('total')"><div><strong>Pagar todo · ${Pedidos.dinero(m.total)}</strong><span>Tu pedido queda pagado.</span></div></label>
       <label class="opc${PED.pagoTipo === 'abono' ? ' on' : ''}"><input type="radio" name="pagotipo" ${PED.pagoTipo === 'abono' ? 'checked' : ''} onchange="elegirPagoTipo('abono')"><div><strong>Dejar un abono · ${Pedidos.dinero(abono)}</strong><span>Pagas los ${Pedidos.dinero(m.total - abono)} restantes al recibir tu pedido.</span></div></label>` : ''}
     ${medios.length ? `<div class="sub">¿Cómo pagas${abono ? ' ' + Pedidos.dinero(aPagar) : ''}?</div>
-      ${medios.includes('yappy') ? opcion('yappy', 'Yappy', 'Pago inmediato desde tu app.') : ''}
+      ${medios.includes('yappy_real') ? opcion('yappy_real', 'Yappy · pago automático', 'Aprueba el pago en tu app y tu pedido se confirma solo.') : ''}
+      ${medios.includes('yappy') ? opcion('yappy', medios.includes('yappy_real') ? 'Yappy · enviar al número' : 'Yappy', 'Pago inmediato desde tu app.') : ''}
       ${medios.includes('transferencia') ? opcion('transferencia', 'Transferencia bancaria', E(n.banco_nombre)) : ''}
       ${detalle}
-      <div class="fg"><label class="flbl" for="p-comp">${PED.metodo === 'transferencia' ? 'Número de referencia de la transferencia' : 'Número de comprobante de Yappy'}</label><input class="fi" id="p-comp" maxlength="60" value="${E(PED.comprobante)}" placeholder="${PED.metodo === 'transferencia' ? 'Lo encuentras en tu banca en línea' : 'Lo encuentras en el detalle del pago'}"></div>`
+      ${PED.metodo === 'yappy_real' ? '' : `<div class="fg"><label class="flbl" for="p-comp">${PED.metodo === 'transferencia' ? 'Número de referencia de la transferencia' : 'Número de comprobante de Yappy'}</label><input class="fi" id="p-comp" maxlength="60" value="${E(PED.comprobante)}" placeholder="${PED.metodo === 'transferencia' ? 'Lo encuentras en tu banca en línea' : 'Lo encuentras en el detalle del pago'}"></div>`}`
     : '<div class="aviso info">Este negocio coordinará el pago contigo por WhatsApp al confirmar tu pedido.</div>'}
     <p class="err" id="p-err"></p>
-    <button class="btn-pedir" id="p-enviar" onclick="enviarPedido()">Enviar pedido</button>
-    <p class="nota">Tu pedido queda reservado y el negocio confirma el pago.</p>`;
+    ${PED.metodo === 'yappy_real' ? '' : '<button class="btn-pedir" id="p-enviar" onclick="enviarPedido()">Enviar pedido</button>'}
+    <p class="nota">${PED.metodo === 'yappy_real' ? 'Tu pedido se confirma solo cuando Yappy aprueba el pago.' : 'Tu pedido queda reservado y el negocio confirma el pago.'}</p>`;
 }
 function elegirMetodo(v){
   const comp = document.getElementById('p-comp');
@@ -1367,6 +1378,102 @@ async function enviarPedido(){
   }
 }
 
+// ---- Pago automático con Yappy Comercial ----
+// Mientras la ventana de Yappy está abierta, el resto del pedido se oculta para que no se encime ni se desordene.
+// Siempre queda un botón "Volver al pedido" por si el cliente cierra la ventana de Yappy sin pagar.
+function aislarYappy(btn){
+  const ov = document.getElementById('ov-prod'), hoja = ov && ov.querySelector('.hoja');
+  if (!hoja || !ov || PED._aislado) return;
+  PED._aislado = [];
+  let nodo = btn;
+  while (nodo && nodo !== hoja){
+    const padre = nodo.parentElement;
+    if (!padre) break;
+    [...padre.children].forEach(h => { if (h !== nodo) PED._aislado.push([h, h.style.visibility, null]); });
+    PED._aislado.push([padre, null, padre.style.cssText]);
+    nodo = padre;
+  }
+  PED._aislado.forEach(([el, vis, css]) => {
+    if (vis !== null) el.style.visibility = 'hidden';
+    else { el.style.background = 'transparent'; el.style.borderColor = 'transparent'; el.style.boxShadow = 'none'; }
+  });
+  hoja.style.overflow = 'visible';
+  const v = document.createElement('button');
+  v.id = 'yappy-volver'; v.type = 'button'; v.textContent = '← Volver a mi pedido';
+  v.style.cssText = 'position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;border:0;border-radius:999px;padding:10px 18px;font:700 13px DM Sans,sans-serif;background:#fff;color:#1F1B2B;box-shadow:0 6px 20px rgba(0,0,0,.28);cursor:pointer;';
+  v.onclick = () => { restaurarYappy(); const m = document.getElementById('p-yappy-msg'); if (m) m.textContent = ''; };
+  ov.appendChild(v);
+  clearTimeout(PED._aisladoT); PED._aisladoT = setTimeout(restaurarYappy, 6 * 60 * 1000);
+}
+function restaurarYappy(){
+  if (!PED._aislado) return;
+  PED._aislado.forEach(([el, vis, css]) => { if (vis !== null) el.style.visibility = vis; else el.style.cssText = css; });
+  const hoja = document.querySelector('#ov-prod .hoja'); if (hoja) hoja.style.overflow = '';
+  PED._aislado = null; clearTimeout(PED._aisladoT);
+  const v = document.getElementById('yappy-volver'); if (v) v.remove();
+}
+// El pedido se crea al tocar el botón (queda pendiente) y SOLO se confirma cuando Yappy avisa al servidor.
+function conectarYappyPedido(){
+  const btn = document.getElementById('p-btn-yappy');
+  if (!btn || btn.dataset.listo) return;
+  btn.dataset.listo = '1';
+  const msg = (t, ok) => { const e = document.getElementById('p-yappy-msg'); if (e){ e.style.color = ok ? '#5a5a66' : ''; e.textContent = t || ''; } };
+  const alias = () => String((document.getElementById('p-alias') || {}).value || '').replace(/\D/g, '').replace(/^507(?=\d{8}$)/, '');
+  btn.addEventListener('eventClick', async () => {
+    const a = alias(); PED.alias = a;
+    if (a.length < 7){ msg('Escribe tu número de Yappy (8 dígitos, sin +507).'); btn.isButtonLoading = false; return; }
+    msg('Preparando tu pago…', true);
+    try {
+      if (!PED.pedidoYappy){
+        PED.pedidoYappy = await Pedidos.crearPedido({
+          productId: PED.prod.id,
+          extras: extrasElegidos().map(x => ({ itemId: x.id, qty: 1 })),
+          fecha: PED.fecha, slotId: PED.franja.id, entrega: PED.entrega,
+          zonaId: PED.entrega === 'domicilio' && !PED.fueraZona ? PED.zonaId : null,
+          direccion: PED.entrega === 'domicilio' ? PED.direccion : null,
+          referencia: PED.entrega === 'domicilio' ? PED.referencia : null,
+          cliente: PED.cliente, destinatario: PED.destinatario, dedicatoria: PED.dedicatoria,
+          pago: { metodo: 'yappy', comprobante: null },
+          pagoTipo: PED.pagoTipo === 'abono' ? 'abono' : 'total'
+        });
+      }
+      const r = await Pedidos.crearOrdenYappyPedido(PED.pedidoYappy.id, a);
+      if (!r || !r.ok){ msg((r && r.error) || 'No se pudo crear la orden de pago. Intenta de nuevo.'); btn.isButtonLoading = false; return; }
+      PED.yappyOrderId = r.orderId;
+      msg('', true);
+      aislarYappy(btn);
+      btn.eventPayment({ transactionId: r.transactionId, documentName: r.documentName, token: r.token });
+    } catch(e){
+      restaurarYappy();
+      msg(e.message || 'No se pudo preparar el pago.');
+      btn.isButtonLoading = false;
+      if (/franja|preparar/i.test(e.message || '')){ PED.franja = null; setTimeout(() => irPaso(2), 1800); }
+    }
+  });
+  btn.addEventListener('eventSuccess', () => { restaurarYappy(); esperarConfirmacionYappy(); });
+  btn.addEventListener('eventError', () => { restaurarYappy(); msg('El pago no se completó. Puedes intentar de nuevo.'); });
+}
+// Espera a que el servidor confirme el pago (Yappy avisa y el pedido pasa a CONFIRMADO)
+async function esperarConfirmacionYappy(){
+  const cuerpo = document.getElementById('p-body');
+  if (cuerpo) cuerpo.innerHTML = '<div class="listo"><h3>Confirmando tu pago…</h3><p class="paso-sub">No cierres esta ventana, solo tarda unos segundos.</p></div>';
+  const fin = Date.now() + 150000;
+  let estado = 'pendiente';
+  while (Date.now() < fin){
+    estado = await Pedidos.estadoOrdenYappy(PED.yappyOrderId);
+    if (estado === 'ejecutado' || ['rechazado', 'cancelado', 'expirado'].includes(estado)) break;
+    await new Promise(r => setTimeout(r, 2500));
+  }
+  if (estado === 'ejecutado'){ PED.pagadoYappy = true; }
+  else if (['rechazado', 'cancelado', 'expirado'].includes(estado)){
+    PED.yappyOrderId = null; irPaso(5);
+    const e = document.getElementById('p-yappy-msg'); if (e) e.textContent = 'Yappy no aprobó el pago. Puedes intentar de nuevo.';
+    return;
+  } else { PED.pagoEnRevision = true; }
+  PED.resultado = PED.pedidoYappy;
+  irPaso(6);
+}
+
 // ---- 6. Listo ----
 function lanzarCelebracion(){
   const el = document.getElementById('celebracion');
@@ -1384,9 +1491,11 @@ function paso6(){
   const wa = String(n.whatsapp || '').replace(/\D/g, '');
   const texto = encodeURIComponent(`Hola, acabo de hacer el pedido ${numero} (${PED.prod.nombre}) para el ${fechaLarga(PED.fecha)}. A nombre de ${PED.cliente.nombre}.`);
   return `<div class="listo"><div class="check-wrap"><i class="ti ti-check"></i></div>
-    <h3>¡Pedido recibido!</h3>
+    <h3>${PED.pagadoYappy ? '¡Pago aprobado!' : '¡Pedido recibido!'}</h3>
     <div class="num">${numero}</div>
-    <p class="paso-sub">${E(n.nombre || '')} revisará tu pago y te confirmará por WhatsApp.</p></div>
+    <p class="paso-sub">${PED.pagadoYappy ? 'Tu pedido quedó confirmado. ' + E(n.nombre || '') + ' te escribirá por WhatsApp si necesita algo más.'
+      : PED.pagoEnRevision ? 'Estamos esperando la confirmación de Yappy. Si te cobraron, tu pedido se confirmará solo; si tienes dudas, escríbele a ' + E(n.nombre || 'la tienda') + '.'
+      : E(n.nombre || '') + ' revisará tu pago y te confirmará por WhatsApp.'}</p></div>
     <div class="resumen">
       <div><span>Producto</span><span>${E(PED.prod.nombre)}</span></div>
       <div><span>Fecha</span><span>${fechaLarga(PED.fecha)}</span></div>
